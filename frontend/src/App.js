@@ -400,6 +400,57 @@ const Dashboard = () => {
           </div>
         )}
         
+        {/* Individual Salary Management */}
+        {(user.role === 'owner' || user.role === 'coowner') && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <span className="mr-2">💰</span>
+              Monthly Salaries - Current Status
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Current User's Salary */}
+              <EditableSalaryCard
+                user={user}
+                currentSalary={currentSalaries[user.id]?.amount || 0}
+                onSalaryUpdated={fetchDashboardStats}
+              />
+              
+              {/* Other User's Salary (Display Only) */}
+              {Object.entries(currentSalaries)
+                .filter(([userId, _]) => userId !== user.id)
+                .map(([userId, salaryData]) => (
+                <div key={userId} className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-cyan-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 flex items-center">
+                        <span className="mr-2">💰</span>
+                        {salaryData.name}'s Salary
+                      </p>
+                      <p className="text-3xl font-bold text-cyan-600 mt-1">
+                        €{parseFloat(salaryData.amount).toLocaleString()}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">Read-only view</p>
+                    </div>
+                    <div className="text-3xl text-cyan-500">💼</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Total Household Income */}
+            <div className="mt-6 p-6 bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-2xl border border-emerald-200">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-gray-700">Combined Household Income</p>
+                <p className="text-4xl font-bold text-emerald-600 mt-2">
+                  €{Object.values(currentSalaries).reduce((sum, salary) => sum + parseFloat(salary.amount), 0).toLocaleString()}
+                  <span className="text-lg font-normal text-gray-600">/month</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
