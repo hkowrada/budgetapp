@@ -266,16 +266,47 @@ const Dashboard = () => {
                 >
                   Agenda
                 </a>
+                <a 
+                  href="/categories"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Categories
+                </a>
               </nav>
+
+              {/* Quick Add Menu */}
+              {user.role !== 'guest' && (
+                <Button
+                  onClick={() => setShowQuickAdd(true)}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-semibold"
+                >
+                  <span className="mr-2">💰</span>
+                  Quick Add
+                </Button>
+              )}
               
               <span className="text-gray-600">Welcome, {user.name}</span>
-              <button
-                data-testid="logout-button"
-                onClick={logout}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors duration-200"
-              >
-                Sign Out
-              </button>
+              
+              {/* User Menu */}
+              <div className="flex items-center space-x-2">
+                {user.role !== 'guest' && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowPasswordDialog(true)}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    🔒 Change Password
+                  </Button>
+                )}
+                <button
+                  data-testid="logout-button"
+                  onClick={logout}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors duration-200"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
         </div>
