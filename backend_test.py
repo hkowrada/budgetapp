@@ -155,13 +155,17 @@ class BudgetAppTester:
             print(f"❌ Bills error: {str(e)}")
             return None
     
-    def update_bill(self, bill_id, new_amount):
-        """Update a bill amount"""
+    def update_bill(self, bill_id, new_amount, new_due_day=None):
+        """Update a bill amount and optionally due day"""
         print(f"\n💡 Testing bill update for ID {bill_id} to €{new_amount}...")
         
         update_data = {
             "expected_amount": new_amount
         }
+        
+        if new_due_day is not None:
+            update_data["due_day"] = new_due_day
+            print(f"   Also updating due day to: {new_due_day}")
         
         try:
             response = self.session.patch(f"{self.base_url}/bills/{bill_id}", json=update_data)
@@ -172,6 +176,8 @@ class BudgetAppTester:
                 print(f"✅ Bill update successful")
                 print(f"   Bill: {data.get('name', 'N/A')}")
                 print(f"   New Amount: €{data.get('expected_amount', 0)}")
+                if new_due_day is not None:
+                    print(f"   New Due Day: {data.get('due_day', 'N/A')}")
                 return data
             else:
                 print(f"❌ Bill update failed: {response.status_code} - {response.text}")
