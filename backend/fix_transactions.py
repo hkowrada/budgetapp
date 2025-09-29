@@ -14,48 +14,41 @@ async def fix_transactions():
     """Fix existing transactions to have proper fields and remove duplicate salaries"""
     print("🔧 Fixing existing transactions...")
     
-    # Get users
-    harish = await db.users.find_one({"email": "harish@budget.app"})
-    durgabhavani = await db.users.find_one({"email": "durgabhavani@budget.app"})
+    # Get all users first
+    all_users = await db.users.find().to_list(None)
+    print("📋 All users in database:")
+    for user in all_users:
+        print(f"   - {user['name']} ({user['email']}) - Role: {user['role']}")
     
-    if not harish or not durgabhavani:
-        print("❌ Could not find required users")
-        return
+    # Get users - try different email formats
+    harish = await db.users.find_one({"$or": [
+        {"email": "harish@budget.app"}, 
+        {"name": "Harish"},
+        {"email": {"$regex": "harish", "$options": "i"}}
+    ]})
     
-    print(f"👤 Harish ID: {harish['id']}")
-    print(f"👤 DurgaBhavani ID: {durgabhavani['id']}")
+    durgabhavani = await db.users.find_one({"$or": [
+        {"email": "durgabhavani@budget.app"},
+        {"name": "DurgaBhavani"},
+        {"email": {"$regex": "durga", "$options": "i"}}
+    ]})
     
-    # Get categories
-    categories = await db.categories.find().to_list(None)
-    income_categories = [cat for cat in categories if cat["type"] == "income"]
-    expense_categories = [cat for cat in categories if cat["type"] == "expense"]
-    
-    print(f"📂 Income categories: {[cat['name'] for cat in income_categories]}")
-    
-    # Find Harish's salary category
-    harish_salary_category = None
-    for cat in income_categories:
-        if "harish" in cat["name"].lower():
-            harish_salary_category = cat
-            break
-    
-    # Find DurgaBhavani's salary category  
-    durga_salary_category = None
-    for cat in income_categories:
-        if "durgabhavani" in cat["name"].lower() or "durga" in cat["name"].lower():
-            durga_salary_category = cat
-            break
-    
-    if not harish_salary_category:
-        print("❌ Could not find Harish's salary category")
+    if not harish:
+        print("❌ Could not find Harish user")
         return
         
-    print(f"💼 Harish salary category: {harish_salary_category['name']}")
-    if durga_salary_category:
-        print(f"💼 DurgaBhavani salary category: {durga_salary_category['name']}")
+    print(f"👤 Found Harish: {harish['name']} ({harish['email']}) - ID: {harish['id']}")
+    if durgabhavani:
+        print(f"👤 Found DurgaBhavani: {durgabhavani['name']} ({durgabhavani['email']}) - ID: {durgabhavani['id']}")
+    
+    # Get all transactions to see what we're working with
+    all_transactions = await db.transactions.find().to_list(None)
+    print(f"\n📊 Current transactions ({len(all_transactions)}):")
+    for txn in all_transactions:
+        print(f"   - {txn['id']}: €{txn['amount']} - {txn.get('description', 'No desc')} - Type: {txn.get('type', 'Unknown')} - Created by: {txn.get('created_by', 'Unknown')}")
     
     # Clean up all old salary transactions
-    print("🧹 Removing all old salary transactions...")
+    print("\n🧹 Removing problematic old salary transactions...")
     
     # Delete transactions with old IDs (txn_1, txn_2, etc.)
     old_salary_transactions = await db.transactions.find({
@@ -63,7 +56,8 @@ async def fix_transactions():
             {"id": "txn_1"},
             {"id": "txn_2"}, 
             {"description": {"$regex": "September Salary", "$options": "i"}},
-            {"description": {"$regex": "^[0-9]+ Salary", "$options": "i"}}
+            {"created_by": {"$exists": False}},
+            {"created_by": None}
         ]
     }).to_list(None)
     
@@ -72,14 +66,17 @@ async def fix_transactions():
         print(f"   - {txn['id']}: €{txn['amount']} - {txn.get('description', 'No desc')}")
     
     # Delete old salary transactions
-    await db.transactions.delete_many({
+    deleted_result = await db.transactions.delete_many({
         "$or": [
             {"id": "txn_1"},
             {"id": "txn_2"},
             {"description": {"$regex": "September Salary", "$options": "i"}},
-            {"description": {"$regex": "^[0-9]+ Salary", "$options": "i"}}
+            {"created_by": {"$exists": False}},
+            {"created_by": None}
         ]
     })
+    
+    print(f"✅ Deleted {deleted_result.deleted_count} old salary transactions")
     
     # Update remaining transactions to have proper type field
     await db.transactions.update_many(
@@ -88,29 +85,24 @@ async def fix_transactions():
     )
     
     # Update expense transactions based on category type
-    expense_category_ids = [cat["id"] for cat in expense_categories]
+    categories = await db.categories.find().to_list(None)
+    expense_category_ids = [cat["id"] for cat in categories if cat["type"] == "expense"]
     await db.transactions.update_many(
         {"category_id": {"$in": expense_category_ids}},
         {"$set": {"type": "expense"}}
     )
     
-    print("✅ Cleaned up old salary transactions")
+    print("✅ Updated transaction types")
     
-    # Show current transaction summary
-    total_transactions = await db.transactions.count_documents({})
-    income_transactions = await db.transactions.count_documents({"type": "income"})
-    expense_transactions = await db.transactions.count_documents({"type": "expense"})
+    # Show final transaction summary
+    remaining_transactions = await db.transactions.find().to_list(None)
+    print(f"\n📊 Final Transaction Summary ({len(remaining_transactions)}):")
+    for txn in remaining_transactions:
+        txn_type = txn.get('type', 'Unknown')
+        created_by = txn.get('created_by', 'Unknown')
+        print(f"   - {txn['id']}: €{txn['amount']} - {txn.get('description', 'No desc')} - Type: {txn_type} - Created by: {created_by}")
     
-    print(f"📊 Transaction Summary:")
-    print(f"   Total: {total_transactions}")
-    print(f"   Income: {income_transactions}")
-    print(f"   Expense: {expense_transactions}")
-    
-    # Show remaining income transactions
-    all_income_txns = await db.transactions.find({"type": "income"}).to_list(None)
-    print(f"💰 Remaining income transactions: {len(all_income_txns)}")
-    for txn in all_income_txns:
-        print(f"   €{txn['amount']} - {txn.get('description', 'No description')} - {txn.get('created_by', 'Unknown')} - {txn['date']}")
+    print("\n🎉 Transaction cleanup completed!")
 
 if __name__ == "__main__":
     asyncio.run(fix_transactions())
