@@ -932,8 +932,8 @@ const AgendaPage = () => {
         onSuccess={fetchDashboardStats}
       />
     </div>
-  );
-};
+//Categories Page with Layout
+const CategoriesPage = () => {
   const { user, logout } = useAuth();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const { toast } = useToast();
@@ -962,6 +962,90 @@ const AgendaPage = () => {
   };
 
   return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50">
+      {/* Header */}
+      <header className="bg-white/90 backdrop-blur-sm border-b border-emerald-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                Family Budget
+              </h1>
+              <span className="text-gray-400">|</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl">{getRoleIcon(user.role)}</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(user.role)}`}>
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {/* Navigation */}
+              <nav className="hidden md:flex items-center space-x-6">
+                <a 
+                  href="/"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Dashboard
+                </a>
+                <a 
+                  href="/calendar"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Calendar
+                </a>
+                <a 
+                  href="/agenda"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Agenda
+                </a>
+                <a 
+                  href="/categories"
+                  className="text-emerald-600 font-medium"
+                >
+                  Categories
+                </a>
+              </nav>
+              
+              {user.role !== 'guest' && (
+                <Button
+                  onClick={() => setShowQuickAdd(true)}
+                  className="bg-emerald-500 hover:bg-emerald-600"
+                >
+                  <span className="mr-2">💰</span>
+                  Quick Add
+                </Button>
+              )}
+
+              <span className="text-gray-600">Welcome, {user.name}</span>
+              <button
+                data-testid="logout-button"
+                onClick={logout}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors duration-200"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <CategoriesManagement user={user} />
+
+      <QuickAddMenu 
+        user={user}
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSuccess={fetchDashboardStats}
+      />
+    </div>
+  );
+};
+
+// Agenda Page with Layout  
+const AgendaPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50">
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-emerald-100 sticky top-0 z-50">
