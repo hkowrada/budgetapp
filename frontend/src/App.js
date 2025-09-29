@@ -215,6 +215,28 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Navigation */}
+              <nav className="hidden md:flex items-center space-x-6">
+                <a 
+                  href="/"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Dashboard
+                </a>
+                <a 
+                  href="/calendar"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Calendar
+                </a>
+                <a 
+                  href="/agenda"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Agenda
+                </a>
+              </nav>
+              
               <span className="text-gray-600">Welcome, {user.name}</span>
               <button
                 data-testid="logout-button"
