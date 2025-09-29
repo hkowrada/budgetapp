@@ -279,8 +279,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Bills update API endpoint"
-    - "Quick expense entry"
+    - "Bills due date editing functionality"
+    - "Expense creation with due dates"
+    - "Enhanced expense form backend support"
     - "Dashboard integration and calculations"
   stuck_tasks: []
   test_all: false
