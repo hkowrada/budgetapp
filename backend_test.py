@@ -144,7 +144,7 @@ class BudgetAppTester:
                 print(f"✅ Retrieved {len(data)} bills")
                 
                 for bill in data:
-                    print(f"   - {bill.get('name', 'N/A')}: €{bill.get('expected_amount', 0)} (ID: {bill.get('id', 'N/A')})")
+                    print(f"   - {bill.get('name', 'N/A')}: €{bill.get('expected_amount', 0)} due on {bill.get('due_day', 'N/A')} (ID: {bill.get('id', 'N/A')})")
                 
                 return data
             else:
