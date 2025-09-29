@@ -161,6 +161,45 @@ backend:
         - working: true
         - agent: "testing"
         - comment: "VERIFIED: Dashboard integration (GET /api/dashboard/stats) working perfectly. All calculations accurate: Total Income (€5250.0), Total Expenses (€1746.5), Monthly Surplus (€3503.5), Savings Rate (66.73%). Manual calculation verification confirms dashboard math is correct. Bill updates and expense entries immediately reflect in dashboard totals as expected."
+        - working: true
+        - agent: "testing"
+        - comment: "RE-VERIFIED: Dashboard integration working correctly with monthly calculations. Fixed test logic to properly compare monthly stats (Dashboard: €1933.0 expenses vs Manual: €1933.0 expenses). Dashboard correctly reflects all recent changes including new expenses and bill updates. Savings Rate: 63.18%."
+
+  - task: "Bills due date editing functionality"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "COMPREHENSIVE TESTING COMPLETED: Bills due date editing (USER ISSUE #1) working perfectly. PATCH /api/bills/{bill_id} successfully tested with both expected_amount AND due_day changes. All 6 bills updated successfully: Electricity (€100, day 5→1→15→28→31), Water (€30, day 10), Internet (€35, day 15), Mobile (€45, day 20), Insurance (€18, day 25), Loan (€1000, day 28). Edge cases tested: due_day = 1, 15, 28, 31 all work correctly. User-reported issue RESOLVED."
+
+  - task: "Expense creation with due dates"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "COMPREHENSIVE TESTING COMPLETED: Expense creation with due dates (USER ISSUES #2 & #3) working perfectly. POST /api/transactions successfully tested with custom due dates. Created 5 test expenses: 3 with specific due dates (2025-10-02, 2025-10-06, 2025-10-13) and 2 regular expenses (current date). All expenses created successfully with correct transaction IDs and dates. Due date functionality allows users to declare due dates when creating expenses as requested. User-reported issues RESOLVED."
+
+  - task: "Enhanced expense form backend support"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "COMPREHENSIVE TESTING COMPLETED: Enhanced expense form backend support working perfectly. POST /api/bills successfully tested for creating recurring monthly bills. Created 3 test bills: Test Streaming Service (€12.99, due day 5), Test Gym Membership (€29.99, due day 15), Test Cloud Storage (€9.99, due day 28). All bills created with custom due_day, name, expected_amount and appear correctly in bills list. Bills integrate properly with dashboard. Backend fully supports enhanced expense form functionality."
 
   - task: "Email newsletter system"
     implemented: false
