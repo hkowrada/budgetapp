@@ -954,6 +954,32 @@ async def create_bill(bill_data: BillCreate, current_user: User = Depends(get_cu
     await log_audit(current_user.id, "CREATE", "bill", bill.id)
     return bill
 
+@api_router.patch("/bills/{bill_id}", response_model=Bill)
+async def update_bill(
+    bill_id: str, 
+    update_data: BillUpdate, 
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot update bills")
+    
+    bill = await db.bills.find_one({"id": bill_id})
+    if not bill:
+        raise HTTPException(status_code=404, detail="Bill not found")
+    
+    # Prepare update data
+    update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.bills.update_one(
+        {"id": bill_id},
+        {"$set": prepare_for_mongo(update_dict)}
+    )
+    
+    await log_audit(current_user.id, "UPDATE", "bill", bill_id, update_dict)
+    updated_bill = await db.bills.find_one({"id": bill_id})
+    return Bill(**parse_from_mongo(updated_bill))
+
 # Budgets
 @api_router.get("/budgets", response_model=List[Budget])
 async def get_budgets(
