@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import axios from 'axios';
 import { Toaster } from './components/ui/toaster';
 import { useToast } from './hooks/use-toast';
+import CalendarView from './components/CalendarView';
+import AgendaView from './components/AgendaView';
 import '@/App.css';
 
 // Context for authentication
