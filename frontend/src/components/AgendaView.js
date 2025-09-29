@@ -41,18 +41,6 @@ const AgendaView = ({ user }) => {
     }
   };
 
-  const groupEventsByDate = (events) => {
-    const grouped = {};
-    events.forEach(event => {
-      const date = moment(event.start).format('YYYY-MM-DD');
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(event);
-    });
-    return grouped;
-  };
-
   const groupBillsByDate = (bills) => {
     const grouped = {};
     bills.forEach(bill => {
@@ -73,14 +61,7 @@ const AgendaView = ({ user }) => {
     );
   }
 
-  const groupedEvents = groupEventsByDate(agendaData.events);
   const groupedBills = groupBillsByDate(agendaData.upcoming_bills);
-
-  // Merge and sort all dates
-  const allDates = [...new Set([
-    ...Object.keys(groupedEvents),
-    ...Object.keys(groupedBills)
-  ])].sort();
 
   return (
     <div className="p-6">
@@ -117,14 +98,105 @@ const AgendaView = ({ user }) => {
         </div>
       </div>
 
-      <Tabs defaultValue="combined" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="combined">Combined View</TabsTrigger>
-          <TabsTrigger value="events">Events Only</TabsTrigger>
-          <TabsTrigger value="bills">Bills Only</TabsTrigger>
+      <Tabs defaultValue="bills" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="bills">Bills Due</TabsTrigger>
+          <TabsTrigger value="events">Events</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="combined" className="space-y-4 mt-6">
+        <TabsContent value="bills" className="space-y-4 mt-6">
+          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+            <span className="mr-2">💳</span>
+            Upcoming Bills ({agendaData.upcoming_bills.length})
+          </h2>
+          {agendaData.upcoming_bills.length === 0 ? (
+            <Card>
+              <CardContent className="flex items-center justify-center h-32">
+                <div className="text-center text-gray-500">
+                  <span className="text-4xl mb-2 block">💳</span>
+                  <p>No bills due in the next {selectedDays} days</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            agendaData.upcoming_bills.map(bill => (
+              <Card key={bill.id} className="border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-2xl">💳</div>
+                      <div>
+                        <div className="font-medium text-gray-800">{bill.name}</div>
+                        <div className="text-sm text-gray-600">
+                          Due: {moment(bill.due_date).format('dddd, MMMM D, YYYY')}
+                          {bill.provider && ` • ${bill.provider}`}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-red-600">€{bill.amount.toLocaleString()}</div>
+                      <Badge className="bg-red-100 text-red-800 text-xs">
+                        {moment(bill.due_date).diff(moment(), 'days') === 0 ? 'Due Today' : 
+                         moment(bill.due_date).diff(moment(), 'days') === 1 ? 'Due Tomorrow' :
+                         `Due in ${moment(bill.due_date).diff(moment(), 'days')} days`}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="events" className="space-y-4 mt-6">
+          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+            <span className="mr-2">📅</span>
+            Upcoming Events ({agendaData.events.length})
+          </h2>
+          {agendaData.events.length === 0 ? (
+            <Card>
+              <CardContent className="flex items-center justify-center h-32">
+                <div className="text-center text-gray-500">
+                  <span className="text-4xl mb-2 block">📅</span>
+                  <p>No upcoming events in the next {selectedDays} days</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            agendaData.events.map(event => (
+              <Card key={event.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-2xl">📅</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-800">{event.title}</div>
+                      <div className="text-sm text-gray-600">
+                        {moment(event.start).format('dddd, MMMM D, YYYY [at] HH:mm')}
+                        {event.location && ` • ${event.location}`}
+                      </div>
+                      {event.notes && (
+                        <div className="text-sm text-gray-500 mt-1">{event.notes}</div>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {event.tags?.map(tag => (
+                        <Badge key={tag} className={`text-xs ${tagColors[tag] || 'bg-gray-100 text-gray-800'}`}>
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AgendaView;
           {allDates.length === 0 ? (
             <Card>
               <CardContent className=\"flex items-center justify-center h-32\">
