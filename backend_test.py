@@ -756,15 +756,15 @@ def main():
         print(f"   Savings Rate: {final_stats.get('savings_rate', 0)}%")
     
     if passed_tests == total_tests:
-        print("\n✅ ALL PHASE 1 TESTS PASSED")
-        print("   - Bills Update API working correctly")
-        print("   - Quick Expense Entry functional")
-        print("   - Dashboard calculations accurate")
-        print("   - Data consistency maintained")
+        print("\n✅ ALL USER REPORTED ISSUE TESTS PASSED")
+        print("   - Bills due date editing working correctly")
+        print("   - Expense creation with due dates functional")
+        print("   - Enhanced expense form backend support working")
+        print("   - Dashboard integration reflects changes immediately")
         sys.exit(0)
     else:
         print(f"\n❌ {total_tests - passed_tests} TEST(S) FAILED")
-        print("   Issues found with Phase 1 implementation")
+        print("   Issues found with user-reported functionality")
         sys.exit(1)
 
 if __name__ == "__main__":
