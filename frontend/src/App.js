@@ -522,25 +522,38 @@ const Dashboard = () => {
               </div>
             </div>
             
-            {/* Upcoming Bills */}
+            {/* Monthly Bills - All Editable */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-orange-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <span className="mr-2">📅</span>
-                Upcoming Bills
-              </h2>
-              <div className="space-y-3">
-                {stats.upcoming_bills && stats.upcoming_bills.length > 0 ? (
-                  stats.upcoming_bills.map((bill) => (
-                    <div key={bill.id} className="flex items-center justify-between p-3 bg-orange-50 rounded-xl">
-                      <div>
-                        <span className="font-medium text-gray-700">{bill.name}</span>
-                        <p className="text-sm text-gray-500">Due: {bill.due_day}th of month</p>
-                      </div>
-                      <span className="font-bold text-orange-600">€{bill.amount.toLocaleString()}</span>
-                    </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                  <span className="mr-2">💳</span>
+                  Monthly Bills
+                </h2>
+                {user.role !== 'guest' && (
+                  <Button
+                    onClick={() => setShowQuickExpense(true)}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    size="sm"
+                  >
+                    <span className="mr-1">💰</span>
+                    Add Expense
+                  </Button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {bills && bills.length > 0 ? (
+                  bills.map((bill) => (
+                    <EditableBillCard
+                      key={bill.id}
+                      bill={bill}
+                      onBillUpdated={fetchDashboardStats}
+                      userRole={user.role}
+                    />
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No upcoming bills</p>
+                  <div className="col-span-full">
+                    <p className="text-gray-500 text-center py-8">No bills found</p>
+                  </div>
                 )}
               </div>
             </div>
