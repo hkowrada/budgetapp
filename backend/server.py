@@ -1327,7 +1327,7 @@ async def startup_event():
                 {
                     "id": str(uuid.uuid4()),
                     "email": "harish@budget.app",
-                    "name": "Harish",
+                    "name": "harish",
                     "role": "owner",
                     "password_hash": bcrypt.hash("budget123"),
                     "is_active": True,
@@ -1335,8 +1335,8 @@ async def startup_event():
                 },
                 {
                     "id": str(uuid.uuid4()),
-                    "email": "spouse@budget.app",
-                    "name": "Spouse",
+                    "email": "durgabhavani@budget.app",
+                    "name": "DurgaBhavani", 
                     "role": "coowner",
                     "password_hash": bcrypt.hash("budget123"),
                     "is_active": True,
@@ -1345,7 +1345,7 @@ async def startup_event():
                 {
                     "id": str(uuid.uuid4()),
                     "email": "guest@budget.app",
-                    "name": "Guest",
+                    "name": "guest",
                     "role": "guest",
                     "password_hash": bcrypt.hash("budget123"),
                     "is_active": True,
@@ -1353,7 +1353,7 @@ async def startup_event():
                 }
             ]
             await db.users.insert_many(users_to_create)
-            logger.info("Created default users: harish@budget.app, spouse@budget.app, guest@budget.app (password: budget123)")
+            logger.info("Created default users: harish@budget.app, durgabhavani@budget.app, guest@budget.app (password: budget123)")
         
         # Create default categories if they don't exist
         category_count = await db.categories.count_documents({})
