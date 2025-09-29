@@ -171,7 +171,7 @@ async def seed_demo_data():
             "amount": 85.50,
             "description": "Weekly Groceries",
             "merchant": "Carrefour",
-            "date": (current_date - datetime.timedelta(days=2)).isoformat(),
+            "date": (current_date - timedelta(days=2)).isoformat(),
             "is_recurring": False,
             "is_initial": False,
             "notes": "Weekly grocery shopping",
