@@ -160,15 +160,17 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const [statsResponse, agendaResponse, usersResponse] = await Promise.all([
+      const [statsResponse, agendaResponse, usersResponse, billsResponse] = await Promise.all([
         axios.get('/dashboard/stats'),
         axios.get('/agenda?days=7'),
-        user.role === 'owner' ? axios.get('/users') : Promise.resolve({ data: [] })
+        user.role === 'owner' ? axios.get('/users') : Promise.resolve({ data: [] }),
+        axios.get('/bills')
       ]);
       
       setStats(statsResponse.data);
       setCurrentSalaries(statsResponse.data.current_salaries || {});
       setAgendaData(agendaResponse.data);
+      setBills(billsResponse.data);
       if (usersResponse.data.length > 0) {
         setAllUsers(usersResponse.data);
       }
