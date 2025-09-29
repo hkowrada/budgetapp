@@ -187,7 +187,7 @@ class BudgetAppTester:
             print(f"❌ Bill update error: {str(e)}")
             return None
     
-    def create_expense(self, description, amount, account_id, category_id):
+    def create_expense(self, description, amount, account_id, category_id, due_date=None):
         """Create a quick expense entry"""
         print(f"\n💸 Testing expense creation: {description} - €{amount}...")
         
@@ -197,8 +197,11 @@ class BudgetAppTester:
             "category_id": category_id,
             "amount": amount,
             "description": description,
-            "date": datetime.now().date().isoformat()
+            "date": due_date or datetime.now().date().isoformat()
         }
+        
+        if due_date:
+            print(f"   With due date: {due_date}")
         
         try:
             response = self.session.post(f"{self.base_url}/transactions", json=expense_data)
@@ -209,6 +212,7 @@ class BudgetAppTester:
                 print(f"✅ Expense created successfully")
                 print(f"   Description: {data.get('description', 'N/A')}")
                 print(f"   Amount: €{data.get('amount', 0)}")
+                print(f"   Date: {data.get('date', 'N/A')}")
                 print(f"   Transaction ID: {data.get('id', 'N/A')}")
                 return data
             else:
