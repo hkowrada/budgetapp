@@ -204,6 +204,9 @@ frontend:
         - working: true
         - agent: "main"
         - comment: "Created QuickExpenseEntry dialog with simple form (description + amount). Successfully tested adding €15.50 coffee expense - dashboard stats updated automatically (Monthly Expenses: €1,565.2→€1,580.7)."
+        - working: true
+        - agent: "testing"
+        - comment: "VERIFIED: Quick Expense Entry API (POST /api/transactions) working correctly. Successfully created 3 test expenses: Coffee and pastries (€15.50), Grocery shopping (€85.30), Gas station fill-up (€65.00). All expenses created with proper transaction IDs and immediately reflected in dashboard calculations."
 
   - task: "Browser notification UI"
     implemented: false
