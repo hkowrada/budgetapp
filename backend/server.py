@@ -164,8 +164,10 @@ class Account(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class TransactionCreate(BaseModel):
+    type: TransactionType
     account_id: str
-    category_id: str
+    to_account_id: Optional[str] = None  # For transfers
+    category_id: Optional[str] = None  # Not required for transfers
     amount: float
     description: Optional[str] = None
     merchant: Optional[str] = None
@@ -176,8 +178,10 @@ class TransactionCreate(BaseModel):
 
 class Transaction(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: TransactionType
     account_id: str
-    category_id: str
+    to_account_id: Optional[str] = None
+    category_id: Optional[str] = None
     amount: float
     description: Optional[str] = None
     merchant: Optional[str] = None
@@ -188,6 +192,72 @@ class Transaction(BaseModel):
     created_by: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CategoryCreate(BaseModel):
+    name: str
+    type: TransactionType
+    is_recurring: bool = False
+    icon: Optional[str] = None
+    color: Optional[str] = None
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[TransactionType] = None
+    is_recurring: Optional[bool] = None
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    active: Optional[bool] = None
+
+class CategoryMerge(BaseModel):
+    source_category_id: str
+    target_category_id: str
+
+class PlannedPurchaseCreate(BaseModel):
+    title: str
+    estimated_cost: float
+    target_date: date
+    account_to_pay_from: str
+    category_id: str
+    installments: List[Dict[str, Any]] = []  # [{amount: float, due_date: date}]
+    notes: Optional[str] = None
+
+class PlannedPurchase(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    estimated_cost: float
+    target_date: date
+    account_to_pay_from: str
+    category_id: str
+    installments: List[Dict[str, Any]] = []
+    status: PurchaseStatus = PurchaseStatus.PLANNED
+    linked_event_ids: List[str] = []  # Calendar events for installments
+    notes: Optional[str] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PasswordChangeRequest(BaseModel):
+    old_password: str
+    new_password: str
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetConfirm(BaseModel):
+    email: EmailStr
+    token: str
+    new_password: str
+
+class AccountCreate(BaseModel):
+    name: str
+    type: str  # bank, card, cash, savings, emergency
+    currency: str = "EUR"
+    opening_balance: float = 0.0
+
+class AccountUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    is_active: Optional[bool] = None
 
 class BillCreate(BaseModel):
     name: str
