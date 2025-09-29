@@ -188,8 +188,7 @@ test_plan:
   current_focus:
     - "Salary update API endpoint"
     - "Salary update display"
-  stuck_tasks:
-    - "Salary update functionality across the app"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
