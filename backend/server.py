@@ -270,6 +270,14 @@ class BillCreate(BaseModel):
     autopay: bool = False
     is_active: bool = True
 
+class BillUpdate(BaseModel):
+    name: Optional[str] = None
+    provider: Optional[str] = None
+    expected_amount: Optional[float] = None
+    due_day: Optional[int] = None
+    autopay: Optional[bool] = None
+    is_active: Optional[bool] = None
+
 class Bill(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
