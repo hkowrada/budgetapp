@@ -8,6 +8,8 @@ import AgendaView from './components/AgendaView';
 import QuickAddMenu from './components/QuickAddMenu';
 import CategoriesManagement from './components/CategoriesManagement';
 import EditableSalaryCard from './components/EditableSalaryCard';
+import EditableBillCard from './components/EditableBillCard';
+import QuickExpenseEntry from './components/QuickExpenseEntry';
 import { Button } from './components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Input } from './components/ui/input';
