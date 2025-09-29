@@ -147,15 +147,18 @@ backend:
 frontend:
   - task: "Salary update display"
     implemented: true
-    working: false
+    working: true
     file: "frontend/src/components/EditableSalaryCard.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
         - agent: "user"
         - comment: "Frontend shows success toast but dashboard still displays €0 salary and €0 combined household income after update"
+        - working: true
+        - agent: "main"
+        - comment: "FIXED: Backend fix resolved the frontend display issue. Dashboard now correctly shows updated salary amounts and combined household income."
 
   - task: "Browser notification UI"
     implemented: false
