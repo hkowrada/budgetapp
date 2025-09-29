@@ -731,8 +731,8 @@ def main():
         print("❌ CRITICAL: Cannot login as Harish. Testing aborted.")
         sys.exit(1)
     
-    # Run the comprehensive Phase 1 tests
-    test_results, final_stats = tester.run_phase1_tests()
+    # Run the user-reported issue tests
+    test_results, final_stats = tester.run_user_reported_issue_tests()
     
     print(f"\n🏁 TESTING COMPLETE")
     print("=" * 50)
