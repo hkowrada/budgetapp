@@ -190,3 +190,5 @@ test_plan:
 agent_communication:
     - agent: "main"
     - message: "User confirmed critical salary update bug still exists. Screenshots show backend API returns success but dashboard displays €0. Need to investigate data retrieval logic in both backend dashboard endpoint and frontend display logic."
+    - agent: "main"  
+    - message: "CRITICAL BUG FIXED: Salary update functionality now works correctly. Issue was DashboardStats model missing current_salaries field and old seeded transactions not being properly cleaned up. Screenshots confirm €4,200 salary displays correctly and Combined Household Income updates properly."
