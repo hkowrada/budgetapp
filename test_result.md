@@ -107,15 +107,18 @@ user_problem_statement: "Calendar and notification enhancements are highest prio
 backend:
   - task: "Salary update API endpoint"
     implemented: true
-    working: false
+    working: true
     file: "backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
         - agent: "user"
         - comment: "User reports salary updates are still adding instead of replacing. API shows success toast but dashboard still shows €0 for salary and combined household income"
+        - working: true
+        - agent: "main"
+        - comment: "FIXED: Added current_salaries field to DashboardStats model and cleaned up old salary transactions. Salary updates now properly replace instead of add."
 
   - task: "Browser notification system"
     implemented: false
