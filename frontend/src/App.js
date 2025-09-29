@@ -932,7 +932,10 @@ const AgendaPage = () => {
         onSuccess={fetchDashboardStats}
       />
     </div>
-//Categories Page with Layout
+  );
+};
+
+// Categories Page with Layout
 const CategoriesPage = () => {
   const { user, logout } = useAuth();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
