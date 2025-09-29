@@ -146,6 +146,8 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState(null);
   const [agendaData, setAgendaData] = useState({ events: [], upcoming_bills: [] });
+  const [currentSalaries, setCurrentSalaries] = useState({});
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
