@@ -156,12 +156,18 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const [statsResponse, agendaResponse] = await Promise.all([
+      const [statsResponse, agendaResponse, usersResponse] = await Promise.all([
         axios.get('/dashboard/stats'),
-        axios.get('/agenda?days=7')
+        axios.get('/agenda?days=7'),
+        user.role === 'owner' ? axios.get('/users') : Promise.resolve({ data: [] })
       ]);
+      
       setStats(statsResponse.data);
+      setCurrentSalaries(statsResponse.data.current_salaries || {});
       setAgendaData(agendaResponse.data);
+      if (usersResponse.data.length > 0) {
+        setAllUsers(usersResponse.data);
+      }
     } catch (error) {
       toast({ 
         title: "Error loading dashboard", 
