@@ -1046,3 +1046,5 @@ const CategoriesPage = () => {
     </div>
   );
 };
+
+export default App;
