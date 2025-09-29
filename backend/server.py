@@ -346,6 +346,95 @@ async def log_audit(user_id: str, action: str, entity: str, entity_id: str, chan
     )
     await db.audit_logs.insert_one(prepare_for_mongo(audit.dict()))
 
+# Timezone utility functions
+def get_paris_timezone():
+    """Get Europe/Paris timezone with DST support"""
+    return ZoneInfo("Europe/Paris")
+
+def convert_to_paris_time(dt: datetime) -> datetime:
+    """Convert datetime to Europe/Paris timezone"""
+    if dt.tzinfo is None:
+        # Assume UTC if no timezone
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(get_paris_timezone())
+
+def is_in_quiet_hours(dt: datetime, quiet_start: time, quiet_end: time) -> bool:
+    """Check if datetime is within quiet hours"""
+    paris_dt = convert_to_paris_time(dt)
+    current_time = paris_dt.time()
+    
+    if quiet_start <= quiet_end:
+        # Normal case: e.g., 22:00 to 08:00 (next day)
+        return current_time >= quiet_start or current_time <= quiet_end
+    else:
+        # Crossing midnight: e.g., 22:00 to 08:00
+        return quiet_start <= current_time <= quiet_end
+
+async def generate_bill_calendar_events():
+    """Auto-generate calendar events for recurring bills"""
+    bills = await db.bills.find({"is_active": True}).to_list(None)
+    household_calendar = await db.calendars.find_one({"scope": "household", "is_default": True})
+    
+    if not household_calendar:
+        # Create default household calendar
+        household_calendar = Calendar(
+            name="Household Calendar",
+            scope=CalendarScope.HOUSEHOLD,
+            is_default=True,
+            color="#DC2626"
+        )
+        await db.calendars.insert_one(prepare_for_mongo(household_calendar.dict()))
+        household_calendar = household_calendar.dict()
+    
+    for bill in bills:
+        # Check if calendar event already exists for this bill
+        existing_event = await db.events.find_one({
+            "source_type": "bill",
+            "source_id": bill["id"]
+        })
+        
+        if not existing_event:
+            # Create calendar event for bill due date
+            paris_tz = get_paris_timezone()
+            now = datetime.now(paris_tz)
+            
+            # Calculate next due date
+            if bill["due_day"] <= now.day:
+                # Next month
+                if now.month == 12:
+                    next_due = now.replace(year=now.year + 1, month=1, day=bill["due_day"], hour=9, minute=0, second=0, microsecond=0)
+                else:
+                    next_due = now.replace(month=now.month + 1, day=bill["due_day"], hour=9, minute=0, second=0, microsecond=0)
+            else:
+                # This month
+                next_due = now.replace(day=bill["due_day"], hour=9, minute=0, second=0, microsecond=0)
+            
+            # Create event
+            event = Event(
+                calendar_id=household_calendar["id"],
+                title=f"📋 {bill['name']} Due",
+                notes=f"Amount: €{bill['expected_amount']} | Provider: {bill.get('provider', 'N/A')}",
+                start=next_due,
+                end=next_due + timedelta(hours=1),
+                tags=[EventTag.BILLS],
+                source_type="bill",
+                source_id=bill["id"],
+                created_by="system"
+            )
+            
+            await db.events.insert_one(prepare_for_mongo(event.dict()))
+            
+            # Create default reminder (24 hours before)
+            reminder = Reminder(
+                event_id=event.id,
+                offset_minutes=1440,  # 24 hours
+                channel=ReminderChannel.INAPP,
+                message=f"Bill due tomorrow: {bill['name']} - €{bill['expected_amount']}"
+            )
+            
+            await db.reminders.insert_one(prepare_for_mongo(reminder.dict()))
+            logger.info(f"Created calendar event and reminder for bill: {bill['name']}")
+
 # Authentication Routes
 @api_router.post("/auth/login", response_model=TokenResponse)
 async def login(login_request: LoginRequest):
