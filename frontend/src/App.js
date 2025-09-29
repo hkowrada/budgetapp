@@ -696,6 +696,14 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/categories" 
+              element={
+                <ProtectedRoute>
+                  <CategoriesPage />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <Toaster />
