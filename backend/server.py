@@ -55,6 +55,26 @@ class RecurrenceType(str, Enum):
     YEARLY = "yearly"
     QUARTERLY = "quarterly"
 
+class CalendarScope(str, Enum):
+    HOUSEHOLD = "household"
+    PERSONAL = "personal"
+
+class EventTag(str, Enum):
+    PERSONAL = "Personal"
+    FAMILY = "Family" 
+    BILLS = "Bills"
+    WORK = "Work"
+    HEALTH = "Health"
+
+class ReminderChannel(str, Enum):
+    INAPP = "inapp"
+    EMAIL = "email"
+
+class ReminderStatus(str, Enum):
+    SCHEDULED = "scheduled"
+    SENT = "sent"
+    SNOOZED = "snoozed"
+
 # Helper functions
 def prepare_for_mongo(data):
     if isinstance(data, dict):
