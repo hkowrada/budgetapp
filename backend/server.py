@@ -543,20 +543,337 @@ async def get_users(current_user: User = Depends(get_current_user)):
     users = await db.users.find().to_list(None)
     return [User(**parse_from_mongo(user)) for user in users]
 
-# Categories
+# Categories Management
 @api_router.get("/categories", response_model=List[Category])
 async def get_categories(current_user: User = Depends(get_current_user)):
-    categories = await db.categories.find().to_list(None)
+    categories = await db.categories.find({"active": {"$ne": False}}).to_list(None)
     return [Category(**parse_from_mongo(cat)) for cat in categories]
 
 @api_router.post("/categories", response_model=Category)
-async def create_category(category_data: Category, current_user: User = Depends(get_current_user)):
+async def create_category(category_data: CategoryCreate, current_user: User = Depends(get_current_user)):
     if current_user.role == UserRole.GUEST:
         raise HTTPException(status_code=403, detail="Guests cannot create categories")
     
-    await db.categories.insert_one(prepare_for_mongo(category_data.dict()))
-    await log_audit(current_user.id, "CREATE", "category", category_data.id)
-    return category_data
+    category = Category(**category_data.dict())
+    await db.categories.insert_one(prepare_for_mongo(category.dict()))
+    await log_audit(current_user.id, "CREATE", "category", category.id)
+    return category
+
+@api_router.patch("/categories/{category_id}", response_model=Category)
+async def update_category(category_id: str, update_data: CategoryUpdate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot update categories")
+    
+    category = await db.categories.find_one({"id": category_id})
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.categories.update_one(
+        {"id": category_id},
+        {"$set": prepare_for_mongo(update_dict)}
+    )
+    
+    await log_audit(current_user.id, "UPDATE", "category", category_id, update_dict)
+    updated_category = await db.categories.find_one({"id": category_id})
+    return Category(**parse_from_mongo(updated_category))
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot delete categories")
+    
+    # Soft delete by marking as inactive
+    await db.categories.update_one(
+        {"id": category_id},
+        {"$set": {"active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    await log_audit(current_user.id, "DELETE", "category", category_id)
+    return {"message": "Category deleted successfully"}
+
+@api_router.post("/categories/merge")
+async def merge_categories(merge_data: CategoryMerge, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot merge categories")
+    
+    source_cat = await db.categories.find_one({"id": merge_data.source_category_id})
+    target_cat = await db.categories.find_one({"id": merge_data.target_category_id})
+    
+    if not source_cat or not target_cat:
+        raise HTTPException(status_code=404, detail="One or both categories not found")
+    
+    # Update all transactions to use target category
+    await db.transactions.update_many(
+        {"category_id": merge_data.source_category_id},
+        {"$set": {"category_id": merge_data.target_category_id}}
+    )
+    
+    # Update all budgets to use target category
+    await db.budgets.update_many(
+        {"category_id": merge_data.source_category_id},
+        {"$set": {"category_id": merge_data.target_category_id}}
+    )
+    
+    # Soft delete source category
+    await db.categories.update_one(
+        {"id": merge_data.source_category_id},
+        {"$set": {"active": False}}
+    )
+    
+    await log_audit(current_user.id, "MERGE", "category", merge_data.source_category_id, {
+        "merged_into": merge_data.target_category_id
+    })
+    
+    return {"message": f"Category '{source_cat['name']}' merged into '{target_cat['name']}'"}
+
+# Enhanced Transactions
+@api_router.post("/transactions", response_model=Transaction)
+async def create_transaction(txn_data: TransactionCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create transactions")
+    
+    # Validate accounts exist
+    account = await db.accounts.find_one({"id": txn_data.account_id})
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    if txn_data.type == TransactionType.TRANSFER:
+        if not txn_data.to_account_id:
+            raise HTTPException(status_code=400, detail="Transfer requires to_account_id")
+        
+        to_account = await db.accounts.find_one({"id": txn_data.to_account_id})
+        if not to_account:
+            raise HTTPException(status_code=404, detail="To account not found")
+    
+    # Validate category for non-transfers
+    if txn_data.type != TransactionType.TRANSFER and txn_data.category_id:
+        category = await db.categories.find_one({"id": txn_data.category_id})
+        if not category:
+            raise HTTPException(status_code=404, detail="Category not found")
+    
+    transaction = Transaction(**txn_data.dict(), created_by=current_user.id)
+    await db.transactions.insert_one(prepare_for_mongo(transaction.dict()))
+    
+    # Update account balances
+    if txn_data.type == TransactionType.INCOME:
+        await db.accounts.update_one(
+            {"id": txn_data.account_id},
+            {"$inc": {"current_balance": txn_data.amount}}
+        )
+    elif txn_data.type == TransactionType.EXPENSE:
+        await db.accounts.update_one(
+            {"id": txn_data.account_id},
+            {"$inc": {"current_balance": -txn_data.amount}}
+        )
+    elif txn_data.type == TransactionType.TRANSFER:
+        # Deduct from source account
+        await db.accounts.update_one(
+            {"id": txn_data.account_id},
+            {"$inc": {"current_balance": -txn_data.amount}}
+        )
+        # Add to destination account
+        await db.accounts.update_one(
+            {"id": txn_data.to_account_id},
+            {"$inc": {"current_balance": txn_data.amount}}
+        )
+    
+    await log_audit(current_user.id, "CREATE", "transaction", transaction.id)
+    return transaction
+
+# Accounts Management
+@api_router.post("/accounts", response_model=Account)
+async def create_account(account_data: AccountCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create accounts")
+    
+    account = Account(**account_data.dict(), current_balance=account_data.opening_balance)
+    await db.accounts.insert_one(prepare_for_mongo(account.dict()))
+    await log_audit(current_user.id, "CREATE", "account", account.id)
+    return account
+
+@api_router.patch("/accounts/{account_id}", response_model=Account)
+async def update_account(account_id: str, update_data: AccountUpdate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot update accounts")
+    
+    account = await db.accounts.find_one({"id": account_id})
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.accounts.update_one(
+        {"id": account_id},
+        {"$set": prepare_for_mongo(update_dict)}
+    )
+    
+    await log_audit(current_user.id, "UPDATE", "account", account_id, update_dict)
+    updated_account = await db.accounts.find_one({"id": account_id})
+    return Account(**parse_from_mongo(updated_account))
+
+# Planned Purchases
+@api_router.get("/planned-purchases", response_model=List[PlannedPurchase])
+async def get_planned_purchases(current_user: User = Depends(get_current_user)):
+    purchases = await db.planned_purchases.find().to_list(None)
+    return [PlannedPurchase(**parse_from_mongo(purchase)) for purchase in purchases]
+
+@api_router.post("/planned-purchases", response_model=PlannedPurchase)
+async def create_planned_purchase(purchase_data: PlannedPurchaseCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create planned purchases")
+    
+    # Validate account and category exist
+    account = await db.accounts.find_one({"id": purchase_data.account_to_pay_from})
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    category = await db.categories.find_one({"id": purchase_data.category_id})
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    purchase = PlannedPurchase(**purchase_data.dict(), created_by=current_user.id)
+    await db.planned_purchases.insert_one(prepare_for_mongo(purchase.dict()))
+    
+    # Create calendar events for installments
+    if purchase_data.installments:
+        household_calendar = await db.calendars.find_one({"scope": "household"})
+        if household_calendar:
+            event_ids = []
+            
+            for i, installment in enumerate(purchase_data.installments):
+                installment_date = datetime.fromisoformat(installment["due_date"]).replace(hour=10, minute=0)
+                
+                event = Event(
+                    calendar_id=household_calendar["id"],
+                    title=f"💰 {purchase.title} - Installment {i+1}",
+                    notes=f"Amount: €{installment['amount']} | Purchase: {purchase.title}",
+                    start=installment_date,
+                    end=installment_date + timedelta(hours=1),
+                    tags=[EventTag.BILLS],
+                    source_type="planned_purchase",
+                    source_id=purchase.id,
+                    created_by=current_user.id
+                )
+                
+                await db.events.insert_one(prepare_for_mongo(event.dict()))
+                event_ids.append(event.id)
+            
+            # Update purchase with linked events
+            await db.planned_purchases.update_one(
+                {"id": purchase.id},
+                {"$set": {"linked_event_ids": event_ids}}
+            )
+    
+    await log_audit(current_user.id, "CREATE", "planned_purchase", purchase.id)
+    return purchase
+
+@api_router.post("/planned-purchases/{purchase_id}/convert-installment")
+async def convert_installment_to_expense(
+    purchase_id: str,
+    installment_index: int,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot convert installments")
+    
+    purchase = await db.planned_purchases.find_one({"id": purchase_id})
+    if not purchase:
+        raise HTTPException(status_code=404, detail="Planned purchase not found")
+    
+    if installment_index >= len(purchase["installments"]):
+        raise HTTPException(status_code=400, detail="Invalid installment index")
+    
+    installment = purchase["installments"][installment_index]
+    
+    # Create expense transaction
+    txn_data = TransactionCreate(
+        type=TransactionType.EXPENSE,
+        account_id=purchase["account_to_pay_from"],
+        category_id=purchase["category_id"],
+        amount=installment["amount"],
+        description=f"{purchase['title']} - Installment {installment_index + 1}",
+        date=datetime.fromisoformat(installment["due_date"]).date()
+    )
+    
+    transaction = Transaction(**txn_data.dict(), created_by=current_user.id)
+    await db.transactions.insert_one(prepare_for_mongo(transaction.dict()))
+    
+    # Update account balance
+    await db.accounts.update_one(
+        {"id": purchase["account_to_pay_from"]},
+        {"$inc": {"current_balance": -installment["amount"]}}
+    )
+    
+    # Mark installment as paid
+    installment["paid"] = True
+    installment["paid_at"] = datetime.now(timezone.utc).isoformat()
+    installment["transaction_id"] = transaction.id
+    
+    # Update purchase
+    purchase["installments"][installment_index] = installment
+    await db.planned_purchases.update_one(
+        {"id": purchase_id},
+        {"$set": {"installments": purchase["installments"]}}
+    )
+    
+    await log_audit(current_user.id, "CONVERT", "planned_purchase", purchase_id, {
+        "installment_index": installment_index,
+        "transaction_id": transaction.id
+    })
+    
+    return {"message": "Installment converted to expense", "transaction_id": transaction.id}
+
+# Password Management
+@api_router.post("/auth/change-password")
+async def change_password(
+    password_data: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot change password")
+    
+    # Verify current password
+    user_data = await db.users.find_one({"id": current_user.id})
+    if not user_data or not bcrypt.verify(password_data.old_password, user_data["password_hash"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Update password
+    new_password_hash = bcrypt.hash(password_data.new_password)
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "password_hash": new_password_hash,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    await log_audit(current_user.id, "CHANGE_PASSWORD", "user", current_user.id)
+    
+    return {"message": "Password changed successfully"}
+
+# Enhanced Calendar Events (with proper permissions)
+@api_router.post("/events", response_model=Event)
+async def create_event(event_data: EventCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create events")
+    
+    # Check calendar access and permissions
+    calendar = await db.calendars.find_one({"id": event_data.calendar_id})
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    
+    # Permission check: can only write to own personal calendar or household calendar
+    if calendar["scope"] == "personal" and calendar["owner_user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot create events in other users' personal calendars")
+    
+    event = Event(**event_data.dict(), created_by=current_user.id)
+    await db.events.insert_one(prepare_for_mongo(event.dict()))
+    await log_audit(current_user.id, "CREATE", "event", event.id)
+    return event
 
 # Accounts
 @api_router.get("/accounts", response_model=List[Account])
