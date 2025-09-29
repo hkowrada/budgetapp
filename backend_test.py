@@ -719,10 +719,10 @@ class BudgetAppTester:
 
 def main():
     """Main testing function"""
-    print("🚀 FAMILY BUDGET APP - PHASE 1 TESTING")
+    print("🚀 FAMILY BUDGET APP - USER REPORTED ISSUES TESTING")
     print("=" * 60)
     print(f"Backend URL: {BACKEND_URL}")
-    print("Focus: Bills Update API, Quick Expense Entry, Dashboard Integration")
+    print("Focus: Due Date Editing, Expense Creation, Enhanced Forms")
     
     tester = BudgetAppTester()
     
