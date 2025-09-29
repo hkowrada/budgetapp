@@ -139,13 +139,18 @@ const Login = () => {
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState(null);
+  const [agendaData, setAgendaData] = useState({ events: [], upcoming_bills: [] });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await axios.get('/dashboard/stats');
-      setStats(response.data);
+      const [statsResponse, agendaResponse] = await Promise.all([
+        axios.get('/dashboard/stats'),
+        axios.get('/agenda?days=7')
+      ]);
+      setStats(statsResponse.data);
+      setAgendaData(agendaResponse.data);
     } catch (error) {
       toast({ 
         title: "Error loading dashboard", 
