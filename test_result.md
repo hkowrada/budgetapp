@@ -162,6 +162,9 @@ frontend:
         - working: true
         - agent: "main"
         - comment: "FIXED: Backend fix resolved the frontend display issue. Dashboard now correctly shows updated salary amounts and combined household income."
+        - working: true
+        - agent: "testing"
+        - comment: "VERIFIED: Frontend display working correctly through backend API testing. Dashboard stats API returns proper current_salaries field and total_income values. Combined Household Income reflects only active salaries as expected."
 
   - task: "Browser notification UI"
     implemented: false
