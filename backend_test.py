@@ -688,28 +688,28 @@ class BudgetAppTester:
         
         return success
     
-    def run_phase1_tests(self):
-        """Run all Phase 1 tests as specified in the review request"""
-        print(f"\n🚀 RUNNING PHASE 1 BUDGET APP TESTS")
+    def run_user_reported_issue_tests(self):
+        """Run tests for user-reported issues as specified in the review request"""
+        print(f"\n🚀 RUNNING USER REPORTED ISSUE TESTS")
         print("=" * 70)
         
         test_results = {}
         
-        # Test 1: Bills Update API
-        print(f"\n1️⃣ BILLS UPDATE API TESTING")
-        test_results['bills_update'] = self.test_bills_update_api()
+        # Test 1: Bills Due Date Editing (USER ISSUE #1)
+        print(f"\n1️⃣ BILLS DUE DATE EDITING (USER ISSUE #1)")
+        test_results['bills_due_date_editing'] = self.test_bills_due_date_editing()
         
-        # Test 2: Quick Expense Entry API
-        print(f"\n2️⃣ QUICK EXPENSE ENTRY API TESTING")
-        test_results['expense_entry'] = self.test_quick_expense_entry()
+        # Test 2: Expense Creation with Due Dates (USER ISSUES #2 & #3)
+        print(f"\n2️⃣ EXPENSE CREATION WITH DUE DATES (USER ISSUES #2 & #3)")
+        test_results['expense_creation_with_due_dates'] = self.test_expense_creation_with_due_dates()
         
-        # Test 3: Dashboard Integration
-        print(f"\n3️⃣ DASHBOARD INTEGRATION TESTING")
+        # Test 3: Enhanced Expense Form Backend Support
+        print(f"\n3️⃣ ENHANCED EXPENSE FORM BACKEND SUPPORT")
+        test_results['enhanced_expense_form'] = self.test_enhanced_expense_form_backend()
+        
+        # Test 4: Dashboard Integration - verify changes reflect immediately
+        print(f"\n4️⃣ DASHBOARD INTEGRATION TESTING")
         test_results['dashboard_integration'] = self.test_dashboard_integration()
-        
-        # Test 4: Data Consistency
-        print(f"\n4️⃣ DATA CONSISTENCY TESTING")
-        test_results['data_consistency'] = self.test_data_consistency()
         
         # Final verification - get updated dashboard stats
         print(f"\n5️⃣ FINAL DASHBOARD VERIFICATION")
