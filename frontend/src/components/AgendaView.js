@@ -287,16 +287,16 @@ export default AgendaView;
           )}
         </TabsContent>
 
-        <TabsContent value=\"events\" className=\"space-y-4 mt-6\">
-          <h2 className=\"text-xl font-semibold text-gray-800 flex items-center\">
-            <span className=\"mr-2\">📅</span>
+        <TabsContent value="events" className="space-y-4 mt-6">
+          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+            <span className="mr-2">📅</span>
             Upcoming Events ({agendaData.events.length})
           </h2>
           {agendaData.events.length === 0 ? (
             <Card>
-              <CardContent className=\"flex items-center justify-center h-32\">
-                <div className=\"text-center text-gray-500\">
-                  <span className=\"text-4xl mb-2 block\">📅</span>
+              <CardContent className="flex items-center justify-center h-32">
+                <div className="text-center text-gray-500">
+                  <span className="text-4xl mb-2 block">📅</span>
                   <p>No upcoming events in the next {selectedDays} days</p>
                 </div>
               </CardContent>
@@ -304,20 +304,20 @@ export default AgendaView;
           ) : (
             agendaData.events.map(event => (
               <Card key={event.id}>
-                <CardContent className=\"p-4\">
-                  <div className=\"flex items-center space-x-3\">
-                    <div className=\"text-2xl\">📅</div>
-                    <div className=\"flex-1\">
-                      <div className=\"font-medium text-gray-800\">{event.title}</div>
-                      <div className=\"text-sm text-gray-600\">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-2xl">📅</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-800">{event.title}</div>
+                      <div className="text-sm text-gray-600">
                         {moment(event.start).format('dddd, MMMM D, YYYY [at] HH:mm')}
                         {event.location && ` • ${event.location}`}
                       </div>
                       {event.notes && (
-                        <div className=\"text-sm text-gray-500 mt-1\">{event.notes}</div>
+                        <div className="text-sm text-gray-500 mt-1">{event.notes}</div>
                       )}
                     </div>
-                    <div className=\"flex flex-wrap gap-1\">
+                    <div className="flex flex-wrap gap-1">
                       {event.tags?.map(tag => (
                         <Badge key={tag} className={`text-xs ${tagColors[tag] || 'bg-gray-100 text-gray-800'}`}>
                           {tag}
