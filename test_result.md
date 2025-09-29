@@ -119,6 +119,9 @@ backend:
         - working: true
         - agent: "main"
         - comment: "FIXED: Added current_salaries field to DashboardStats model and cleaned up old salary transactions. Salary updates now properly replace instead of add."
+        - working: true
+        - agent: "testing"
+        - comment: "VERIFIED: Comprehensive testing completed. Salary update API (PATCH /api/salary/update) works perfectly. Tested with user Harish: salary updates REPLACE instead of ADD (€4200→€3000→€4500), dashboard shows correct amounts, current_salaries field populated correctly, only ONE salary transaction exists (no duplicates), old duplicate transactions cleaned up. Multiple rapid updates tested successfully (5000→5500→6000→4800→5200). All data integrity checks passed."
 
   - task: "Browser notification system"
     implemented: false
