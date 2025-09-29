@@ -271,6 +271,44 @@ class BudgetAppTester:
             print(f"❌ Categories error: {str(e)}")
             return None
     
+    def create_bill(self, name, expected_amount, due_day, account_id, category_id, provider=None):
+        """Create a new recurring bill"""
+        print(f"\n📋 Testing bill creation: {name} - €{expected_amount} due on {due_day}...")
+        
+        bill_data = {
+            "name": name,
+            "expected_amount": expected_amount,
+            "due_day": due_day,
+            "account_id": account_id,
+            "category_id": category_id,
+            "recurrence": "monthly",
+            "autopay": False,
+            "is_active": True
+        }
+        
+        if provider:
+            bill_data["provider"] = provider
+        
+        try:
+            response = self.session.post(f"{self.base_url}/bills", json=bill_data)
+            print(f"Bill creation response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Bill created successfully")
+                print(f"   Name: {data.get('name', 'N/A')}")
+                print(f"   Amount: €{data.get('expected_amount', 0)}")
+                print(f"   Due Day: {data.get('due_day', 'N/A')}")
+                print(f"   Bill ID: {data.get('id', 'N/A')}")
+                return data
+            else:
+                print(f"❌ Bill creation failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Bill creation error: {str(e)}")
+            return None
+    
     def test_bills_update_api(self):
         """Test Bills Update API with all 6 bills as specified"""
         print(f"\n🧪 TESTING BILLS UPDATE API")
