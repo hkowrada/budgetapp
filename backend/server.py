@@ -378,6 +378,7 @@ class DashboardStats(BaseModel):
     upcoming_bills: List[Dict[str, Any]]
     category_breakdown: Dict[str, float]
     recent_transactions: List[Dict[str, Any]]
+    current_salaries: Dict[str, Any] = Field(default_factory=dict)
 
 class AuditLog(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
