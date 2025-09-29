@@ -309,9 +309,9 @@ class BudgetAppTester:
             print(f"❌ Bill creation error: {str(e)}")
             return None
     
-    def test_bills_update_api(self):
-        """Test Bills Update API with all 6 bills as specified"""
-        print(f"\n🧪 TESTING BILLS UPDATE API")
+    def test_bills_due_date_editing(self):
+        """Test Bills Due Date Editing - USER REPORTED ISSUE #1"""
+        print(f"\n🧪 TESTING BILLS DUE DATE EDITING (USER ISSUE #1)")
         print("=" * 60)
         
         # Get all bills first
@@ -320,46 +320,76 @@ class BudgetAppTester:
             print("❌ Failed to get bills")
             return False
         
-        # Expected bills from the review request
-        expected_bills = {
-            "Electricity Bill": 100,
-            "Water Bill": 30,
-            "Internet & WiFi": 35,
-            "Mobile Phone": 45,
-            "Home Insurance": 18,
-            "Home Loan EMI": 1000
+        # Test due date changes for all 6 bills as specified
+        expected_bills_with_due_dates = {
+            "Electricity": {"amount": 100, "old_due": 15, "new_due": 5},
+            "Water": {"amount": 30, "old_due": 20, "new_due": 10},
+            "Internet": {"amount": 35, "old_due": 25, "new_due": 15},
+            "Mobile": {"amount": 45, "old_due": 10, "new_due": 20},
+            "Insurance": {"amount": 18, "old_due": 20, "new_due": 25},
+            "Loan": {"amount": 1000, "old_due": 1, "new_due": 28}
         }
         
         success = True
         updated_bills = []
         
-        # Test updating each bill
+        # Test updating each bill with both amount AND due date
         for bill in bills:
             bill_name = bill.get('name', '')
             bill_id = bill.get('id')
+            current_due_day = bill.get('due_day')
             
             # Find matching expected bill
-            new_amount = None
-            for expected_name, amount in expected_bills.items():
-                if expected_name.lower() in bill_name.lower() or bill_name.lower() in expected_name.lower():
-                    new_amount = amount
+            bill_config = None
+            for expected_name, config in expected_bills_with_due_dates.items():
+                if expected_name.lower() in bill_name.lower():
+                    bill_config = config
                     break
             
-            if new_amount and bill_id:
-                print(f"\n📝 Updating {bill_name} to €{new_amount}...")
-                result = self.update_bill(bill_id, new_amount)
+            if bill_config and bill_id:
+                new_amount = bill_config["amount"]
+                new_due_day = bill_config["new_due"]
+                
+                print(f"\n📝 Testing {bill_name}:")
+                print(f"   Current due day: {current_due_day}")
+                print(f"   Updating to: €{new_amount}, due day {new_due_day}")
+                
+                result = self.update_bill(bill_id, new_amount, new_due_day)
                 if result:
                     updated_bills.append(result)
-                    print(f"✅ Successfully updated {bill_name}")
+                    # Verify the update worked
+                    if result.get('due_day') == new_due_day and result.get('expected_amount') == new_amount:
+                        print(f"✅ Successfully updated {bill_name} - both amount and due date")
+                    else:
+                        print(f"❌ Update incomplete for {bill_name}")
+                        print(f"   Expected: €{new_amount}, due day {new_due_day}")
+                        print(f"   Got: €{result.get('expected_amount')}, due day {result.get('due_day')}")
+                        success = False
                 else:
                     print(f"❌ Failed to update {bill_name}")
                     success = False
             else:
-                print(f"⚠️ Skipping {bill_name} - not in expected bills list")
+                print(f"⚠️ Skipping {bill_name} - not in test configuration")
         
-        print(f"\n📊 Bills Update Summary:")
+        # Test edge cases for due_day
+        if updated_bills:
+            print(f"\n🧪 Testing edge cases for due dates...")
+            test_bill = updated_bills[0]
+            bill_id = test_bill.get('id')
+            
+            edge_cases = [1, 15, 28, 31]
+            for edge_due_day in edge_cases:
+                print(f"\n   Testing due day: {edge_due_day}")
+                result = self.update_bill(bill_id, test_bill.get('expected_amount'), edge_due_day)
+                if result and result.get('due_day') == edge_due_day:
+                    print(f"   ✅ Edge case {edge_due_day} works")
+                else:
+                    print(f"   ❌ Edge case {edge_due_day} failed")
+                    success = False
+        
+        print(f"\n📊 Due Date Editing Summary:")
         print(f"   Total bills updated: {len(updated_bills)}")
-        print(f"   Expected updates: {len(expected_bills)}")
+        print(f"   Expected updates: {len(expected_bills_with_due_dates)}")
         
         return success and len(updated_bills) > 0
     
