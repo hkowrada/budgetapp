@@ -504,9 +504,10 @@ class BudgetAppTester:
 
 def main():
     """Main testing function"""
-    print("🚀 FAMILY BUDGET APP - SALARY UPDATE TESTING")
+    print("🚀 FAMILY BUDGET APP - PHASE 1 TESTING")
     print("=" * 60)
     print(f"Backend URL: {BACKEND_URL}")
+    print("Focus: Bills Update API, Quick Expense Entry, Dashboard Integration")
     
     tester = BudgetAppTester()
     
@@ -515,20 +516,40 @@ def main():
         print("❌ CRITICAL: Cannot login as Harish. Testing aborted.")
         sys.exit(1)
     
-    # Run the comprehensive salary update test
-    success = tester.test_salary_update_sequence()
+    # Run the comprehensive Phase 1 tests
+    test_results, final_stats = tester.run_phase1_tests()
     
     print(f"\n🏁 TESTING COMPLETE")
-    print("=" * 30)
+    print("=" * 50)
     
-    if success:
-        print("✅ ALL TESTS PASSED: Salary update functionality is working correctly")
-        print("   - Salary updates REPLACE instead of ADD")
-        print("   - Dashboard shows correct current salary")
-        print("   - No duplicate salary transactions")
+    # Summary of results
+    passed_tests = sum(1 for result in test_results.values() if result)
+    total_tests = len(test_results)
+    
+    print(f"\n📊 TEST RESULTS SUMMARY:")
+    print(f"   Tests Passed: {passed_tests}/{total_tests}")
+    
+    for test_name, result in test_results.items():
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"   {test_name.replace('_', ' ').title()}: {status}")
+    
+    if final_stats:
+        print(f"\n📈 FINAL DASHBOARD STATE:")
+        print(f"   Combined Household Income: €{final_stats.get('total_income', 0)}")
+        print(f"   Monthly Expenses: €{final_stats.get('total_expenses', 0)}")
+        print(f"   Surplus: €{final_stats.get('monthly_surplus', 0)}")
+        print(f"   Savings Rate: {final_stats.get('savings_rate', 0)}%")
+    
+    if passed_tests == total_tests:
+        print("\n✅ ALL PHASE 1 TESTS PASSED")
+        print("   - Bills Update API working correctly")
+        print("   - Quick Expense Entry functional")
+        print("   - Dashboard calculations accurate")
+        print("   - Data consistency maintained")
         sys.exit(0)
     else:
-        print("❌ SOME TESTS FAILED: Issues found with salary update functionality")
+        print(f"\n❌ {total_tests - passed_tests} TEST(S) FAILED")
+        print("   Issues found with Phase 1 implementation")
         sys.exit(1)
 
 if __name__ == "__main__":
