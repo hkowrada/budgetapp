@@ -100,6 +100,81 @@ button:active {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* React Big Calendar Customizations */
+.rbc-calendar {
+  font-family: 'Inter', sans-serif;
+}
+
+.rbc-header {
+  padding: 10px 6px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-today {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb;
+}
+
+.rbc-event {
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.rbc-slot-selection {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #f3f4f6;
+}
+
+.rbc-time-view .rbc-time-gutter {
+  background-color: #f9fafb;
+}
+
+.rbc-btn-group > button {
+  background: white;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rbc-btn-group > button:hover {
+  background: #f3f4f6;
+}
+
+.rbc-btn-group > button.rbc-active {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.rbc-toolbar {
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.rbc-toolbar-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 /* Responsive typography */
 @media (max-width: 640px) {
   body {
@@ -112,6 +187,15 @@ button:active {
   
   h2 {
     font-size: 1.5rem;
+  }
+  
+  .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .rbc-toolbar > * {
+    margin: 5px 0;
   }
 }
 
