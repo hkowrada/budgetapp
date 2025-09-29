@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Family Budget App
-Testing the recently fixed salary update functionality
+Testing Phase 1 Implementation - Simple Budget App
+Focus: Bills Update API, Quick Expense Entry, Dashboard Integration
 """
 
 import requests
