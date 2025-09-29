@@ -7,6 +7,7 @@ import { Input } from './ui/input';
 const EditableBillCard = ({ bill, onBillUpdated, userRole }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newAmount, setNewAmount] = useState(bill.expected_amount || '');
+  const [newDueDay, setNewDueDay] = useState(bill.due_day || '');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -16,15 +17,21 @@ const EditableBillCard = ({ bill, onBillUpdated, userRole }) => {
       return;
     }
 
+    if (!newDueDay || parseInt(newDueDay) < 1 || parseInt(newDueDay) > 31) {
+      toast({ title: 'Please enter a valid due day (1-31)', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
     try {
       await axios.patch(`/bills/${bill.id}`, {
-        expected_amount: parseFloat(newAmount)
+        expected_amount: parseFloat(newAmount),
+        due_day: parseInt(newDueDay)
       });
       
       toast({ 
         title: 'Bill Updated!', 
-        description: `${bill.name} updated to €${parseFloat(newAmount).toLocaleString()}`
+        description: `${bill.name}: €${parseFloat(newAmount).toLocaleString()}, Due: ${newDueDay}th`
       });
       
       setIsEditing(false);
@@ -42,6 +49,7 @@ const EditableBillCard = ({ bill, onBillUpdated, userRole }) => {
 
   const handleCancel = () => {
     setNewAmount(bill.expected_amount || '');
+    setNewDueDay(bill.due_day || '');
     setIsEditing(false);
   };
 
@@ -68,33 +76,53 @@ const EditableBillCard = ({ bill, onBillUpdated, userRole }) => {
           <p className="text-xs text-gray-500 mb-2">Due: {bill.due_day} of every month</p>
           
           {isEditing ? (
-            <div className="flex items-center space-x-2 mt-2">
-              <Input
-                type="number"
-                step="0.01"
-                value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                placeholder="Enter new amount"
-                className="w-24 h-8 text-sm"
-                disabled={loading}
-              />
-              <Button 
-                size="sm" 
-                onClick={handleUpdateBill}
-                disabled={loading}
-                className="bg-blue-500 hover:bg-blue-600 h-8 text-xs px-2"
-              >
-                {loading ? '...' : 'Save'}
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={handleCancel}
-                disabled={loading}
-                className="h-8 text-xs px-2"
-              >
-                Cancel
-              </Button>
+            <div className="space-y-2 mt-2">
+              <div className="flex items-center space-x-2">
+                <div className="flex flex-col">
+                  <label className="text-xs text-gray-500 mb-1">Amount (€)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={newAmount}
+                    onChange={(e) => setNewAmount(e.target.value)}
+                    placeholder="Amount"
+                    className="w-24 h-8 text-sm"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-gray-500 mb-1">Due Day</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="31"
+                    value={newDueDay}
+                    onChange={(e) => setNewDueDay(e.target.value)}
+                    placeholder="Day"
+                    className="w-16 h-8 text-sm"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button 
+                  size="sm" 
+                  onClick={handleUpdateBill}
+                  disabled={loading}
+                  className="bg-blue-500 hover:bg-blue-600 h-8 text-xs px-2"
+                >
+                  {loading ? '...' : 'Save'}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={handleCancel}
+                  disabled={loading}
+                  className="h-8 text-xs px-2"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="flex items-center space-x-2 mt-1">
