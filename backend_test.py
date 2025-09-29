@@ -393,9 +393,9 @@ class BudgetAppTester:
         
         return success and len(updated_bills) > 0
     
-    def test_quick_expense_entry(self):
-        """Test Quick Expense Entry API"""
-        print(f"\n🧪 TESTING QUICK EXPENSE ENTRY API")
+    def test_expense_creation_with_due_dates(self):
+        """Test Expense Creation with Due Dates - USER REPORTED ISSUE #2 & #3"""
+        print(f"\n🧪 TESTING EXPENSE CREATION WITH DUE DATES (USER ISSUES #2 & #3)")
         print("=" * 60)
         
         # Get accounts and categories first
@@ -419,17 +419,61 @@ class BudgetAppTester:
         category = expense_categories[0]  # Use first expense category
         category_id = category.get('id')
         
-        # Test expenses
+        # Test expenses with due dates as requested by user
+        from datetime import timedelta
+        today = datetime.now().date()
+        
         test_expenses = [
-            {"description": "Coffee and pastries", "amount": 15.50},
-            {"description": "Grocery shopping", "amount": 85.30},
-            {"description": "Gas station fill-up", "amount": 65.00}
+            {
+                "description": "Grocery shopping with due date", 
+                "amount": 85.30,
+                "due_date": (today + timedelta(days=3)).isoformat()
+            },
+            {
+                "description": "Utility payment due next week", 
+                "amount": 120.50,
+                "due_date": (today + timedelta(days=7)).isoformat()
+            },
+            {
+                "description": "Medical appointment payment", 
+                "amount": 65.00,
+                "due_date": (today + timedelta(days=14)).isoformat()
+            }
         ]
         
         success = True
         created_expenses = []
         
+        print(f"\n📝 Testing expense creation with due dates...")
         for expense in test_expenses:
+            result = self.create_expense(
+                expense["description"], 
+                expense["amount"], 
+                account_id, 
+                category_id,
+                expense["due_date"]
+            )
+            if result:
+                created_expenses.append(result)
+                # Verify the due date was set correctly
+                if result.get('date') == expense["due_date"]:
+                    print(f"   ✅ Due date correctly set for: {expense['description']}")
+                else:
+                    print(f"   ❌ Due date mismatch for: {expense['description']}")
+                    print(f"      Expected: {expense['due_date']}, Got: {result.get('date')}")
+                    success = False
+            else:
+                print(f"   ❌ Failed to create expense: {expense['description']}")
+                success = False
+        
+        # Also test regular expenses without due dates to ensure backward compatibility
+        print(f"\n📝 Testing regular expense creation (no due date)...")
+        regular_expenses = [
+            {"description": "Coffee and pastries", "amount": 15.50},
+            {"description": "Gas station fill-up", "amount": 65.00}
+        ]
+        
+        for expense in regular_expenses:
             result = self.create_expense(
                 expense["description"], 
                 expense["amount"], 
@@ -438,12 +482,14 @@ class BudgetAppTester:
             )
             if result:
                 created_expenses.append(result)
+                print(f"   ✅ Regular expense created: {expense['description']}")
             else:
+                print(f"   ❌ Failed to create regular expense: {expense['description']}")
                 success = False
         
-        print(f"\n📊 Expense Entry Summary:")
+        print(f"\n📊 Expense Creation Summary:")
         print(f"   Total expenses created: {len(created_expenses)}")
-        print(f"   Expected expenses: {len(test_expenses)}")
+        print(f"   Expected expenses: {len(test_expenses) + len(regular_expenses)}")
         
         return success and len(created_expenses) > 0
     
