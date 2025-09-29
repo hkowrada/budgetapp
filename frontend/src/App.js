@@ -252,6 +252,83 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Upcoming Events & Bills Widget */}
+        {agendaData && (agendaData.events.length > 0 || agendaData.upcoming_bills.length > 0) && (
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-emerald-100 mb-8">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <span className="mr-2">📅</span>
+              This Week's Schedule
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Upcoming Events */}
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-3 flex items-center">
+                  <span className="mr-2">🗓️</span>
+                  Events ({agendaData.events.length})
+                </h3>
+                <div className="space-y-2">
+                  {agendaData.events.slice(0, 3).map((event) => (
+                    <div key={event.id} className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl">
+                      <div>
+                        <div className="font-medium text-gray-800">{event.title}</div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(event.start).toLocaleDateString()} at {new Date(event.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                      </div>
+                      {event.tags && event.tags.length > 0 && (
+                        <span className="text-xs px-2 py-1 bg-emerald-200 text-emerald-800 rounded-full">
+                          {event.tags[0]}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {agendaData.events.length > 3 && (
+                    <div className="text-center">
+                      <a href="/agenda" className="text-sm text-emerald-600 hover:text-emerald-700">
+                        +{agendaData.events.length - 3} more events
+                      </a>
+                    </div>
+                  )}
+                  {agendaData.events.length === 0 && (
+                    <p className="text-gray-500 text-sm text-center py-4">No events this week</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Upcoming Bills */}
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-3 flex items-center">
+                  <span className="mr-2">💳</span>
+                  Bills Due ({agendaData.upcoming_bills.length})
+                </h3>
+                <div className="space-y-2">
+                  {agendaData.upcoming_bills.slice(0, 3).map((bill) => (
+                    <div key={bill.id} className="flex items-center justify-between p-3 bg-red-50 rounded-xl">
+                      <div>
+                        <div className="font-medium text-gray-800">{bill.name}</div>
+                        <div className="text-sm text-gray-600">Due: {new Date(bill.due_date).toLocaleDateString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-red-600">€{bill.amount.toLocaleString()}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {agendaData.upcoming_bills.length > 3 && (
+                    <div className="text-center">
+                      <a href="/agenda" className="text-sm text-red-600 hover:text-red-700">
+                        +{agendaData.upcoming_bills.length - 3} more bills
+                      </a>
+                    </div>
+                  )}
+                  {agendaData.upcoming_bills.length === 0 && (
+                    <p className="text-gray-500 text-sm text-center py-4">No bills due this week</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
