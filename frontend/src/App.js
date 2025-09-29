@@ -5,6 +5,11 @@ import { Toaster } from './components/ui/toaster';
 import { useToast } from './hooks/use-toast';
 import CalendarView from './components/CalendarView';
 import AgendaView from './components/AgendaView';
+import QuickAddMenu from './components/QuickAddMenu';
+import CategoriesManagement from './components/CategoriesManagement';
+import { Button } from './components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
+import { Input } from './components/ui/input';
 import '@/App.css';
 
 // Context for authentication
