@@ -37,6 +37,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -48,6 +49,7 @@ const Login = () => {
       localStorage.setItem('user_data', JSON.stringify(user));
       login(user);
       toast({ title: "Login successful", description: `Welcome back, ${user.name}!` });
+      navigate('/'); // Navigate to dashboard after successful login
     } catch (error) {
       toast({ 
         title: "Login failed", 
