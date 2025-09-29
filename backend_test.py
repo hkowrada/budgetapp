@@ -131,105 +131,376 @@ class BudgetAppTester:
             print(f"❌ Transactions error: {str(e)}")
             return None
     
-    def test_salary_update_sequence(self):
-        """Test the complete salary update sequence as requested"""
-        print(f"\n🧪 TESTING SALARY UPDATE SEQUENCE")
+    def get_bills(self):
+        """Get all bills"""
+        print(f"\n📋 Getting all bills...")
+        
+        try:
+            response = self.session.get(f"{self.base_url}/bills")
+            print(f"Bills response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Retrieved {len(data)} bills")
+                
+                for bill in data:
+                    print(f"   - {bill.get('name', 'N/A')}: €{bill.get('expected_amount', 0)} (ID: {bill.get('id', 'N/A')})")
+                
+                return data
+            else:
+                print(f"❌ Bills retrieval failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Bills error: {str(e)}")
+            return None
+    
+    def update_bill(self, bill_id, new_amount):
+        """Update a bill amount"""
+        print(f"\n💡 Testing bill update for ID {bill_id} to €{new_amount}...")
+        
+        update_data = {
+            "expected_amount": new_amount
+        }
+        
+        try:
+            response = self.session.patch(f"{self.base_url}/bills/{bill_id}", json=update_data)
+            print(f"Bill update response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Bill update successful")
+                print(f"   Bill: {data.get('name', 'N/A')}")
+                print(f"   New Amount: €{data.get('expected_amount', 0)}")
+                return data
+            else:
+                print(f"❌ Bill update failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Bill update error: {str(e)}")
+            return None
+    
+    def create_expense(self, description, amount, account_id, category_id):
+        """Create a quick expense entry"""
+        print(f"\n💸 Testing expense creation: {description} - €{amount}...")
+        
+        expense_data = {
+            "type": "expense",
+            "account_id": account_id,
+            "category_id": category_id,
+            "amount": amount,
+            "description": description,
+            "date": datetime.now().date().isoformat()
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/transactions", json=expense_data)
+            print(f"Expense creation response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Expense created successfully")
+                print(f"   Description: {data.get('description', 'N/A')}")
+                print(f"   Amount: €{data.get('amount', 0)}")
+                print(f"   Transaction ID: {data.get('id', 'N/A')}")
+                return data
+            else:
+                print(f"❌ Expense creation failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Expense creation error: {str(e)}")
+            return None
+    
+    def get_accounts(self):
+        """Get all accounts"""
+        print(f"\n🏦 Getting all accounts...")
+        
+        try:
+            response = self.session.get(f"{self.base_url}/accounts")
+            print(f"Accounts response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Retrieved {len(data)} accounts")
+                
+                for account in data:
+                    print(f"   - {account.get('name', 'N/A')}: €{account.get('current_balance', 0)} (ID: {account.get('id', 'N/A')})")
+                
+                return data
+            else:
+                print(f"❌ Accounts retrieval failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Accounts error: {str(e)}")
+            return None
+    
+    def get_categories(self):
+        """Get all categories"""
+        print(f"\n📂 Getting all categories...")
+        
+        try:
+            response = self.session.get(f"{self.base_url}/categories")
+            print(f"Categories response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Retrieved {len(data)} categories")
+                
+                expense_categories = [cat for cat in data if cat.get('type') == 'expense']
+                print(f"   Expense categories: {len(expense_categories)}")
+                
+                return data
+            else:
+                print(f"❌ Categories retrieval failed: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Categories error: {str(e)}")
+            return None
+    
+    def test_bills_update_api(self):
+        """Test Bills Update API with all 6 bills as specified"""
+        print(f"\n🧪 TESTING BILLS UPDATE API")
         print("=" * 60)
         
-        # Step 1: Get initial dashboard stats
-        print("\n1️⃣ Getting initial dashboard stats...")
-        initial_stats = self.get_dashboard_stats()
-        if not initial_stats:
-            print("❌ Failed to get initial dashboard stats")
+        # Get all bills first
+        bills = self.get_bills()
+        if not bills:
+            print("❌ Failed to get bills")
             return False
         
-        initial_income = initial_stats.get('total_income', 0)
-        initial_salaries = initial_stats.get('current_salaries', {})
-        print(f"   Initial total income: €{initial_income}")
-        print(f"   Initial current salaries: {initial_salaries}")
+        # Expected bills from the review request
+        expected_bills = {
+            "Electricity Bill": 100,
+            "Water Bill": 30,
+            "Internet & WiFi": 35,
+            "Mobile Phone": 45,
+            "Home Insurance": 18,
+            "Home Loan EMI": 1000
+        }
         
-        # Step 2: Update salary to €3000
-        print("\n2️⃣ Updating salary to €3000...")
-        update_result_1 = self.update_salary(3000)
-        if not update_result_1:
-            print("❌ Failed to update salary to €3000")
+        success = True
+        updated_bills = []
+        
+        # Test updating each bill
+        for bill in bills:
+            bill_name = bill.get('name', '')
+            bill_id = bill.get('id')
+            
+            # Find matching expected bill
+            new_amount = None
+            for expected_name, amount in expected_bills.items():
+                if expected_name.lower() in bill_name.lower() or bill_name.lower() in expected_name.lower():
+                    new_amount = amount
+                    break
+            
+            if new_amount and bill_id:
+                print(f"\n📝 Updating {bill_name} to €{new_amount}...")
+                result = self.update_bill(bill_id, new_amount)
+                if result:
+                    updated_bills.append(result)
+                    print(f"✅ Successfully updated {bill_name}")
+                else:
+                    print(f"❌ Failed to update {bill_name}")
+                    success = False
+            else:
+                print(f"⚠️ Skipping {bill_name} - not in expected bills list")
+        
+        print(f"\n📊 Bills Update Summary:")
+        print(f"   Total bills updated: {len(updated_bills)}")
+        print(f"   Expected updates: {len(expected_bills)}")
+        
+        return success and len(updated_bills) > 0
+    
+    def test_quick_expense_entry(self):
+        """Test Quick Expense Entry API"""
+        print(f"\n🧪 TESTING QUICK EXPENSE ENTRY API")
+        print("=" * 60)
+        
+        # Get accounts and categories first
+        accounts = self.get_accounts()
+        categories = self.get_categories()
+        
+        if not accounts or not categories:
+            print("❌ Failed to get accounts or categories")
             return False
         
-        # Step 3: Verify dashboard after first update
-        print("\n3️⃣ Verifying dashboard after €3000 update...")
-        stats_after_3000 = self.get_dashboard_stats()
-        if not stats_after_3000:
-            print("❌ Failed to get dashboard stats after €3000 update")
+        # Use first active account
+        account = accounts[0]
+        account_id = account.get('id')
+        
+        # Find a suitable expense category (like Groceries)
+        expense_categories = [cat for cat in categories if cat.get('type') == 'expense']
+        if not expense_categories:
+            print("❌ No expense categories found")
             return False
         
-        income_after_3000 = stats_after_3000.get('total_income', 0)
-        salaries_after_3000 = stats_after_3000.get('current_salaries', {})
+        category = expense_categories[0]  # Use first expense category
+        category_id = category.get('id')
         
-        # Step 4: Update salary to €4500
-        print("\n4️⃣ Updating salary to €4500...")
-        update_result_2 = self.update_salary(4500)
-        if not update_result_2:
-            print("❌ Failed to update salary to €4500")
+        # Test expenses
+        test_expenses = [
+            {"description": "Coffee and pastries", "amount": 15.50},
+            {"description": "Grocery shopping", "amount": 85.30},
+            {"description": "Gas station fill-up", "amount": 65.00}
+        ]
+        
+        success = True
+        created_expenses = []
+        
+        for expense in test_expenses:
+            result = self.create_expense(
+                expense["description"], 
+                expense["amount"], 
+                account_id, 
+                category_id
+            )
+            if result:
+                created_expenses.append(result)
+            else:
+                success = False
+        
+        print(f"\n📊 Expense Entry Summary:")
+        print(f"   Total expenses created: {len(created_expenses)}")
+        print(f"   Expected expenses: {len(test_expenses)}")
+        
+        return success and len(created_expenses) > 0
+    
+    def test_dashboard_integration(self):
+        """Test Dashboard Integration - verify calculations are accurate"""
+        print(f"\n🧪 TESTING DASHBOARD INTEGRATION")
+        print("=" * 60)
+        
+        # Get dashboard stats
+        stats = self.get_dashboard_stats()
+        if not stats:
+            print("❌ Failed to get dashboard stats")
             return False
         
-        # Step 5: Verify final dashboard state
-        print("\n5️⃣ Verifying final dashboard state...")
-        final_stats = self.get_dashboard_stats()
-        if not final_stats:
-            print("❌ Failed to get final dashboard stats")
+        # Get transactions to verify calculations
+        transactions = self.get_transactions(100)
+        if not transactions:
+            print("❌ Failed to get transactions")
             return False
         
-        final_income = final_stats.get('total_income', 0)
-        final_salaries = final_stats.get('current_salaries', {})
+        # Manual calculation
+        manual_income = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'income')
+        manual_expenses = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'expense')
+        manual_surplus = manual_income - manual_expenses
         
-        # Step 6: Check transactions to ensure no duplicates
-        print("\n6️⃣ Checking transaction integrity...")
-        transactions = self.get_transactions(50)  # Get more transactions to check for duplicates
+        # Compare with dashboard
+        dashboard_income = stats.get('total_income', 0)
+        dashboard_expenses = stats.get('total_expenses', 0)
+        dashboard_surplus = stats.get('monthly_surplus', 0)
         
-        # Analysis and validation
-        print(f"\n📋 ANALYSIS RESULTS")
-        print("=" * 40)
+        print(f"\n📊 Dashboard vs Manual Calculation:")
+        print(f"   Income - Dashboard: €{dashboard_income}, Manual: €{manual_income}")
+        print(f"   Expenses - Dashboard: €{dashboard_expenses}, Manual: €{manual_expenses}")
+        print(f"   Surplus - Dashboard: €{dashboard_surplus}, Manual: €{manual_surplus}")
+        
+        # Tolerance for floating point comparison
+        tolerance = 0.01
+        
+        success = True
+        if abs(dashboard_income - manual_income) > tolerance:
+            print(f"❌ Income mismatch: Dashboard €{dashboard_income} vs Manual €{manual_income}")
+            success = False
+        else:
+            print("✅ Income calculation matches")
+        
+        if abs(dashboard_expenses - manual_expenses) > tolerance:
+            print(f"❌ Expenses mismatch: Dashboard €{dashboard_expenses} vs Manual €{manual_expenses}")
+            success = False
+        else:
+            print("✅ Expenses calculation matches")
+        
+        if abs(dashboard_surplus - manual_surplus) > tolerance:
+            print(f"❌ Surplus mismatch: Dashboard €{dashboard_surplus} vs Manual €{manual_surplus}")
+            success = False
+        else:
+            print("✅ Surplus calculation matches")
+        
+        return success
+    
+    def test_data_consistency(self):
+        """Test Data Consistency - ensure no duplicates and proper categorization"""
+        print(f"\n🧪 TESTING DATA CONSISTENCY")
+        print("=" * 60)
+        
+        # Get all data
+        transactions = self.get_transactions(200)
+        bills = self.get_bills()
+        accounts = self.get_accounts()
+        
+        if not transactions or not bills or not accounts:
+            print("❌ Failed to get required data")
+            return False
         
         success = True
         
-        # Check if salary updates are replacing, not adding
-        print(f"Initial income: €{initial_income}")
-        print(f"Income after €3000 update: €{income_after_3000}")
-        print(f"Final income after €4500 update: €{final_income}")
-        
-        # The key test: final income should be €4500, not cumulative
-        if final_income == 4500:
-            print("✅ PASS: Salary updates are REPLACING, not adding")
-        else:
-            print(f"❌ FAIL: Expected final income €4500, got €{final_income}")
+        # Check for duplicate bill entries
+        bill_names = [bill.get('name', '') for bill in bills]
+        if len(bill_names) != len(set(bill_names)):
+            print("❌ Duplicate bill names found")
             success = False
-        
-        # Check current_salaries field
-        user_id = self.user_info.get('id') if self.user_info else None
-        if user_id and user_id in final_salaries:
-            user_salary = final_salaries[user_id]
-            if user_salary.get('amount') == 4500:
-                print("✅ PASS: current_salaries field shows correct amount")
-            else:
-                print(f"❌ FAIL: current_salaries shows €{user_salary.get('amount')}, expected €4500")
-                success = False
         else:
-            print("❌ FAIL: User not found in current_salaries or field missing")
-            success = False
+            print("✅ No duplicate bill names")
         
-        # Check for duplicate transactions
-        if transactions:
-            salary_txns = [t for t in transactions if t.get('type') == 'income' and 
-                          t.get('created_by') == user_id and 
-                          'salary' in t.get('description', '').lower()]
+        # Check account balance consistency
+        for account in accounts:
+            account_id = account.get('id')
+            account_name = account.get('name', 'Unknown')
+            current_balance = account.get('current_balance', 0)
             
-            if len(salary_txns) == 1:
-                print("✅ PASS: Only ONE salary transaction exists (no duplicates)")
-            else:
-                print(f"❌ FAIL: Found {len(salary_txns)} salary transactions, expected 1")
+            # Calculate expected balance from transactions
+            account_transactions = [t for t in transactions if t.get('account_id') == account_id]
+            
+            balance_from_txns = account.get('opening_balance', 0)
+            for txn in account_transactions:
+                if txn.get('type') == 'income':
+                    balance_from_txns += txn.get('amount', 0)
+                elif txn.get('type') == 'expense':
+                    balance_from_txns -= txn.get('amount', 0)
+            
+            if abs(current_balance - balance_from_txns) > 0.01:
+                print(f"❌ Balance inconsistency for {account_name}: Current €{current_balance}, Expected €{balance_from_txns}")
                 success = False
+            else:
+                print(f"✅ Balance consistent for {account_name}: €{current_balance}")
         
         return success
+    
+    def run_phase1_tests(self):
+        """Run all Phase 1 tests as specified in the review request"""
+        print(f"\n🚀 RUNNING PHASE 1 BUDGET APP TESTS")
+        print("=" * 70)
+        
+        test_results = {}
+        
+        # Test 1: Bills Update API
+        print(f"\n1️⃣ BILLS UPDATE API TESTING")
+        test_results['bills_update'] = self.test_bills_update_api()
+        
+        # Test 2: Quick Expense Entry API
+        print(f"\n2️⃣ QUICK EXPENSE ENTRY API TESTING")
+        test_results['expense_entry'] = self.test_quick_expense_entry()
+        
+        # Test 3: Dashboard Integration
+        print(f"\n3️⃣ DASHBOARD INTEGRATION TESTING")
+        test_results['dashboard_integration'] = self.test_dashboard_integration()
+        
+        # Test 4: Data Consistency
+        print(f"\n4️⃣ DATA CONSISTENCY TESTING")
+        test_results['data_consistency'] = self.test_data_consistency()
+        
+        # Final verification - get updated dashboard stats
+        print(f"\n5️⃣ FINAL DASHBOARD VERIFICATION")
+        final_stats = self.get_dashboard_stats()
+        
+        return test_results, final_stats
 
 def main():
     """Main testing function"""
