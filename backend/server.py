@@ -979,7 +979,7 @@ async def create_budget(budget_data: BudgetCreate, current_user: User = Depends(
     await log_audit(current_user.id, "CREATE", "budget", budget.id)
     return budget
 
-# Dashboard
+# Enhanced Dashboard with current salary calculation
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
 async def get_dashboard_stats(
     month: Optional[int] = None,
@@ -998,13 +998,42 @@ async def get_dashboard_stats(
     
     # Get transactions for the month
     transactions = await db.transactions.find({
-        "date": {"$gte": start_date, "$lt": end_date}
+        "date": {"$gte": start_date, "$$lt": end_date}
     }).to_list(None)
     
     # Get categories for classification
     categories = await db.categories.find().to_list(None)
     category_map = {cat["id"]: cat for cat in categories}
     
+    # Get current salaries (most recent salary transaction for each user)
+    users = await db.users.find().to_list(None)
+    current_salaries = {}
+    
+    for user in users:
+        if user["role"] in ["owner", "coowner"]:
+            # Find salary categories for this user
+            user_salary_categories = [cat["id"] for cat in categories 
+                                    if cat["type"] == "income" and user["name"].lower() in cat["name"].lower()]
+            
+            if user_salary_categories:
+                # Get most recent salary transaction
+                recent_salary = await db.transactions.find_one(
+                    {
+                        "created_by": user["id"],
+                        "type": "income", 
+                        "category_id": {"$in": user_salary_categories}
+                    },
+                    sort=[("date", -1)]
+                )
+                
+                if recent_salary:
+                    current_salaries[user["id"]] = {
+                        "name": user["name"],
+                        "amount": recent_salary["amount"],
+                        "category_id": recent_salary["category_id"]
+                    }
+    
+    # Calculate totals based on current month transactions
     total_income = 0.0
     total_expenses = 0.0
     category_breakdown = {}
@@ -1028,15 +1057,85 @@ async def get_dashboard_stats(
     # Get recent transactions
     recent_transactions = await db.transactions.find().sort("created_at", -1).limit(10).to_list(None)
     
-    return DashboardStats(
-        total_income=total_income,
-        total_expenses=total_expenses,
-        monthly_surplus=monthly_surplus,
-        savings_rate=round(savings_rate, 2),
-        upcoming_bills=[{"id": bill["id"], "name": bill["name"], "amount": bill["expected_amount"], "due_day": bill["due_day"]} for bill in upcoming_bills],
-        category_breakdown=category_breakdown,
-        recent_transactions=[{"id": txn["id"], "amount": txn["amount"], "description": txn.get("description", ""), "date": txn["date"]} for txn in recent_transactions]
+    return {
+        **DashboardStats(
+            total_income=total_income,
+            total_expenses=total_expenses,
+            monthly_surplus=monthly_surplus,
+            savings_rate=round(savings_rate, 2),
+            upcoming_bills=[{"id": bill["id"], "name": bill["name"], "amount": bill["expected_amount"], "due_day": bill["due_day"]} for bill in upcoming_bills],
+            category_breakdown=category_breakdown,
+            recent_transactions=[{"id": txn["id"], "amount": txn["amount"], "description": txn.get("description", ""), "date": txn["date"]} for txn in recent_transactions]
+        ).dict(),
+        "current_salaries": current_salaries
+    }
+
+# Update Salary Endpoint (replaces existing salary)
+@api_router.patch("/salary/update")
+async def update_salary(
+    new_salary: float,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot update salary")
+    
+    # Find user's salary category
+    categories = await db.categories.find({"type": "income"}).to_list(None)
+    user_salary_category = None
+    
+    for cat in categories:
+        if current_user.name.lower() in cat["name"].lower():
+            user_salary_category = cat
+            break
+    
+    if not user_salary_category:
+        raise HTTPException(status_code=404, detail="Salary category not found for user")
+    
+    # Get user's default account
+    accounts = await db.accounts.find({"is_active": True}).to_list(None)
+    if not accounts:
+        raise HTTPException(status_code=404, detail="No active accounts found")
+    
+    default_account = accounts[0]  # Use first active account
+    
+    # Create new salary transaction for current month
+    current_date = datetime.now().date()
+    first_of_month = current_date.replace(day=1)
+    
+    # Delete any existing salary transaction for current month
+    await db.transactions.delete_many({
+        "created_by": current_user.id,
+        "type": "income",
+        "category_id": user_salary_category["id"],
+        "date": {"$gte": first_of_month.isoformat()}
+    })
+    
+    # Create new salary transaction
+    salary_transaction = Transaction(
+        type=TransactionType.INCOME,
+        account_id=default_account["id"],
+        category_id=user_salary_category["id"],
+        amount=new_salary,
+        description=f"{current_date.strftime('%B %Y')} Salary - Updated",
+        date=first_of_month,
+        is_recurring=True,
+        created_by=current_user.id
     )
+    
+    await db.transactions.insert_one(prepare_for_mongo(salary_transaction.dict()))
+    
+    # Update account balance
+    await db.accounts.update_one(
+        {"id": default_account["id"]},
+        {"$inc": {"current_balance": new_salary}}
+    )
+    
+    await log_audit(current_user.id, "UPDATE_SALARY", "transaction", salary_transaction.id, {
+        "new_amount": new_salary,
+        "old_transactions_deleted": True
+    })
+    
+    return {"message": f"Salary updated to €{new_salary}", "transaction_id": salary_transaction.id}
 
 # Audit Logs (Owner only)
 @api_router.get("/audit-logs", response_model=List[AuditLog])
