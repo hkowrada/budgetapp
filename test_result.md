@@ -101,3 +101,86 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Calendar and notification enhancements are highest priority (mobile browser notifications + email newsletters). Critical bug still exists - salary/expense updates are adding instead of updating values across the app."
+
+backend:
+  - task: "Salary update API endpoint"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "user"
+        - comment: "User reports salary updates are still adding instead of replacing. API shows success toast but dashboard still shows €0 for salary and combined household income"
+
+  - task: "Browser notification system"
+    implemented: false
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Not yet implemented - user requested browser notifications for mobile"
+
+  - task: "Email newsletter system"
+    implemented: false
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Not yet implemented - user wants simple opensource solution (Nodemailer with Gmail)"
+
+frontend:
+  - task: "Salary update display"
+    implemented: true
+    working: false
+    file: "frontend/src/components/EditableSalaryCard.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "user"
+        - comment: "Frontend shows success toast but dashboard still displays €0 salary and €0 combined household income after update"
+
+  - task: "Browser notification UI"
+    implemented: false
+    working: "NA"
+    file: "frontend/src/components/"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Not yet implemented - needs browser notification API integration"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Salary update API endpoint"
+    - "Salary update display"
+  stuck_tasks:
+    - "Salary update functionality across the app"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+    - message: "User confirmed critical salary update bug still exists. Screenshots show backend API returns success but dashboard displays €0. Need to investigate data retrieval logic in both backend dashboard endpoint and frontend display logic."
