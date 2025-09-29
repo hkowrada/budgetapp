@@ -657,6 +657,247 @@ async def get_audit_logs(
     logs = await db.audit_logs.find().sort("timestamp", -1).skip(offset).limit(limit).to_list(None)
     return [AuditLog(**parse_from_mongo(log)) for log in logs]
 
+# Calendar Management
+@api_router.get("/calendars", response_model=List[Calendar])
+async def get_calendars(current_user: User = Depends(get_current_user)):
+    query = {
+        "$or": [
+            {"scope": "household"},
+            {"owner_user_id": current_user.id}
+        ]
+    }
+    calendars = await db.calendars.find(query).to_list(None)
+    return [Calendar(**parse_from_mongo(cal)) for cal in calendars]
+
+@api_router.post("/calendars", response_model=Calendar)
+async def create_calendar(calendar_data: Calendar, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create calendars")
+    
+    # Set owner for personal calendars
+    if calendar_data.scope == CalendarScope.PERSONAL:
+        calendar_data.owner_user_id = current_user.id
+    
+    await db.calendars.insert_one(prepare_for_mongo(calendar_data.dict()))
+    await log_audit(current_user.id, "CREATE", "calendar", calendar_data.id)
+    return calendar_data
+
+# Events Management
+@api_router.get("/events", response_model=List[Event])
+async def get_events(
+    calendar_id: Optional[str] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+    tags: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    query = {}
+    
+    # Filter by accessible calendars
+    accessible_calendars = await db.calendars.find({
+        "$or": [
+            {"scope": "household"},
+            {"owner_user_id": current_user.id}
+        ]
+    }).to_list(None)
+    accessible_calendar_ids = [cal["id"] for cal in accessible_calendars]
+    
+    if calendar_id:
+        if calendar_id not in accessible_calendar_ids:
+            raise HTTPException(status_code=403, detail="Access denied to this calendar")
+        query["calendar_id"] = calendar_id
+    else:
+        query["calendar_id"] = {"$in": accessible_calendar_ids}
+    
+    # Date range filter
+    if start and end:
+        query["start"] = {"$gte": start.isoformat(), "$lte": end.isoformat()}
+    elif start:
+        query["start"] = {"$gte": start.isoformat()}
+    elif end:
+        query["start"] = {"$lte": end.isoformat()}
+    
+    # Tags filter
+    if tags:
+        tag_list = [tag.strip() for tag in tags.split(",")]
+        query["tags"] = {"$in": tag_list}
+    
+    events = await db.events.find(query).sort("start", 1).to_list(None)
+    return [Event(**parse_from_mongo(event)) for event in events]
+
+@api_router.post("/events", response_model=Event)
+async def create_event(event_data: EventCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create events")
+    
+    # Check calendar access
+    calendar = await db.calendars.find_one({"id": event_data.calendar_id})
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    
+    # Check permissions
+    if calendar["scope"] == "personal" and calendar["owner_user_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot create events in other users' personal calendars")
+    
+    event = Event(**event_data.dict(), created_by=current_user.id)
+    await db.events.insert_one(prepare_for_mongo(event.dict()))
+    await log_audit(current_user.id, "CREATE", "event", event.id)
+    return event
+
+@api_router.patch("/events/{event_id}", response_model=Event)
+async def update_event(event_id: str, update_data: Dict[str, Any], current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot update events")
+    
+    event = await db.events.find_one({"id": event_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Check permissions
+    calendar = await db.calendars.find_one({"id": event["calendar_id"]})
+    if calendar["scope"] == "personal" and calendar["owner_user_id"] != current_user.id:
+        if event["created_by"] != current_user.id:
+            raise HTTPException(status_code=403, detail="Cannot update this event")
+    
+    # Update fields
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.events.update_one(
+        {"id": event_id},
+        {"$set": prepare_for_mongo(update_data)}
+    )
+    
+    await log_audit(current_user.id, "UPDATE", "event", event_id, update_data)
+    
+    updated_event = await db.events.find_one({"id": event_id})
+    return Event(**parse_from_mongo(updated_event))
+
+@api_router.delete("/events/{event_id}")
+async def delete_event(event_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot delete events")
+    
+    event = await db.events.find_one({"id": event_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Check permissions
+    calendar = await db.calendars.find_one({"id": event["calendar_id"]})
+    if calendar["scope"] == "personal" and calendar["owner_user_id"] != current_user.id:
+        if event["created_by"] != current_user.id:
+            raise HTTPException(status_code=403, detail="Cannot delete this event")
+    
+    await db.events.delete_one({"id": event_id})
+    await db.reminders.delete_many({"event_id": event_id})  # Delete associated reminders
+    await log_audit(current_user.id, "DELETE", "event", event_id)
+    
+    return {"message": "Event deleted successfully"}
+
+# Reminders Management  
+@api_router.post("/events/{event_id}/reminders", response_model=Reminder)
+async def create_reminder(event_id: str, reminder_data: ReminderCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot create reminders")
+    
+    # Verify event exists and user has access
+    event = await db.events.find_one({"id": event_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    reminder = Reminder(**reminder_data.dict())
+    
+    # Calculate trigger time
+    event_start = datetime.fromisoformat(event["start"])
+    reminder.trigger_time = event_start - timedelta(minutes=reminder.offset_minutes)
+    
+    await db.reminders.insert_one(prepare_for_mongo(reminder.dict()))
+    await log_audit(current_user.id, "CREATE", "reminder", reminder.id)
+    return reminder
+
+@api_router.get("/reminders", response_model=List[Reminder])
+async def get_reminders(current_user: User = Depends(get_current_user)):
+    # Get user's accessible events first
+    accessible_calendars = await db.calendars.find({
+        "$or": [
+            {"scope": "household"},
+            {"owner_user_id": current_user.id}
+        ]
+    }).to_list(None)
+    accessible_calendar_ids = [cal["id"] for cal in accessible_calendars]
+    
+    accessible_events = await db.events.find({
+        "calendar_id": {"$in": accessible_calendar_ids}
+    }).to_list(None)
+    accessible_event_ids = [event["id"] for event in accessible_events]
+    
+    reminders = await db.reminders.find({
+        "event_id": {"$in": accessible_event_ids}
+    }).to_list(None)
+    
+    return [Reminder(**parse_from_mongo(reminder)) for reminder in reminders]
+
+# Agenda and Dashboard Integration
+@api_router.get("/agenda")
+async def get_agenda(
+    days: int = 30,
+    current_user: User = Depends(get_current_user)
+):
+    """Get upcoming events and bills for agenda view"""
+    paris_tz = get_paris_timezone()
+    now = datetime.now(paris_tz)
+    end_date = now + timedelta(days=days)
+    
+    # Get accessible calendars
+    accessible_calendars = await db.calendars.find({
+        "$or": [
+            {"scope": "household"},
+            {"owner_user_id": current_user.id}
+        ]
+    }).to_list(None)
+    accessible_calendar_ids = [cal["id"] for cal in accessible_calendars]
+    
+    # Get upcoming events
+    events = await db.events.find({
+        "calendar_id": {"$in": accessible_calendar_ids},
+        "start": {"$gte": now.isoformat(), "$lte": end_date.isoformat()}
+    }).sort("start", 1).to_list(None)
+    
+    # Get upcoming bills (separate from events)
+    bills = await db.bills.find({"is_active": True}).to_list(None)
+    upcoming_bills = []
+    
+    for bill in bills:
+        # Calculate next due date
+        current_date = now.date()
+        if bill["due_day"] <= current_date.day:
+            # Next month
+            if current_date.month == 12:
+                next_due = current_date.replace(year=current_date.year + 1, month=1, day=bill["due_day"])
+            else:
+                next_due = current_date.replace(month=current_date.month + 1, day=bill["due_day"])
+        else:
+            # This month
+            next_due = current_date.replace(day=bill["due_day"])
+        
+        if next_due <= end_date.date():
+            upcoming_bills.append({
+                "id": bill["id"],
+                "name": bill["name"],
+                "amount": bill["expected_amount"],
+                "due_date": next_due.isoformat(),
+                "provider": bill.get("provider")
+            })
+    
+    return {
+        "events": [Event(**parse_from_mongo(event)) for event in events],
+        "upcoming_bills": upcoming_bills,
+        "range": {
+            "start": now.isoformat(),
+            "end": end_date.isoformat(),
+            "days": days
+        }
+    }
+
 # Health Check
 @api_router.get("/health")
 async def health_check():
