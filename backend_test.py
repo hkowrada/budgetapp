@@ -493,6 +493,97 @@ class BudgetAppTester:
         
         return success and len(created_expenses) > 0
     
+    def test_enhanced_expense_form_backend(self):
+        """Test Enhanced Expense Form Backend Support - Creating Bills"""
+        print(f"\n🧪 TESTING ENHANCED EXPENSE FORM BACKEND SUPPORT")
+        print("=" * 60)
+        
+        # Get accounts and categories first
+        accounts = self.get_accounts()
+        categories = self.get_categories()
+        
+        if not accounts or not categories:
+            print("❌ Failed to get accounts or categories")
+            return False
+        
+        # Use first active account
+        account = accounts[0]
+        account_id = account.get('id')
+        
+        # Find a suitable expense category
+        expense_categories = [cat for cat in categories if cat.get('type') == 'expense']
+        if not expense_categories:
+            print("❌ No expense categories found")
+            return False
+        
+        category = expense_categories[0]
+        category_id = category.get('id')
+        
+        # Test creating new bills with custom due dates
+        test_bills = [
+            {
+                "name": "Test Streaming Service",
+                "expected_amount": 12.99,
+                "due_day": 5,
+                "provider": "Netflix"
+            },
+            {
+                "name": "Test Gym Membership",
+                "expected_amount": 29.99,
+                "due_day": 15,
+                "provider": "FitGym"
+            },
+            {
+                "name": "Test Cloud Storage",
+                "expected_amount": 9.99,
+                "due_day": 28,
+                "provider": "CloudCorp"
+            }
+        ]
+        
+        success = True
+        created_bills = []
+        
+        print(f"\n📝 Testing bill creation through enhanced expense form...")
+        for bill in test_bills:
+            result = self.create_bill(
+                bill["name"],
+                bill["expected_amount"],
+                bill["due_day"],
+                account_id,
+                category_id,
+                bill["provider"]
+            )
+            if result:
+                created_bills.append(result)
+                print(f"   ✅ Bill created: {bill['name']}")
+            else:
+                print(f"   ❌ Failed to create bill: {bill['name']}")
+                success = False
+        
+        # Verify bills appear in bills list
+        if created_bills:
+            print(f"\n📝 Verifying bills appear in bills list...")
+            all_bills = self.get_bills()
+            if all_bills:
+                created_bill_ids = [bill.get('id') for bill in created_bills]
+                found_bills = [bill for bill in all_bills if bill.get('id') in created_bill_ids]
+                
+                if len(found_bills) == len(created_bills):
+                    print(f"   ✅ All {len(created_bills)} new bills found in bills list")
+                else:
+                    print(f"   ❌ Only {len(found_bills)}/{len(created_bills)} bills found in list")
+                    success = False
+            else:
+                print(f"   ❌ Failed to retrieve bills list for verification")
+                success = False
+        
+        print(f"\n📊 Enhanced Expense Form Summary:")
+        print(f"   Total bills created: {len(created_bills)}")
+        print(f"   Expected bills: {len(test_bills)}")
+        
+        return success and len(created_bills) > 0
+    
     def test_dashboard_integration(self):
         """Test Dashboard Integration - verify calculations are accurate"""
         print(f"\n🧪 TESTING DASHBOARD INTEGRATION")
