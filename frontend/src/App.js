@@ -716,6 +716,12 @@ function App() {
 // Calendar Page with Layout
 const CalendarPage = () => {
   const { user, logout } = useAuth();
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const { toast } = useToast();
+
+  const fetchDashboardStats = () => {
+    toast({ title: 'Transaction added successfully!' });
+  };
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -775,7 +781,23 @@ const CalendarPage = () => {
                 >
                   Agenda
                 </a>
+                <a 
+                  href="/categories"
+                  className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                >
+                  Categories
+                </a>
               </nav>
+              
+              {user.role !== 'guest' && (
+                <Button
+                  onClick={() => setShowQuickAdd(true)}
+                  className="bg-emerald-500 hover:bg-emerald-600"
+                >
+                  <span className="mr-2">💰</span>
+                  Quick Add
+                </Button>
+              )}
               
               <span className="text-gray-600">Welcome, {user.name}</span>
               <button
@@ -791,6 +813,13 @@ const CalendarPage = () => {
       </header>
 
       <CalendarView user={user} />
+      
+      <QuickAddMenu 
+        user={user}
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSuccess={fetchDashboardStats}
+      />
     </div>
   );
 };
