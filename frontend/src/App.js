@@ -7,6 +7,7 @@ import CalendarView from './components/CalendarView';
 import AgendaView from './components/AgendaView';
 import QuickAddMenu from './components/QuickAddMenu';
 import CategoriesManagement from './components/CategoriesManagement';
+import EditableSalaryCard from './components/EditableSalaryCard';
 import { Button } from './components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Input } from './components/ui/input';
