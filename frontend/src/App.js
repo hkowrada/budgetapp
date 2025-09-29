@@ -149,6 +149,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [agendaData, setAgendaData] = useState({ events: [], upcoming_bills: [] });
   const [currentSalaries, setCurrentSalaries] = useState({});
+  const [bills, setBills] = useState([]);
+  const [showQuickExpense, setShowQuickExpense] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
