@@ -83,23 +83,23 @@ const AgendaView = ({ user }) => {
   ])].sort();
 
   return (
-    <div className=\"p-6\">
-      <div className=\"flex items-center justify-between mb-6\">
-        <h1 className=\"text-3xl font-bold text-gray-800 flex items-center\">
-          <span className=\"mr-3\">📋</span>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+          <span className="mr-3">📋</span>
           Agenda & Upcoming
         </h1>
         
-        <div className=\"flex items-center space-x-4\">
-          <div className=\"flex items-center space-x-2\">
-            <span className=\"text-sm font-medium text-gray-700\">View:</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-gray-700">View:</span>
             {[7, 14, 30].map(days => (
               <Button
                 key={days}
-                variant={selectedDays === days ? \"default\" : \"outline\"}
-                size=\"sm\"
+                variant={selectedDays === days ? "default" : "outline"}
+                size="sm"
                 onClick={() => setSelectedDays(days)}
-                className={selectedDays === days ? \"bg-emerald-500 hover:bg-emerald-600\" : \"\"}
+                className={selectedDays === days ? "bg-emerald-500 hover:bg-emerald-600" : ""}
               >
                 {days} days
               </Button>
@@ -108,23 +108,23 @@ const AgendaView = ({ user }) => {
           
           <Button
             onClick={loadAgenda}
-            variant=\"outline\"
-            className=\"border-emerald-200\"
+            variant="outline"
+            className="border-emerald-200"
           >
-            <span className=\"mr-2\">🔄</span>
+            <span className="mr-2">🔄</span>
             Refresh
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue=\"combined\" className=\"w-full\">
-        <TabsList className=\"grid w-full grid-cols-3\">
-          <TabsTrigger value=\"combined\">Combined View</TabsTrigger>
-          <TabsTrigger value=\"events\">Events Only</TabsTrigger>
-          <TabsTrigger value=\"bills\">Bills Only</TabsTrigger>
+      <Tabs defaultValue="combined" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="combined">Combined View</TabsTrigger>
+          <TabsTrigger value="events">Events Only</TabsTrigger>
+          <TabsTrigger value="bills">Bills Only</TabsTrigger>
         </TabsList>
 
-        <TabsContent value=\"combined\" className=\"space-y-4 mt-6\">
+        <TabsContent value="combined" className="space-y-4 mt-6">
           {allDates.length === 0 ? (
             <Card>
               <CardContent className=\"flex items-center justify-center h-32\">
