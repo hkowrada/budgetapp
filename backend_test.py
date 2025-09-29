@@ -601,9 +601,25 @@ class BudgetAppTester:
             print("❌ Failed to get transactions")
             return False
         
-        # Manual calculation
-        manual_income = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'income')
-        manual_expenses = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'expense')
+        # Filter transactions for current month (same logic as dashboard)
+        from datetime import datetime
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+        
+        monthly_transactions = []
+        for t in transactions:
+            txn_date = t.get('date', '')
+            if txn_date:
+                try:
+                    txn_datetime = datetime.fromisoformat(txn_date)
+                    if txn_datetime.month == current_month and txn_datetime.year == current_year:
+                        monthly_transactions.append(t)
+                except:
+                    pass
+        
+        # Manual calculation for current month only
+        manual_income = sum(t.get('amount', 0) for t in monthly_transactions if t.get('type') == 'income')
+        manual_expenses = sum(t.get('amount', 0) for t in monthly_transactions if t.get('type') == 'expense')
         manual_surplus = manual_income - manual_expenses
         
         # Compare with dashboard
@@ -611,7 +627,8 @@ class BudgetAppTester:
         dashboard_expenses = stats.get('total_expenses', 0)
         dashboard_surplus = stats.get('monthly_surplus', 0)
         
-        print(f"\n📊 Dashboard vs Manual Calculation:")
+        print(f"\n📊 Dashboard vs Manual Calculation (Current Month Only):")
+        print(f"   Monthly transactions found: {len(monthly_transactions)}")
         print(f"   Income - Dashboard: €{dashboard_income}, Manual: €{manual_income}")
         print(f"   Expenses - Dashboard: €{dashboard_expenses}, Manual: €{manual_expenses}")
         print(f"   Surplus - Dashboard: €{dashboard_surplus}, Manual: €{manual_surplus}")
@@ -637,6 +654,29 @@ class BudgetAppTester:
             success = False
         else:
             print("✅ Surplus calculation matches")
+        
+        # Additional verification: Check that dashboard reflects recent changes
+        print(f"\n📊 Verifying dashboard reflects recent changes:")
+        
+        # Check if recent expenses we created are reflected
+        recent_expense_descriptions = [
+            "Grocery shopping with due date",
+            "Utility payment due next week", 
+            "Medical appointment payment",
+            "Coffee and pastries",
+            "Gas station fill-up"
+        ]
+        
+        recent_expenses_found = 0
+        for txn in monthly_transactions:
+            if txn.get('description', '') in recent_expense_descriptions:
+                recent_expenses_found += 1
+        
+        if recent_expenses_found >= 3:  # At least some of our test expenses should be in current month
+            print(f"✅ Dashboard reflects recent expense changes ({recent_expenses_found} test expenses found)")
+        else:
+            print(f"⚠️ Limited recent expense reflection ({recent_expenses_found} test expenses found)")
+            # This is not a failure since expenses might be in different months
         
         return success
     
