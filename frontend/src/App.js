@@ -146,6 +146,9 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [agendaData, setAgendaData] = useState({ events: [], upcoming_bills: [] });
   const [loading, setLoading] = useState(true);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ old_password: '', new_password: '', confirm_password: '' });
   const { toast } = useToast();
 
   const fetchDashboardStats = async () => {
@@ -164,6 +167,29 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      toast({ title: 'Passwords do not match', variant: 'destructive' });
+      return;
+    }
+
+    try {
+      await axios.post('/auth/change-password', {
+        old_password: passwordForm.old_password,
+        new_password: passwordForm.new_password
+      });
+      toast({ title: 'Password changed successfully!' });
+      setShowPasswordDialog(false);
+      setPasswordForm({ old_password: '', new_password: '', confirm_password: '' });
+    } catch (error) {
+      toast({
+        title: 'Error changing password',
+        description: error.response?.data?.detail || 'Failed to change password',
+        variant: 'destructive'
+      });
     }
   };
 
