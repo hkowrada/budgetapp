@@ -1386,7 +1386,7 @@ async def startup_event():
             await db.accounts.insert_many(accounts_to_create)
             logger.info("Created default accounts")
         
-        # Create default calendars if they don't exist
+        # Create default calendars with proper personal calendar setup
         calendar_count = await db.calendars.count_documents({})
         if calendar_count == 0:
             users = await db.users.find().to_list(None)
@@ -1394,18 +1394,18 @@ async def startup_event():
             spouse = next((u for u in users if u["email"] == "spouse@budget.app"), None)
             
             calendars_to_create = [
-                # Household calendar
+                # Household calendar (shared)
                 {"id": str(uuid.uuid4()), "name": "Household Calendar", "scope": "household", "owner_user_id": None, "is_default": True, "color": "#DC2626", "created_at": datetime.now(timezone.utc).isoformat()},
             ]
             
-            # Personal calendars
+            # Personal calendars with proper names
             if harish:
-                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "Harish's Calendar", "scope": "personal", "owner_user_id": harish["id"], "is_default": False, "color": "#10B981", "created_at": datetime.now(timezone.utc).isoformat()})
+                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "harish", "scope": "personal", "owner_user_id": harish["id"], "is_default": False, "color": "#10B981", "created_at": datetime.now(timezone.utc).isoformat()})
             if spouse:
-                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "Spouse's Calendar", "scope": "personal", "owner_user_id": spouse["id"], "is_default": False, "color": "#3B82F6", "created_at": datetime.now(timezone.utc).isoformat()})
+                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "DurgaBhavani", "scope": "personal", "owner_user_id": spouse["id"], "is_default": False, "color": "#3B82F6", "created_at": datetime.now(timezone.utc).isoformat()})
             
             await db.calendars.insert_many(calendars_to_create)
-            logger.info(f"Created {len(calendars_to_create)} default calendars")
+            logger.info(f"Created {len(calendars_to_create)} default calendars with personal ownership")
         
         # Create default user preferences
         prefs_count = await db.user_preferences.count_documents({})
