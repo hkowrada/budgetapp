@@ -130,7 +130,7 @@ const Login = () => {
           <p className="text-sm font-semibold text-emerald-800 mb-2">Demo Accounts:</p>
           <div className="space-y-1 text-xs text-emerald-700">
             <div>👑 Owner: harish@budget.app</div>
-            <div>🤝 Co-owner: spouse@budget.app</div>
+            <div>🤝 Co-owner: durgabhavani@budget.app</div>
             <div>👁️ Guest: guest@budget.app</div>
             <div className="text-emerald-600 font-medium mt-1">Password: budget123</div>
           </div>
