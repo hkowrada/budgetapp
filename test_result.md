@@ -197,3 +197,5 @@ agent_communication:
     - message: "User confirmed critical salary update bug still exists. Screenshots show backend API returns success but dashboard displays €0. Need to investigate data retrieval logic in both backend dashboard endpoint and frontend display logic."
     - agent: "main"  
     - message: "CRITICAL BUG FIXED: Salary update functionality now works correctly. Issue was DashboardStats model missing current_salaries field and old seeded transactions not being properly cleaned up. Screenshots confirm €4,200 salary displays correctly and Combined Household Income updates properly."
+    - agent: "testing"
+    - message: "COMPREHENSIVE TESTING COMPLETED: Salary update bug fix verified successfully. All requested test scenarios passed: 1) PATCH /api/salary/update replaces salary amounts correctly (tested €4200→€3000→€4500), 2) GET /api/dashboard/stats returns accurate current_salaries and total_income, 3) Data integrity confirmed - only ONE active salary transaction per user, old duplicates cleaned up, 4) Multiple rapid updates work correctly. The critical bug is fully resolved."
