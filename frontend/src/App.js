@@ -531,15 +531,77 @@ const Dashboard = () => {
             <div className="flex items-center">
               <span className="text-2xl mr-3">🚀</span>
               <div>
-                <h3 className="font-bold text-emerald-800">Coming Soon: Full Feature Set</h3>
+                <h3 className="font-bold text-emerald-800">Advanced Features Available</h3>
                 <p className="text-emerald-700 mt-1">
-                  Advanced features including AI-powered forecasting, transaction management, budget planning, and detailed analytics are being developed.
+                  Full transaction management, calendar planning, category customization, and household budgeting tools are now active.
                 </p>
               </div>
             </div>
           </div>
         )}
       </main>
+
+      {/* Quick Add Menu Dialog */}
+      <QuickAddMenu 
+        user={user}
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSuccess={fetchDashboardStats}
+      />
+
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+              <Input
+                type="password"
+                value={passwordForm.old_password}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, old_password: e.target.value }))}
+                placeholder="Enter current password"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+              <Input
+                type="password"
+                value={passwordForm.new_password}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
+                placeholder="Enter new password"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+              <Input
+                type="password"
+                value={passwordForm.confirm_password}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
+                placeholder="Confirm new password"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handlePasswordChange}
+                disabled={!passwordForm.old_password || !passwordForm.new_password || !passwordForm.confirm_password}
+                className="bg-emerald-500 hover:bg-emerald-600"
+              >
+                Change Password
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
