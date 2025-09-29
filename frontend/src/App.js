@@ -628,6 +628,12 @@ const Dashboard = () => {
         onSuccess={fetchDashboardStats}
       />
 
+      <QuickExpenseEntry
+        isOpen={showQuickExpense}
+        onClose={() => setShowQuickExpense(false)}
+        onExpenseAdded={fetchDashboardStats}
+      />
+
       {/* Password Change Dialog */}
       <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
         <DialogContent className="max-w-md">
