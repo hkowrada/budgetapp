@@ -998,7 +998,7 @@ async def get_dashboard_stats(
     
     # Get transactions for the month
     transactions = await db.transactions.find({
-        "date": {"$gte": start_date, "$$lt": end_date}
+        "date": {"$gte": start_date, "$lt": end_date}
     }).to_list(None)
     
     # Get categories for classification
