@@ -1391,7 +1391,7 @@ async def startup_event():
         if calendar_count == 0:
             users = await db.users.find().to_list(None)
             harish = next((u for u in users if u["email"] == "harish@budget.app"), None)
-            spouse = next((u for u in users if u["email"] == "spouse@budget.app"), None)
+            spouse = next((u for u in users if u["email"] == "durgabhavani@budget.app"), None)
             
             calendars_to_create = [
                 # Household calendar (shared)
