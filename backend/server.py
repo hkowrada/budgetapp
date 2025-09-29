@@ -1098,19 +1098,34 @@ async def update_salary(
     
     default_account = accounts[0]  # Use first active account
     
+    # Get all existing salary transactions for this user
+    existing_salary_transactions = await db.transactions.find({
+        "created_by": current_user.id,
+        "type": "income",
+        "category_id": user_salary_category["id"]
+    }).to_list(None)
+    
+    # Calculate total existing salary amount to reverse
+    total_existing_salary = sum(txn["amount"] for txn in existing_salary_transactions)
+    
+    # Delete all existing salary transactions for this user
+    await db.transactions.delete_many({
+        "created_by": current_user.id,
+        "type": "income",
+        "category_id": user_salary_category["id"]
+    })
+    
+    # Reverse the balance changes from old salary transactions
+    if total_existing_salary > 0:
+        await db.accounts.update_one(
+            {"id": default_account["id"]},
+            {"$inc": {"current_balance": -total_existing_salary}}
+        )
+    
     # Create new salary transaction for current month
     current_date = datetime.now().date()
     first_of_month = current_date.replace(day=1)
     
-    # Delete any existing salary transaction for current month
-    await db.transactions.delete_many({
-        "created_by": current_user.id,
-        "type": "income",
-        "category_id": user_salary_category["id"],
-        "date": {"$gte": first_of_month.isoformat()}
-    })
-    
-    # Create new salary transaction
     salary_transaction = Transaction(
         type=TransactionType.INCOME,
         account_id=default_account["id"],
@@ -1124,7 +1139,7 @@ async def update_salary(
     
     await db.transactions.insert_one(prepare_for_mongo(salary_transaction.dict()))
     
-    # Update account balance
+    # Update account balance with new salary
     await db.accounts.update_one(
         {"id": default_account["id"]},
         {"$inc": {"current_balance": new_salary}}
@@ -1132,10 +1147,16 @@ async def update_salary(
     
     await log_audit(current_user.id, "UPDATE_SALARY", "transaction", salary_transaction.id, {
         "new_amount": new_salary,
-        "old_transactions_deleted": True
+        "old_amount_total": total_existing_salary,
+        "replaced_transactions": len(existing_salary_transactions)
     })
     
-    return {"message": f"Salary updated to €{new_salary}", "transaction_id": salary_transaction.id}
+    return {
+        "message": f"Salary updated to €{new_salary}", 
+        "transaction_id": salary_transaction.id,
+        "old_salary_total": total_existing_salary,
+        "new_salary": new_salary
+    }
 
 # Audit Logs (Owner only)
 @api_router.get("/audit-logs", response_model=List[AuditLog])
