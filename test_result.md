@@ -150,6 +150,18 @@ backend:
         - agent: "main"
         - comment: "Deprioritized per user request - focus on simple, practical features first"
 
+  - task: "Dashboard integration and calculations"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "VERIFIED: Dashboard integration (GET /api/dashboard/stats) working perfectly. All calculations accurate: Total Income (€5250.0), Total Expenses (€1746.5), Monthly Surplus (€3503.5), Savings Rate (66.73%). Manual calculation verification confirms dashboard math is correct. Bill updates and expense entries immediately reflect in dashboard totals as expected."
+
   - task: "Email newsletter system"
     implemented: false
     working: "NA"
