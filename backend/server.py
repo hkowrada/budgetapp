@@ -221,6 +221,78 @@ class Budget(BaseModel):
     spent_amount: float = 0.0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# Calendar and Events Models
+class Calendar(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    scope: CalendarScope
+    owner_user_id: Optional[str] = None  # For personal calendars
+    is_default: bool = False
+    color: str = "#10B981"  # Default emerald color
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EventCreate(BaseModel):
+    calendar_id: str
+    title: str
+    notes: Optional[str] = None
+    location: Optional[str] = None
+    start: datetime
+    end: datetime
+    all_day: bool = False
+    tags: List[EventTag] = []
+    attendees: List[str] = []  # User IDs
+    rrule: Optional[str] = None  # RFC 5545 RRULE string
+    source_type: Optional[str] = None  # "bill", "manual"
+    source_id: Optional[str] = None  # Bill ID if auto-generated
+
+class Event(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    calendar_id: str
+    title: str
+    notes: Optional[str] = None
+    location: Optional[str] = None
+    start: datetime
+    end: datetime
+    all_day: bool = False
+    tags: List[EventTag] = []
+    attendees: List[str] = []
+    rrule: Optional[str] = None
+    exdates: List[datetime] = []  # Exception dates
+    source_type: Optional[str] = None
+    source_id: Optional[str] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ReminderCreate(BaseModel):
+    event_id: str
+    offset_minutes: int  # Minutes before event
+    channel: ReminderChannel = ReminderChannel.INAPP
+    message: Optional[str] = None
+
+class Reminder(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    event_id: str
+    offset_minutes: int
+    channel: ReminderChannel
+    status: ReminderStatus = ReminderStatus.SCHEDULED
+    message: Optional[str] = None
+    trigger_time: Optional[datetime] = None
+    sent_at: Optional[datetime] = None
+    snoozed_until: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserPreferences(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    timezone: str = "Europe/Paris"
+    quiet_hours_start: time = time(22, 0)  # 10 PM
+    quiet_hours_end: time = time(8, 0)   # 8 AM
+    default_reminder_minutes: int = 30
+    email_notifications: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class DashboardStats(BaseModel):
     total_income: float
     total_expenses: float
