@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Calendar and notification enhancements are highest priority (mobile browser notifications + email newsletters). Critical bug still exists - salary/expense updates are adding instead of updating values across the app."
+user_problem_statement: "User wants a simple, practical family budget app focused on real usability. All bills should be editable (not just salary), easy expense entry, and basic math without complex features."
 
 backend:
   - task: "Salary update API endpoint"
@@ -123,29 +123,41 @@ backend:
         - agent: "testing"
         - comment: "VERIFIED: Comprehensive testing completed. Salary update API (PATCH /api/salary/update) works perfectly. Tested with user Harish: salary updates REPLACE instead of ADD (€4200→€3000→€4500), dashboard shows correct amounts, current_salaries field populated correctly, only ONE salary transaction exists (no duplicates), old duplicate transactions cleaned up. Multiple rapid updates tested successfully (5000→5500→6000→4800→5200). All data integrity checks passed."
 
-  - task: "Browser notification system"
-    implemented: false
-    working: "NA"
+  - task: "Bills update API endpoint"
+    implemented: true
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Added PATCH /bills/{bill_id} endpoint with BillUpdate model. All bills now editable - tested successfully with Electricity Bill update from €95 to €100."
+
+  - task: "Browser notification system"
+    implemented: false
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Not yet implemented - user requested browser notifications for mobile"
+        - comment: "Deprioritized per user request - focus on simple, practical features first"
 
   - task: "Email newsletter system"
     implemented: false
     working: "NA"
     file: "backend/server.py"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Not yet implemented - user wants simple opensource solution (Nodemailer with Gmail)"
+        - comment: "Deprioritized per user request - focus on simple, practical features first"
 
 frontend:
   - task: "Salary update display"
