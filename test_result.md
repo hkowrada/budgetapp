@@ -240,8 +240,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Salary update API endpoint"
-    - "Salary update display"
+    - "Bills update API endpoint"
+    - "Quick expense entry"
+    - "Dashboard integration and calculations"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
