@@ -331,38 +331,38 @@ export default AgendaView;
           )}
         </TabsContent>
 
-        <TabsContent value=\"bills\" className=\"space-y-4 mt-6\">
-          <h2 className=\"text-xl font-semibold text-gray-800 flex items-center\">
-            <span className=\"mr-2\">💳</span>
+        <TabsContent value="bills" className="space-y-4 mt-6">
+          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+            <span className="mr-2">💳</span>
             Upcoming Bills ({agendaData.upcoming_bills.length})
           </h2>
           {agendaData.upcoming_bills.length === 0 ? (
             <Card>
-              <CardContent className=\"flex items-center justify-center h-32\">
-                <div className=\"text-center text-gray-500\">
-                  <span className=\"text-4xl mb-2 block\">💳</span>
+              <CardContent className="flex items-center justify-center h-32">
+                <div className="text-center text-gray-500">
+                  <span className="text-4xl mb-2 block">💳</span>
                   <p>No bills due in the next {selectedDays} days</p>
                 </div>
               </CardContent>
             </Card>
           ) : (
             agendaData.upcoming_bills.map(bill => (
-              <Card key={bill.id} className=\"border-red-200\">
-                <CardContent className=\"p-4\">
-                  <div className=\"flex items-center justify-between\">
-                    <div className=\"flex items-center space-x-3\">
-                      <div className=\"text-2xl\">💳</div>
+              <Card key={bill.id} className="border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-2xl">💳</div>
                       <div>
-                        <div className=\"font-medium text-gray-800\">{bill.name}</div>
-                        <div className=\"text-sm text-gray-600\">
+                        <div className="font-medium text-gray-800">{bill.name}</div>
+                        <div className="text-sm text-gray-600">
                           Due: {moment(bill.due_date).format('dddd, MMMM D, YYYY')}
                           {bill.provider && ` • ${bill.provider}`}
                         </div>
                       </div>
                     </div>
-                    <div className=\"text-right\">
-                      <div className=\"font-bold text-red-600\">€{bill.amount.toLocaleString()}</div>
-                      <Badge className=\"bg-red-100 text-red-800 text-xs\">
+                    <div className="text-right">
+                      <div className="font-bold text-red-600">€{bill.amount.toLocaleString()}</div>
+                      <Badge className="bg-red-100 text-red-800 text-xs">
                         {moment(bill.due_date).diff(moment(), 'days') === 0 ? 'Due Today' : 
                          moment(bill.due_date).diff(moment(), 'days') === 1 ? 'Due Tomorrow' :
                          `Due in ${moment(bill.due_date).diff(moment(), 'days')} days`}
