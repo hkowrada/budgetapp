@@ -991,6 +991,44 @@ async def startup_event():
             ]
             await db.accounts.insert_many(accounts_to_create)
             logger.info("Created default accounts")
+        
+        # Create default calendars if they don't exist
+        calendar_count = await db.calendars.count_documents({})
+        if calendar_count == 0:
+            users = await db.users.find().to_list(None)
+            harish = next((u for u in users if u["email"] == "harish@budget.app"), None)
+            spouse = next((u for u in users if u["email"] == "spouse@budget.app"), None)
+            
+            calendars_to_create = [
+                # Household calendar
+                {"id": str(uuid.uuid4()), "name": "Household Calendar", "scope": "household", "owner_user_id": None, "is_default": True, "color": "#DC2626", "created_at": datetime.now(timezone.utc).isoformat()},
+            ]
+            
+            # Personal calendars
+            if harish:
+                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "Harish's Calendar", "scope": "personal", "owner_user_id": harish["id"], "is_default": False, "color": "#10B981", "created_at": datetime.now(timezone.utc).isoformat()})
+            if spouse:
+                calendars_to_create.append({"id": str(uuid.uuid4()), "name": "Spouse's Calendar", "scope": "personal", "owner_user_id": spouse["id"], "is_default": False, "color": "#3B82F6", "created_at": datetime.now(timezone.utc).isoformat()})
+            
+            await db.calendars.insert_many(calendars_to_create)
+            logger.info(f"Created {len(calendars_to_create)} default calendars")
+        
+        # Create default user preferences
+        prefs_count = await db.user_preferences.count_documents({})
+        if prefs_count == 0:
+            users = await db.users.find().to_list(None)
+            prefs_to_create = []
+            
+            for user in users:
+                prefs = UserPreferences(user_id=user["id"])
+                prefs_to_create.append(prepare_for_mongo(prefs.dict()))
+            
+            if prefs_to_create:
+                await db.user_preferences.insert_many(prefs_to_create)
+                logger.info(f"Created user preferences for {len(prefs_to_create)} users")
+        
+        # Generate calendar events for bills
+        await generate_bill_calendar_events()
             
         logger.info("Database initialized successfully")
         
