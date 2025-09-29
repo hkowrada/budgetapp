@@ -178,17 +178,41 @@ frontend:
         - agent: "testing"
         - comment: "VERIFIED: Frontend display working correctly through backend API testing. Dashboard stats API returns proper current_salaries field and total_income values. Combined Household Income reflects only active salaries as expected."
 
+  - task: "Editable bills interface"
+    implemented: true
+    working: true
+    file: "frontend/src/components/EditableBillCard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Created EditableBillCard component. All bills now have ✏️ Edit buttons. Successfully tested updating Electricity Bill from €95 to €100. Clean card layout with icons and due dates."
+
+  - task: "Quick expense entry"
+    implemented: true
+    working: true
+    file: "frontend/src/components/QuickExpenseEntry.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Created QuickExpenseEntry dialog with simple form (description + amount). Successfully tested adding €15.50 coffee expense - dashboard stats updated automatically (Monthly Expenses: €1,565.2→€1,580.7)."
+
   - task: "Browser notification UI"
     implemented: false
     working: "NA"
     file: "frontend/src/components/"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Not yet implemented - needs browser notification API integration"
+        - comment: "Deprioritized per user request - focus on simple, practical features first"
 
 metadata:
   created_by: "main_agent"
