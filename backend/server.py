@@ -48,6 +48,13 @@ class UserRole(str, Enum):
 class TransactionType(str, Enum):
     INCOME = "income"
     EXPENSE = "expense"
+    TRANSFER = "transfer"
+
+class PurchaseStatus(str, Enum):
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress" 
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 class RecurrenceType(str, Enum):
     MONTHLY = "monthly"
