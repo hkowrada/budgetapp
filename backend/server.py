@@ -1093,23 +1093,21 @@ async def get_dashboard_stats(
                         "category_id": recent_salary["category_id"]
                     }
     
-    # Calculate totals based on current month transactions
-    total_income = 0.0
+    # Calculate totals - for monthly income, use current salaries only
+    # For total expenses, use current month transactions  
+    monthly_recurring_income = sum(salary_data["amount"] for salary_data in current_salaries.values())
     total_expenses = 0.0
     category_breakdown = {}
     
     for txn in transactions:
         category = category_map.get(txn["category_id"])
-        if category:
-            if category["type"] == "income":
-                total_income += txn["amount"]
-            else:
-                total_expenses += txn["amount"]
-                cat_name = category["name"]
-                category_breakdown[cat_name] = category_breakdown.get(cat_name, 0) + txn["amount"]
+        if category and category["type"] == "expense":
+            total_expenses += txn["amount"]
+            cat_name = category["name"]
+            category_breakdown[cat_name] = category_breakdown.get(cat_name, 0) + txn["amount"]
     
-    monthly_surplus = total_income - total_expenses
-    savings_rate = (monthly_surplus / total_income * 100) if total_income > 0 else 0
+    monthly_surplus = monthly_recurring_income - total_expenses
+    savings_rate = (monthly_surplus / monthly_recurring_income * 100) if monthly_recurring_income > 0 else 0
     
     # Get upcoming bills
     upcoming_bills = await db.bills.find({"is_active": True}).to_list(None)
