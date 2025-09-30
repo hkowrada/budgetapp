@@ -290,6 +290,32 @@ const CalendarView = ({ user }) => {
         
         <div className="flex items-center space-x-4">
           <Button
+            onClick={() => {
+              if (user.role === 'guest') {
+                toast({
+                  title: 'Access denied',
+                  description: 'Guests can only view events',
+                  variant: 'destructive'
+                });
+                return;
+              }
+              setSelectedSlot({ start: new Date(), end: new Date(Date.now() + 60*60*1000) });
+              setEventForm({
+                title: '',
+                description: '',
+                location: '',
+                calendar_id: getUserCalendarId(),
+                remind_1day: true,
+                remind_1hour: true
+              });
+              setShowEventDialog(true);
+            }}
+            className="bg-green-500 hover:bg-green-600"
+          >
+            <span className="mr-2">➕</span>
+            Add Event
+          </Button>
+          <Button
             onClick={() => setShowEmailSettings(true)}
             variant="outline"
             className="border-blue-200"
