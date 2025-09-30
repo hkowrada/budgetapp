@@ -1364,6 +1364,58 @@ const CategoriesPage = () => {
         </div>
       </header>
 
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white/95 backdrop-blur-sm border-b border-emerald-100 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <nav className="flex flex-col space-y-4">
+              <a 
+                href="/"
+                className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </a>
+              <a 
+                href="/calendar"
+                className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Calendar
+              </a>
+              <a 
+                href="/agenda"
+                className="text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Agenda
+              </a>
+              <a 
+                href="/categories"
+                className="text-emerald-600 font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Categories
+              </a>
+              
+              {/* Mobile Quick Add */}
+              {user.role !== 'guest' && (
+                <Button
+                  onClick={() => {
+                    setShowQuickAdd(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg mt-4"
+                >
+                  <span className="mr-2">⚡</span>
+                  Quick Add
+                </Button>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
+
       <CategoriesManagement user={user} />
 
       <QuickAddMenu 
