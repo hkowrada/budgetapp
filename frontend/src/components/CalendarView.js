@@ -345,11 +345,20 @@ const CalendarView = ({ user }) => {
                 return;
               }
               setSelectedSlot({ start: new Date(), end: new Date(Date.now() + 60*60*1000) });
+              const now = new Date();
+              const oneHourLater = new Date(now.getTime() + 60*60*1000);
+              
               setEventForm({
                 title: '',
                 description: '',
                 location: '',
                 calendar_id: getUserCalendarId(),
+                start_date: moment(now).format('YYYY-MM-DD'),
+                start_time: moment(now).format('HH:mm'),
+                end_date: moment(oneHourLater).format('YYYY-MM-DD'),
+                end_time: moment(oneHourLater).format('HH:mm'),
+                is_recurring: false,
+                recurrence_type: 'weekly',
                 remind_1day: true,
                 remind_1hour: true
               });
