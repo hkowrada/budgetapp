@@ -147,11 +147,24 @@ const CalendarView = ({ user }) => {
     }
     
     setSelectedSlot({ start, end });
+    
+    // Format dates for the form
+    const startDate = moment(start).format('YYYY-MM-DD');
+    const startTime = moment(start).format('HH:mm');
+    const endDate = moment(end).format('YYYY-MM-DD');
+    const endTime = moment(end).format('HH:mm');
+    
     setEventForm({
       title: '',
       description: '',
       location: '',
-      calendar_id: getUserCalendarId(), // Default to user's own calendar
+      calendar_id: getUserCalendarId(),
+      start_date: startDate,
+      start_time: startTime,
+      end_date: endDate,
+      end_time: endTime,
+      is_recurring: false,
+      recurrence_type: 'weekly',
       remind_1day: true,
       remind_1hour: true
     });
