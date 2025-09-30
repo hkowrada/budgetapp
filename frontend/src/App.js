@@ -1257,7 +1257,12 @@ const AgendaPage = () => {
 const CategoriesPage = () => {
   const { user, logout } = useAuth();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   const fetchDashboardStats = () => {
     // Placeholder for refreshing dashboard stats after transactions
