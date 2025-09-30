@@ -529,26 +529,65 @@ const Dashboard = () => {
                   <span className="mr-2">💳</span>
                   Monthly Bills
                 </h2>
-                {user.role !== 'guest' && (
-                  <Button
-                    onClick={() => setShowQuickExpense(true)}
-                    className="bg-green-500 hover:bg-green-600 text-white"
-                    size="sm"
-                  >
-                    <span className="mr-1">💰</span>
-                    Add Expense
-                  </Button>
-                )}
+                <div className="flex space-x-2">
+                  {user.role !== 'guest' && (
+                    <Button
+                      onClick={() => setShowQuickExpense(true)}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                      size="sm"
+                    >
+                      <span className="mr-1">💰</span>
+                      Add Expense
+                    </Button>
+                  )}
+                  {user.role !== 'guest' && (
+                    <Button
+                      onClick={() => {
+                        // Create a new bill 
+                        setShowQuickExpense(true); // Reuse the expense form with recurring option
+                      }}
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      size="sm"
+                    >
+                      <span className="mr-1">➕</span>
+                      Add Bill
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {bills && bills.length > 0 ? (
                   bills.map((bill) => (
-                    <EditableBillCard
-                      key={bill.id}
-                      bill={bill}
-                      onBillUpdated={fetchDashboardStats}
-                      userRole={user.role}
-                    />
+                    <div key={bill.id} className="relative">
+                      <EditableBillCard
+                        bill={bill}
+                        onBillUpdated={fetchDashboardStats}
+                        userRole={user.role}
+                      />
+                      {user.role !== 'guest' && (
+                        <Button
+                          onClick={async () => {
+                            if (confirm(`Are you sure you want to delete "${bill.name}"?`)) {
+                              try {
+                                await axios.delete(`/bills/${bill.id}`);
+                                toast({ title: 'Bill deleted successfully' });
+                                fetchDashboardStats();
+                              } catch (error) {
+                                toast({ 
+                                  title: 'Error deleting bill', 
+                                  variant: 'destructive' 
+                                });
+                              }
+                            }
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="absolute top-2 right-2 h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                        >
+                          🗑️
+                        </Button>
+                      )}
+                    </div>
                   ))
                 ) : (
                   <div className="col-span-full">
