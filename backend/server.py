@@ -1047,8 +1047,15 @@ async def get_dashboard_stats(
     for user in users:
         if user["role"] in ["owner", "coowner"]:
             # Find salary categories for this user
-            user_salary_categories = [cat["id"] for cat in categories 
-                                    if cat["type"] == "income" and user["name"].lower() in cat["name"].lower()]
+            user_salary_categories = []
+            for cat in categories:
+                if cat["type"] == "income":
+                    # Check if category contains user's name
+                    if user["name"].lower() in cat["name"].lower():
+                        user_salary_categories.append(cat["id"])
+                    # Check for role-based categories (like "Salary - Spouse" for coowner)
+                    elif user["role"] == "coowner" and "spouse" in cat["name"].lower():
+                        user_salary_categories.append(cat["id"])
             
             if user_salary_categories:
                 # Get most recent salary transaction
