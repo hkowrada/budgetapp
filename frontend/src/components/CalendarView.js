@@ -32,6 +32,12 @@ const CalendarView = ({ user }) => {
     description: '',
     location: '',
     calendar_id: '',
+    start_date: '',
+    start_time: '',
+    end_date: '',
+    end_time: '',
+    is_recurring: false,
+    recurrence_type: 'weekly', // daily, weekly, monthly, yearly
     remind_1day: true,
     remind_1hour: true
   });
