@@ -909,7 +909,12 @@ function App() {
 const CalendarPage = () => {
   const { user, logout } = useAuth();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   const fetchDashboardStats = () => {
     toast({ title: 'Transaction added successfully!' });
