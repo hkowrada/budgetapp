@@ -1423,10 +1423,25 @@ async def get_agenda(
             if current_date.month == 12:
                 next_due = current_date.replace(year=current_date.year + 1, month=1, day=bill["due_day"])
             else:
-                next_due = current_date.replace(month=current_date.month + 1, day=bill["due_day"])
+                # Handle invalid days (like 31st in a month with only 30 days)
+                try:
+                    next_due = current_date.replace(month=current_date.month + 1, day=bill["due_day"])
+                except ValueError:
+                    # If due day doesn't exist in next month, use last day of month
+                    import calendar
+                    next_month = current_date.month + 1 if current_date.month < 12 else 1
+                    next_year = current_date.year if current_date.month < 12 else current_date.year + 1
+                    last_day = calendar.monthrange(next_year, next_month)[1]
+                    next_due = current_date.replace(month=next_month, year=next_year, day=min(bill["due_day"], last_day))
         else:
-            # This month
-            next_due = current_date.replace(day=bill["due_day"])
+            # This month - handle invalid days
+            try:
+                next_due = current_date.replace(day=bill["due_day"])
+            except ValueError:
+                # If due day doesn't exist in current month, use last day of month
+                import calendar
+                last_day = calendar.monthrange(current_date.year, current_date.month)[1]
+                next_due = current_date.replace(day=min(bill["due_day"], last_day))
         
         if next_due <= end_date.date():
             upcoming_bills.append({
