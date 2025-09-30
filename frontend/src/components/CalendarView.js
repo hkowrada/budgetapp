@@ -24,6 +24,7 @@ const CalendarView = ({ user }) => {
   const [selectedCalendars, setSelectedCalendars] = useState(new Set());
   const [emailSettings, setEmailSettings] = useState({ email: '', notifications: true });
   const [showEmailSettings, setShowEmailSettings] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
   
   // Event form state
   const [eventForm, setEventForm] = useState({
