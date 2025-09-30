@@ -1231,6 +1231,41 @@ async def create_calendar(calendar_data: Calendar, current_user: User = Depends(
     await log_audit(current_user.id, "CREATE", "calendar", calendar_data.id)
     return calendar_data
 
+# User Preferences Management
+@api_router.get("/user/preferences", response_model=UserPreferences)
+async def get_user_preferences(current_user: User = Depends(get_current_user)):
+    preferences = await db.user_preferences.find_one({"user_id": current_user.id})
+    if not preferences:
+        # Create default preferences
+        default_prefs = UserPreferences(user_id=current_user.id)
+        await db.user_preferences.insert_one(prepare_for_mongo(default_prefs.dict()))
+        return default_prefs
+    return UserPreferences(**parse_from_mongo(preferences))
+
+@api_router.patch("/user/preferences")
+async def update_user_preferences(
+    preference_updates: dict, 
+    current_user: User = Depends(get_current_user)
+):
+    # Get existing preferences or create default
+    existing = await db.user_preferences.find_one({"user_id": current_user.id})
+    if not existing:
+        new_prefs = UserPreferences(user_id=current_user.id)
+        await db.user_preferences.insert_one(prepare_for_mongo(new_prefs.dict()))
+        existing = await db.user_preferences.find_one({"user_id": current_user.id})
+    
+    # Update with new values
+    update_data = {k: v for k, v in preference_updates.items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.user_preferences.update_one(
+        {"user_id": current_user.id},
+        {"$set": prepare_for_mongo(update_data)}
+    )
+    
+    updated_prefs = await db.user_preferences.find_one({"user_id": current_user.id})
+    return {"message": "Preferences updated successfully", "preferences": parse_from_mongo(updated_prefs)}
+
 # Events Management
 @api_router.get("/events", response_model=List[Event])
 async def get_events(
