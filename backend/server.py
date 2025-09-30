@@ -371,8 +371,8 @@ class UserPreferences(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     timezone: str = "Europe/Paris"
-    quiet_hours_start: time = time(22, 0)  # 10 PM
-    quiet_hours_end: time = time(8, 0)   # 8 AM
+    quiet_hours_start: str = "22:00"  # 10 PM as string
+    quiet_hours_end: str = "08:00"   # 8 AM as string
     default_reminder_minutes: int = 30
     email_notifications: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
