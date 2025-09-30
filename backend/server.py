@@ -1117,7 +1117,7 @@ async def get_dashboard_stats(
     
     return {
         **DashboardStats(
-            total_income=total_income,
+            total_income=monthly_recurring_income,
             total_expenses=total_expenses,
             monthly_surplus=monthly_surplus,
             savings_rate=round(savings_rate, 2),
