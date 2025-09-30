@@ -988,6 +988,24 @@ async def update_bill(
     updated_bill = await db.bills.find_one({"id": bill_id})
     return Bill(**parse_from_mongo(updated_bill))
 
+@api_router.delete("/bills/{bill_id}")
+async def delete_bill(
+    bill_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == UserRole.GUEST:
+        raise HTTPException(status_code=403, detail="Guests cannot delete bills")
+    
+    bill = await db.bills.find_one({"id": bill_id})
+    if not bill:
+        raise HTTPException(status_code=404, detail="Bill not found")
+    
+    # Delete the bill
+    await db.bills.delete_one({"id": bill_id})
+    await log_audit(current_user.id, "DELETE", "bill", bill_id)
+    
+    return {"message": f"Bill '{bill['name']}' deleted successfully"}
+
 # Budgets
 @api_router.get("/budgets", response_model=List[Budget])
 async def get_budgets(
