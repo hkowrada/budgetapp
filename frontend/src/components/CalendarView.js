@@ -284,10 +284,35 @@ const CalendarView = ({ user }) => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-          <span className="mr-3">📅</span>
-          Family Calendar
-        </h1>
+        <div className="flex items-center space-x-4">
+          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+            <span className="mr-3">📅</span>
+            Family Calendar
+          </h1>
+          
+          {/* Year Navigation */}
+          <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 border border-gray-200">
+            <Button
+              onClick={() => setCurrentDate(new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1))}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+            >
+              ⟨⟨
+            </Button>
+            <span className="font-semibold text-gray-700 min-w-[80px] text-center">
+              {currentDate.getFullYear()}
+            </span>
+            <Button
+              onClick={() => setCurrentDate(new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), 1))}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+            >
+              ⟩⟩
+            </Button>
+          </div>
+        </div>
         
         <div className="flex items-center space-x-4">
           <Button
