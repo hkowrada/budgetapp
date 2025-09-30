@@ -1114,12 +1114,17 @@ async def update_salary(
     if current_user.role == UserRole.GUEST:
         raise HTTPException(status_code=403, detail="Guests cannot update salary")
     
-    # Find user's salary category
+    # Find user's salary category - handle both name-based and role-based matching
     categories = await db.categories.find({"type": "income"}).to_list(None)
     user_salary_category = None
     
     for cat in categories:
+        # Check if category contains user's name
         if current_user.name.lower() in cat["name"].lower():
+            user_salary_category = cat
+            break
+        # Check for role-based categories (like "Salary - Spouse" for DurgaBhavani)
+        elif current_user.role == "coowner" and "spouse" in cat["name"].lower():
             user_salary_category = cat
             break
     
