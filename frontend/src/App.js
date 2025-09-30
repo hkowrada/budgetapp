@@ -986,24 +986,30 @@ const CalendarPage = () => {
                 </a>
               </nav>
               
-              {user.role !== 'guest' && (
-                <Button
-                  onClick={() => setShowQuickAdd(true)}
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                >
-                  <span className="mr-2">💰</span>
-                  Quick Add
-                </Button>
-              )}
-              
-              <span className="text-gray-600">Welcome, {user.name}</span>
+              {/* Mobile menu button */}
               <button
-                data-testid="logout-button"
-                onClick={logout}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors duration-200"
+                onClick={toggleMobileMenu}
+                className="md:hidden p-2 rounded-md text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+                aria-label="Toggle mobile menu"
               >
-                Sign Out
+                <div className="w-6 h-6 flex flex-col justify-center items-center">
+                  <span className={`bg-current block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm ${mobileMenuOpen ? 'rotate-45 translate-y-1' : '-translate-y-0.5'}`}></span>
+                  <span className={`bg-current block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm my-0.5 ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
+                  <span className={`bg-current block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm ${mobileMenuOpen ? '-rotate-45 -translate-y-1' : 'translate-y-0.5'}`}></span>
+                </div>
               </button>
+
+              {/* User info & logout */}
+              <div className="flex items-center space-x-3">
+                <Button
+                  onClick={logout}
+                  variant="ghost"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <span className="mr-2">🚪</span>
+                  <span className="hidden sm:inline">Sign Out</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
