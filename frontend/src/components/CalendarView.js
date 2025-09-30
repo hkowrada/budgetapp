@@ -418,6 +418,8 @@ const CalendarView = ({ user }) => {
           selectRange={true}
           views={[Views.MONTH, Views.WEEK, Views.DAY]}
           defaultView={Views.MONTH}
+          date={currentDate}
+          onNavigate={(date) => setCurrentDate(date)}
           eventPropGetter={eventStyleGetter}
           style={{ height: '100%' }}
           formats={{
