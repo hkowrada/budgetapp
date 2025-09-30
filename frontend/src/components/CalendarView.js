@@ -498,6 +498,49 @@ const CalendarView = ({ user }) => {
               />
             </div>
             
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Start Date *</label>
+                <Input
+                  type="date"
+                  value={eventForm.start_date}
+                  onChange={(e) => setEventForm(prev => ({ ...prev, start_date: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Start Time *</label>
+                <Input
+                  type="time"
+                  value={eventForm.start_time}
+                  onChange={(e) => setEventForm(prev => ({ ...prev, start_time: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">End Date</label>
+                <Input
+                  type="date"
+                  value={eventForm.end_date}
+                  onChange={(e) => setEventForm(prev => ({ ...prev, end_date: e.target.value }))}
+                  placeholder="Same as start date"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">End Time</label>
+                <Input
+                  type="time"
+                  value={eventForm.end_time}
+                  onChange={(e) => setEventForm(prev => ({ ...prev, end_time: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
             <div>
               <label className="text-sm font-medium text-gray-700">Description</label>
               <Textarea
@@ -539,6 +582,36 @@ const CalendarView = ({ user }) => {
             </div>
 
             <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={eventForm.is_recurring}
+                  onCheckedChange={(checked) => setEventForm(prev => ({ ...prev, is_recurring: checked }))}
+                />
+                <label className="text-sm font-medium text-gray-700">Recurring Event</label>
+              </div>
+              
+              {eventForm.is_recurring && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Repeat</label>
+                  <Select 
+                    value={eventForm.recurrence_type} 
+                    onValueChange={(value) => setEventForm(prev => ({ ...prev, recurrence_type: value }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3">
               <label className="text-sm font-medium text-gray-700">Reminders</label>
               
               <div className="flex items-center space-x-2">
@@ -546,7 +619,7 @@ const CalendarView = ({ user }) => {
                   checked={eventForm.remind_1day}
                   onCheckedChange={(checked) => setEventForm(prev => ({ ...prev, remind_1day: checked }))}
                 />
-                <label className="text-sm text-gray-700">Remind me 1 day before</label>
+                <label className="text-sm text-gray-700">Remind me 1 day before (Email + Notification)</label>
               </div>
               
               <div className="flex items-center space-x-2">
@@ -554,7 +627,7 @@ const CalendarView = ({ user }) => {
                   checked={eventForm.remind_1hour}
                   onCheckedChange={(checked) => setEventForm(prev => ({ ...prev, remind_1hour: checked }))}
                 />
-                <label className="text-sm text-gray-700">Remind me 1 hour before</label>
+                <label className="text-sm text-gray-700">Remind me 1 hour before (Email + Notification)</label>
               </div>
             </div>
             
