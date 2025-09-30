@@ -363,6 +363,7 @@ const CalendarView = ({ user }) => {
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
           selectable={user.role !== 'guest'}
+          selectRange={true}
           views={[Views.MONTH, Views.WEEK, Views.DAY]}
           defaultView={Views.MONTH}
           eventPropGetter={eventStyleGetter}
@@ -374,6 +375,8 @@ const CalendarView = ({ user }) => {
           }}
           timeslots={2}
           step={30}
+          popup={true}
+          showMultiDayTimes={true}
         />
       </div>
 
