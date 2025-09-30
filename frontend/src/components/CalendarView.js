@@ -201,17 +201,35 @@ const CalendarView = ({ user }) => {
       return;
     }
 
+    if (!eventForm.start_date || !eventForm.start_time) {
+      toast({ title: 'Please enter start date and time', variant: 'destructive' });
+      return;
+    }
+
     try {
+      // Create start and end DateTime objects
+      const startDateTime = moment(`${eventForm.start_date} ${eventForm.start_time}`).toISOString();
+      const endDateTime = moment(`${eventForm.end_date || eventForm.start_date} ${eventForm.end_time || eventForm.start_time}`).toISOString();
+
       const eventData = {
         title: eventForm.title,
         description: eventForm.description,
         location: eventForm.location,
-        start: selectedSlot.start.toISOString(),
-        end: selectedSlot.end.toISOString(),
+        start: startDateTime,
+        end: endDateTime,
         calendar_id: eventForm.calendar_id,
-        tags: ['Personal'], // Default tag
+        tags: ['Personal'],
         reminders: []
       };
+
+      // Add recurring information if enabled
+      if (eventForm.is_recurring) {
+        eventData.recurrence = {
+          frequency: eventForm.recurrence_type,
+          interval: 1
+        };
+        eventData.tags.push('Recurring');
+      }
 
       // Add reminders based on user selection
       if (eventForm.remind_1day) {
@@ -240,7 +258,7 @@ const CalendarView = ({ user }) => {
       
       toast({
         title: 'Event created',
-        description: `"${eventForm.title}" has been added to your calendar`
+        description: `"${eventForm.title}" has been added to your calendar${eventForm.is_recurring ? ` (${eventForm.recurrence_type})` : ''}`
       });
       
       setShowEventDialog(false);
