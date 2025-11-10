@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Test - Family Expense Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f7fafc;
+        }
+        
+        .test-section h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status.pending {
+            background: #fef5e7;
+            color: #d69e2e;
+        }
+        
+        .status.pass {
+            background: #e6fffa;
+            color: #047857;
+        }
+        
+        .status.fail {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .info-box {
+            background: #e6fffa;
+            border-left: 4px solid #047857;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box strong {
+            color: #047857;
+        }
+        
+        .warning-box {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .warning-box strong {
+            color: #c53030;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .summary-card {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .summary-card h3 {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .test-all-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px 32px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Security Testing Suite</h1>
+            <p>Family Expense Tracker - Authentication Security Verification</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>ℹ️ About This Test:</strong> This page tests the security implementation of your expense tracker.
+                It verifies that PINs are secure, authentication works properly, and brute-force protection is active.
+            </div>
+            
+            <button class="test-all-btn" onclick="runAllTests()">▶️ Run All Security Tests</button>
+            
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>Tests Passed</h3>
+                    <div class="number" id="passCount">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Tests Failed</h3>
+                    <div class="number" id="failCount">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Tests</h3>
+                    <div class="number" id="totalCount">6</div>
+                </div>
+            </div>
+            
+            <!-- Test 1: Check if auth.php exists -->
+            <div class="test-section" id="test1">
+                <h2>
+                    Test 1: Authentication API Availability
+                    <span class="status pending" id="status1">PENDING</span>
+                </h2>
+                <p>Verifies that auth.php is accessible and responding</p>
+                <button onclick="test1()">Run Test 1</button>
+                <div class="test-result" id="result1" style="display:none;"></div>
+            </div>
+            
+            <!-- Test 2: Test invalid login -->
+            <div class="test-section" id="test2">
+                <h2>
+                    Test 2: Invalid PIN Rejection
+                    <span class="status pending" id="status2">PENDING</span>
+                </h2>
+                <p>Verifies that incorrect PINs are rejected</p>
+                <button onclick="test2()">Run Test 2</button>
+                <div class="test-result" id="result2" style="display:none;"></div>
+            </div>
+            
+            <!-- Test 3: Test valid login -->
+            <div class="test-section" id="test3">
+                <h2>
+                    Test 3: Valid PIN Authentication
+                    <span class="status pending" id="status3">PENDING</span>
+                </h2>
+                <p>Verifies that correct PINs are accepted</p>
+                <button onclick="test3()">Run Test 3</button>
+                <div class="test-result" id="result3" style="display:none;"></div>
+            </div>
+            
+            <!-- Test 4: Test session check -->
+            <div class="test-section" id="test4">
+                <h2>
+                    Test 4: Session Validation
+                    <span class="status pending" id="status4">PENDING</span>
+                </h2>
+                <p>Verifies that PHP sessions are working correctly</p>
+                <button onclick="test4()">Run Test 4</button>
+                <div class="test-result" id="result4" style="display:none;"></div>
+            </div>
+            
+            <!-- Test 5: Test brute force protection -->
+            <div class="test-section" id="test5">
+                <h2>
+                    Test 5: Brute-Force Protection
+                    <span class="status pending" id="status5">PENDING</span>
+                </h2>
+                <p>Verifies rate limiting (max 5 attempts before lockout)</p>
+                <button onclick="test5()">Run Test 5</button>
+                <div class="test-result" id="result5" style="display:none;"></div>
+            </div>
+            
+            <!-- Test 6: Test logout -->
+            <div class="test-section" id="test6">
+                <h2>
+                    Test 6: Secure Logout
+                    <span class="status pending" id="status6">PENDING</span>
+                </h2>
+                <p>Verifies that logout properly destroys sessions</p>
+                <button onclick="test6()">Run Test 6</button>
+                <div class="test-result" id="result6" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const AUTH_URL = 'auth.php';
+        let passCount = 0;
+        let failCount = 0;
+        
+        function updateCounts() {
+            document.getElementById('passCount').textContent = passCount;
+            document.getElementById('failCount').textContent = failCount;
+        }
+        
+        function setStatus(testNum, status, message) {
+            const statusEl = document.getElementById(`status${testNum}`);
+            const resultEl = document.getElementById(`result${testNum}`);
+            
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = status.toUpperCase();
+            
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = message;
+            
+            if (status === 'pass') {
+                passCount++;
+            } else if (status === 'fail') {
+                failCount++;
+            }
+            updateCounts();
+        }
+        
+        async function test1() {
+            try {
+                const response = await fetch(AUTH_URL + '?action=invalid', {
+                    method: 'GET'
+                });
+                
+                if (response.ok || response.status === 400) {
+                    setStatus(1, 'pass', '✅ auth.php is accessible and responding<br>Status: ' + response.status);
+                } else {
+                    setStatus(1, 'fail', '❌ auth.php returned unexpected status: ' + response.status);
+                }
+            } catch (error) {
+                setStatus(1, 'fail', '❌ Cannot reach auth.php<br>Error: ' + error.message + '<br><br>Make sure auth.php is uploaded to the same folder as this test page.');
+            }
+        }
+        
+        async function test2() {
+            try {
+                const response = await fetch(AUTH_URL + '?action=login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'harish',
+                        pin: '9999'  // Wrong PIN
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success && response.status === 401) {
+                    setStatus(2, 'pass', '✅ Invalid PIN correctly rejected<br>Message: ' + result.message);
+                } else {
+                    setStatus(2, 'fail', '❌ Invalid PIN was not rejected properly<br>Response: ' + JSON.stringify(result));
+                }
+            } catch (error) {
+                setStatus(2, 'fail', '❌ Test failed<br>Error: ' + error.message);
+            }
+        }
+        
+        async function test3() {
+            try {
+                const response = await fetch(AUTH_URL + '?action=login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'guest',
+                        pin: '0000'  // Correct PIN for guest
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.user) {
+                    setStatus(3, 'pass', '✅ Valid PIN accepted successfully<br>User: ' + result.data.user.name + '<br>Role: ' + result.data.user.role);
+                } else {
+                    setStatus(3, 'fail', '❌ Valid PIN was rejected<br>Response: ' + JSON.stringify(result));
+                }
+            } catch (error) {
+                setStatus(3, 'fail', '❌ Test failed<br>Error: ' + error.message);
+            }
+        }
+        
+        async function test4() {
+            try {
+                // First login
+                await fetch(AUTH_URL + '?action=login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'guest',
+                        pin: '0000'
+                    })
+                });
+                
+                // Then check session
+                const response = await fetch(AUTH_URL + '?action=check', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.user) {
+                    setStatus(4, 'pass', '✅ Session validation working<br>Active User: ' + result.data.user.name);
+                } else {
+                    setStatus(4, 'fail', '❌ Session validation failed<br>Response: ' + JSON.stringify(result));
+                }
+            } catch (error) {
+                setStatus(4, 'fail', '❌ Test failed<br>Error: ' + error.message);
+            }
+        }
+        
+        async function test5() {
+            try {
+                let locked = false;
+                let attempts = 0;
+                
+                // Try to login with wrong PIN multiple times
+                for (let i = 0; i < 6; i++) {
+                    const response = await fetch(AUTH_URL + '?action=login', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: 'testbruteforce',  // Use a test username
+                            pin: '9999'
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    attempts++;
+                    
+                    if (response.status === 429) {
+                        locked = true;
+                        break;
+                    }
+                }
+                
+                if (locked) {
+                    setStatus(5, 'pass', '✅ Brute-force protection active<br>Account locked after ' + attempts + ' attempts');
+                } else {
+                    setStatus(5, 'fail', '❌ No rate limiting detected after ' + attempts + ' attempts');
+                }
+            } catch (error) {
+                setStatus(5, 'fail', '❌ Test failed<br>Error: ' + error.message);
+            }
+        }
+        
+        async function test6() {
+            try {
+                // First login
+                await fetch(AUTH_URL + '?action=login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'guest',
+                        pin: '0000'
+                    })
+                });
+                
+                // Then logout
+                const logoutResponse = await fetch(AUTH_URL + '?action=logout', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const logoutResult = await logoutResponse.json();
+                
+                // Check if session is destroyed
+                const checkResponse = await fetch(AUTH_URL + '?action=check', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const checkResult = await checkResponse.json();
+                
+                if (logoutResult.success && !checkResult.success) {
+                    setStatus(6, 'pass', '✅ Logout successfully destroys session<br>Session properly terminated');
+                } else {
+                    setStatus(6, 'fail', '❌ Logout did not destroy session properly');
+                }
+            } catch (error) {
+                setStatus(6, 'fail', '❌ Test failed<br>Error: ' + error.message);
+            }
+        }
+        
+        async function runAllTests() {
+            passCount = 0;
+            failCount = 0;
+            updateCounts();
+            
+            await test1();
+            await new Promise(r => setTimeout(r, 500));
+            
+            await test2();
+            await new Promise(r => setTimeout(r, 500));
+            
+            await test3();
+            await new Promise(r => setTimeout(r, 500));
+            
+            await test4();
+            await new Promise(r => setTimeout(r, 500));
+            
+            await test5();
+            await new Promise(r => setTimeout(r, 500));
+            
+            await test6();
+            
+            // Show final summary
+            alert(`Security Tests Complete!\n\n✅ Passed: ${passCount}\n❌ Failed: ${failCount}\n\nCheck the detailed results above.`);
+        }
+    </script>
+</body>
+</html>
