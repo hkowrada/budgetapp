@@ -219,13 +219,30 @@ Set up monthly bills that remind you automatically:
 - **Date filters** - Select start/end dates
 - **Clear button** - Reset all filters
 
-### Exporting Data (Backup)
+### Setting Up Auto-Sync (Sync Across Browsers)
+1. Click **"Setup Auto-Sync"** button (orange)
+2. Select **"File-Based Sync"**
+3. Click **"Select/Create Sync File"**
+4. Choose a shared folder location:
+   - **Dropbox:** `C:\Users\YourName\Dropbox\`
+   - **Google Drive:** `C:\Users\YourName\Google Drive\`
+   - **USB Drive:** `D:\` or `E:\`
+   - **Network:** `\\network\shared\`
+5. Name the file: `family-expenses.json`
+6. Open the app in another browser
+7. Click **"Setup Auto-Sync"** in that browser too
+8. Select THE SAME FILE you created in step 5
+9. ✅ Both browsers now share the same data!
+
+**Important:** All browsers must select the SAME file for sync to work.
+
+### Exporting Data (Manual Backup)
 1. Click **"Export"** button
 2. JSON file downloads automatically
 3. Save this file safely!
 4. **File name:** `family-expenses-2025-11-10.json`
 
-### Importing Data (Restore/Transfer)
+### Importing Data (Manual Restore/Transfer)
 1. Click **"Import"** button
 2. Select your backup JSON file
 3. Confirm to replace current data
