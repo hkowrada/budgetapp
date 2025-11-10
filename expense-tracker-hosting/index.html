@@ -2554,6 +2554,208 @@
             console.log('API Test Results:', results);
         }
 
+        // Due Bills Display
+        function updateDueBills() {
+            const today = new Date();
+            const currentDay = today.getDate();
+            const dueBills = [];
+
+            allData.recurring.forEach(recurring => {
+                if (!recurring.active) return;
+
+                const daysUntilDue = recurring.dayOfMonth - currentDay;
+                let status = '';
+                let urgency = '';
+
+                if (daysUntilDue === 0) {
+                    status = 'DUE TODAY!';
+                    urgency = 'urgent';
+                } else if (daysUntilDue > 0 && daysUntilDue <= 3) {
+                    status = `Due in ${daysUntilDue} day${daysUntilDue > 1 ? 's' : ''}`;
+                    urgency = 'soon';
+                } else if (daysUntilDue < 0 && daysUntilDue > -7) {
+                    status = `${Math.abs(daysUntilDue)} day${Math.abs(daysUntilDue) > 1 ? 's' : ''} overdue`;
+                    urgency = 'overdue';
+                }
+
+                if (urgency) {
+                    dueBills.push({ ...recurring, status, urgency, daysUntilDue });
+                }
+            });
+
+            const section = document.getElementById('dueBillsSection');
+            const container = document.getElementById('dueBillsContainer');
+
+            if (dueBills.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            dueBills.sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+
+            container.innerHTML = dueBills.map(bill => {
+                const bgColor = bill.urgency === 'urgent' ? '#fff5f5' : 
+                               bill.urgency === 'overdue' ? '#fed7d7' : '#fffbeb';
+                const borderColor = bill.urgency === 'urgent' ? '#f56565' : 
+                                   bill.urgency === 'overdue' ? '#fc8181' : '#f6ad55';
+                
+                return `
+                    <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 16px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size: 16px;">${bill.name}</strong>
+                            <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                                €${bill.amount.toFixed(2)} • ${bill.category} • ${bill.status}
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-small" onclick="payRecurring('${bill.id}')">
+                            <i class="fas fa-check"></i> Pay Now
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Monthly Reports
+        let currentReportMonth = new Date();
+
+        function populateMonthSelector() {
+            const selector = document.getElementById('monthSelector');
+            selector.innerHTML = '';
+
+            // Get range of months (6 months back to 6 months forward)
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 6);
+
+            for (let i = -6; i <= 6; i++) {
+                const date = new Date();
+                date.setMonth(date.getMonth() + i);
+                const value = date.toISOString().slice(0, 7);
+                const label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                if (i === 0) option.selected = true;
+                selector.appendChild(option);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentReportMonth.setMonth(currentReportMonth.getMonth() + direction);
+            document.getElementById('monthSelector').value = currentReportMonth.toISOString().slice(0, 7);
+            updateMonthlyReport();
+        }
+
+        function changeToMonth() {
+            const monthStr = document.getElementById('monthSelector').value;
+            const [year, month] = monthStr.split('-').map(Number);
+            currentReportMonth = new Date(year, month - 1, 1);
+            updateMonthlyReport();
+        }
+
+        function updateMonthlyReport() {
+            const monthKey = currentReportMonth.toISOString().slice(0, 7);
+            const [year, month] = monthKey.split('-').map(Number);
+            const monthStart = new Date(year, month - 1, 1);
+            const monthEnd = new Date(year, month, 0);
+            const now = new Date();
+            const isCurrentMonth = monthKey === now.toISOString().slice(0, 7);
+            const isFutureMonth = currentReportMonth > now;
+
+            // Get actual expenses for this month
+            const monthExpenses = allData.expenses.filter(exp => {
+                const expDate = new Date(exp.date);
+                return expDate >= monthStart && expDate <= monthEnd;
+            });
+
+            const actualTotal = monthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            const salary = allData.salaries[monthKey] || 2700;
+
+            // Get recurring expenses
+            const recurringTotal = allData.recurring
+                .filter(r => r.active)
+                .reduce((sum, r) => sum + parseFloat(r.amount), 0);
+
+            // Calculate projection for future months
+            const projection = isFutureMonth ? recurringTotal : null;
+
+            // Category breakdown
+            const categoryTotals = {};
+            monthExpenses.forEach(exp => {
+                if (!categoryTotals[exp.category]) categoryTotals[exp.category] = 0;
+                categoryTotals[exp.category] += parseFloat(exp.amount);
+            });
+
+            // Projected categories for future months
+            if (isFutureMonth) {
+                allData.recurring.filter(r => r.active).forEach(r => {
+                    if (!categoryTotals[r.category]) categoryTotals[r.category] = 0;
+                    categoryTotals[r.category] += parseFloat(r.amount);
+                });
+            }
+
+            const container = document.getElementById('monthlyReport');
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">
+                            ${isFutureMonth ? 'Projected' : 'Actual'} Expenses
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: #1a202c;">
+                            €${(isFutureMonth ? projection : actualTotal).toFixed(2)}
+                        </div>
+                        ${isFutureMonth ? '<div style="font-size: 12px; color: #a0aec0; margin-top: 4px;">Based on recurring bills</div>' : 
+                          `<div style="font-size: 12px; color: #a0aec0; margin-top: 4px;">${monthExpenses.length} transactions</div>`}
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">Salary</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #1a202c;">€${salary.toFixed(2)}</div>
+                        ${!isFutureMonth && !isCurrentMonth ? '<div style="font-size: 12px; color: #a0aec0; margin-top: 4px;">Historical</div>' : ''}
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">
+                            ${isFutureMonth ? 'Projected' : 'Actual'} Balance
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: ${(salary - (isFutureMonth ? projection : actualTotal)) >= 0 ? '#38a169' : '#c53030'};">
+                            €${(salary - (isFutureMonth ? projection : actualTotal)).toFixed(2)}
+                        </div>
+                        <div style="font-size: 12px; color: #a0aec0; margin-top: 4px;">
+                            ${((isFutureMonth ? projection : actualTotal) / salary * 100).toFixed(1)}% of salary
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (Object.keys(categoryTotals).length > 0) {
+                html += '<h3 style="margin: 24px 0 16px; font-size: 18px;">Category Breakdown</h3>';
+                html += '<div style="display: flex; flex-direction: column; gap: 12px;">';
+                
+                const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+                const maxAmount = sortedCategories[0][1];
+                
+                sortedCategories.forEach(([category, amount]) => {
+                    const percentage = (amount / maxAmount) * 100;
+                    html += `
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="min-width: 120px; font-weight: 600; color: #4a5568;">${category}</div>
+                            <div style="flex: 1; height: 32px; background: #f7fafc; border-radius: 8px; overflow: hidden; position: relative;">
+                                <div style="height: 100%; width: ${percentage}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; color: white; font-weight: 600; font-size: 13px;">
+                                    €${amount.toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            } else if (!isFutureMonth) {
+                html += '<div style="text-align: center; color: #a0aec0; padding: 40px;">No expenses recorded for this month</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
         // Auto-save reminder
         let lastSaveTime = Date.now();
         setInterval(() => {
