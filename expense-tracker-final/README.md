@@ -8,6 +8,34 @@ No installation, no server, no packages. Works 100% offline after first load.
 
 ---
 
+## ⚠️ COMMON ISSUE: Different Data in Different Browsers?
+
+**This is NORMAL!** Each browser (Chrome, Firefox, Safari, Edge) stores data separately.
+
+### Quick Fix - Choose One:
+
+**Option 1: Auto-Sync (Best Solution)** ⭐
+1. Open app in first browser
+2. Click **"Setup Auto-Sync"** (orange button)
+3. Select **"File-Based Sync"**
+4. Choose a Dropbox/Google Drive folder
+5. Create file: `family-expenses.json`
+6. Open app in second browser
+7. Click **"Setup Auto-Sync"** again
+8. Select THE SAME FILE from step 5
+9. ✅ Done! Both browsers now share data
+
+**Option 2: Manual Sync**
+- Click **"Export"** in Browser 1 → Download JSON file
+- Click **"Import"** in Browser 2 → Upload that JSON file
+- Repeat whenever you want to sync
+
+**Option 3: Use One Browser**
+- Just use Chrome (or Firefox/Safari) for all expense tracking
+- Don't switch browsers
+
+---
+
 ## 🔐 Login with PIN
 
 ### Pre-configured Users:
