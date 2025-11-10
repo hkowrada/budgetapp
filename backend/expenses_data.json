@@ -6,5 +6,30 @@
     "Transport",
     "Entertainment"
   ],
-  "expenses": []
+  "expenses": [
+    {
+      "id": "1",
+      "amount": 1000.0,
+      "category": "Rent",
+      "date": "2025-11-10",
+      "description": "Monthly rent payment",
+      "member": "John"
+    },
+    {
+      "id": "2",
+      "amount": 130.0,
+      "category": "Electricity",
+      "date": "2025-11-10",
+      "description": "Electricity bill",
+      "member": "Sarah"
+    },
+    {
+      "id": "3",
+      "amount": 250.0,
+      "category": "Groceries",
+      "date": "2025-11-10",
+      "description": "Weekly groceries",
+      "member": "John"
+    }
+  ]
 }
