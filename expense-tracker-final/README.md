@@ -99,10 +99,35 @@ Set up monthly bills that remind you automatically:
 
 ## 📊 Data Storage
 
-### Storage Method:
-- **Browser localStorage** - Data saved automatically on your device
-- **JSON Export** - Download backup file anytime
-- **Import from file** - Restore or transfer data
+### ⚠️ IMPORTANT: Each Browser Has Separate Data
+
+**Why do I see different data in Chrome vs Firefox?**
+- Each browser stores data separately (Chrome, Firefox, Safari, Edge all have their own storage)
+- This is normal browser behavior - data doesn't sync automatically
+- **Solution:** Use one of the sync methods below
+
+### Storage Methods:
+
+**Option 1: Auto-Sync (Recommended)** ⭐
+1. Click **"Setup Auto-Sync"** button
+2. Select **"File-Based Sync"**
+3. Choose a shared location:
+   - Dropbox folder
+   - Google Drive folder
+   - USB drive
+   - Network folder
+4. Create/select file: `family-expenses.json`
+5. Open app in other browsers and select THE SAME file
+6. ✅ All browsers now use the same data!
+
+**Option 2: Manual Export/Import**
+- **Export** - Download JSON backup file
+- **Import** - Load backup in other browser
+- Repeat for each browser you use
+
+**Option 3: Use One Browser Only**
+- Pick your favorite browser (Chrome/Firefox/Safari/Edge)
+- Only use that browser for expense tracking
 
 ### Data Structure:
 ```json
