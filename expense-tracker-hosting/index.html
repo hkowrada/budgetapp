@@ -1554,6 +1554,27 @@
     </style>
 </head>
 <body>
+    <!-- PWA Install Banner -->
+    <div class="pwa-install-banner" id="installBanner">
+        <i class="fas fa-download"></i>
+        <span>Install app for offline access & better experience!</span>
+        <button onclick="installPWA()">Install</button>
+        <button class="close-install" onclick="closeInstallBanner()">×</button>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i>
+        <span>You're offline</span>
+    </div>
+
+    <!-- Update Available Banner -->
+    <div class="update-banner" id="updateBanner">
+        <i class="fas fa-sync-alt"></i>
+        <span>New version available!</span>
+        <button onclick="updateApp()">Update Now</button>
+    </div>
+
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-box">
