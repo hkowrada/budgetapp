@@ -4,7 +4,8 @@
     "Electricity",
     "Groceries",
     "Transport",
-    "Entertainment"
+    "Entertainment",
+    "Internet"
   ],
   "expenses": [
     {
@@ -29,6 +30,14 @@
       "category": "Groceries",
       "date": "2025-11-10",
       "description": "Weekly groceries",
+      "member": "John"
+    },
+    {
+      "id": "4",
+      "amount": 45.0,
+      "category": "Internet",
+      "date": "2025-11-10",
+      "description": "Monthly internet bill",
       "member": "John"
     }
   ]
