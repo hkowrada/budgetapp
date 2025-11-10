@@ -2394,6 +2394,51 @@
             }, 3000);
         }
 
+        // Test API connection
+        async function testAPI() {
+            const results = [];
+            
+            // Test 1: API exists
+            try {
+                const response = await fetch(API_URL);
+                if (response.ok) {
+                    results.push('✅ API is accessible');
+                    const data = await response.json();
+                    results.push(`✅ Data loaded: ${Object.keys(data).join(', ')}`);
+                } else {
+                    results.push(`❌ API error: ${response.status} ${response.statusText}`);
+                }
+            } catch (e) {
+                results.push(`❌ Cannot reach API: ${e.message}`);
+            }
+            
+            // Test 2: Write test
+            try {
+                const testData = { ...allData, _test: Date.now() };
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        results.push('✅ Write test successful');
+                    } else {
+                        results.push(`❌ Write failed: ${result.message}`);
+                    }
+                } else {
+                    results.push(`❌ Write error: ${response.status}`);
+                }
+            } catch (e) {
+                results.push(`❌ Write test failed: ${e.message}`);
+            }
+            
+            // Show results
+            alert('API Test Results:\\n\\n' + results.join('\\n') + '\\n\\nCheck browser console (F12) for more details.');
+            console.log('API Test Results:', results);
+        }
+
         // Auto-save reminder
         let lastSaveTime = Date.now();
         setInterval(() => {
