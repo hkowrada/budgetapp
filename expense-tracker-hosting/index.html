@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Expense Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo i {
+            font-size: 64px;
+            color: #667eea;
+            margin-bottom: 16px;
+        }
+
+        .login-logo h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .login-logo p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .user-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .user-card {
+            padding: 20px 24px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .user-card:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .user-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .user-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .user-role {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .user-permissions {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* PIN Input */
+        .pin-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .pin-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .pin-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #1a202c;
+        }
+
+        .pin-box p {
+            color: #718096;
+            margin-bottom: 24px;
+        }
+
+        .pin-input-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .pin-digit {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .pin-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* Notifications */
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f56565;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            font-size: 32px;
+            color: #667eea;
+        }
+
+        .logo h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .current-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .current-user i {
+            color: #667eea;
+        }
+
+        .current-user span {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-logout {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .btn-logout:hover {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-clear {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .btn-clear:hover {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fc8181;
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-edit {
+            background: #ed8936;
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            margin-bottom: 24px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-card.alert {
+            border: 2px solid #f56565;
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-content h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .card-content .amount {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .card-content .sub-info {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #f56565 0%, #c53030 100%);
+        }
+
+        /* Search */
+        .search-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Tables */
+        .expenses-section, .recurring-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .expenses-section h2, .recurring-section h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .expenses-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .expenses-table thead {
+            background: #f7fafc;
+        }
+
+        .expenses-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .expenses-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .expenses-table tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #a0aec0;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e6fffa;
+            color: #047857;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.due-soon {
+            background: #fef5e7;
+            color: #d69e2e;
+        }
+
+        .status-badge.overdue {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .status-badge.active {
+            background: #e6fffa;
+            color: #047857;
+        }
+
+        .amount-cell {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a202c;
+        }
+
+        /* Category Chart */
+        .category-summary-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .category-summary-section h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .category-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .category-name {
+            min-width: 120px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .bar-container {
+            flex: 1;
+            height: 32px;
+            background: #f7fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #a0aec0;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #2d3748;
+        }
+
+        /* Form */
+        form {
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            transition: border-color 0.2s;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Categories Management */
+        .categories-container {
+            padding: 32px;
+        }
+
+        .add-category-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 0;
+        }
+
+        .add-category-form input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .add-category-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .categories-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .category-item:hover {
+            background: #e2e8f0;
+        }
+
+        .category-item span {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: white;
+            border-left: 4px solid #ed8936;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-box.warning {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+
+        .alert-box.danger {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .alert-box i {
+            font-size: 24px;
+            color: #ed8936;
+        }
+
+        .alert-box.danger i {
+            color: #f56565;
+        }
+
+        .alert-box .alert-content {
+            flex: 1;
+        }
+
+        .alert-box .alert-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #2d3748;
+        }
+
+        .alert-box .alert-message {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .header-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .expenses-table {
+                font-size: 12px;
+            }
+            
+            .expenses-table th,
+            .expenses-table td {
+                padding: 10px 8px;
+            }
+
+            .login-box {
+                padding: 32px 24px;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-wallet"></i>
+                <h1>Family Expense Tracker</h1>
+                <p>Select a user to continue</p>
+            </div>
+            <div class="user-selection">
+                <div class="user-card" onclick="selectUser('harish')">
+                    <div class="user-card-header">
+                        <div class="user-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <h3>Harish</h3>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <div class="user-permissions">PIN: 1234 | Full Access</div>
+                </div>
+                
+                <div class="user-card" onclick="selectUser('bhavani')">
+                    <div class="user-card-header">
+                        <div class="user-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <div>
+                            <h3>Bhavani</h3>
+                            <div class="user-role">Contributor</div>
+                        </div>
+                    </div>
+                    <div class="user-permissions">PIN: 5678 | Can Add Only</div>
+                </div>
+                
+                <div class="user-card" onclick="selectUser('guest')">
+                    <div class="user-card-header">
+                        <div class="user-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div>
+                            <h3>Guest</h3>
+                            <div class="user-role">Viewer</div>
+                        </div>
+                    </div>
+                    <div class="user-permissions">PIN: 0000 | Read-Only</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN Modal -->
+    <div id="pinModal" class="pin-modal">
+        <div class="pin-box">
+            <h2>Enter PIN</h2>
+            <p id="pinUsername">Enter 4-digit PIN for <strong></strong></p>
+            <div class="pin-input-container">
+                <input type="password" maxlength="1" class="pin-digit" id="pin1">
+                <input type="password" maxlength="1" class="pin-digit" id="pin2">
+                <input type="password" maxlength="1" class="pin-digit" id="pin3">
+                <input type="password" maxlength="1" class="pin-digit" id="pin4">
+            </div>
+            <div class="pin-buttons">
+                <button class="btn btn-secondary" onclick="cancelPinEntry()">Cancel</button>
+                <button class="btn btn-primary" onclick="verifyPin()">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainApp" class="container hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    <h1>Family Expense Tracker</h1>
+                </div>
+                <div class="user-info">
+                    <div class="current-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="currentUserName"></span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="showAddExpenseModal()" id="btnAddExpense">
+                            <i class="fas fa-plus"></i> Add Expense
+                        </button>
+                        <button class="btn btn-warning" onclick="showRecurringModal()" id="btnRecurring">
+                            <i class="fas fa-sync-alt"></i>
+                            <span class="notification-badge" id="recurringNotification"></span>
+                            Recurring
+                        </button>
+                        <button class="btn btn-secondary" onclick="showManageCategoriesModal()" id="btnManageCategories">
+                            <i class="fas fa-tags"></i> Categories
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSalaryModal()" id="btnManageSalary">
+                            <i class="fas fa-money-bill-wave"></i> Salary
+                        </button>
+                        <button class="btn btn-warning btn-small" onclick="setupAutoSync()" id="btnAutoSync">
+                            <i class="fas fa-sync"></i> Setup Auto-Sync
+                        </button>
+                        <button class="btn btn-success btn-small" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-success btn-small" onclick="document.getElementById('importFile').click()">
+                            <i class="fas fa-upload"></i> Import
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                        <button class="btn btn-logout" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Alerts -->
+        <div id="alertsContainer"></div>
+        
+        <!-- Browser Data Notice -->
+        <div id="browserNotice" class="alert-box" style="border-left-color: #4facfe; background: #ebf8ff; display: none;">
+            <i class="fas fa-info-circle" style="color: #4facfe;"></i>
+            <div class="alert-content">
+                <div class="alert-title">Different Data in Each Browser?</div>
+                <div class="alert-message">
+                    Each browser stores data separately. 
+                    <strong>Solution:</strong> Click 
+                    <button onclick="setupAutoSync()" style="display: inline; padding: 4px 12px; background: #4facfe; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin: 0 4px;">
+                        <i class="fas fa-sync"></i> Setup Auto-Sync
+                    </button> 
+                    to use a shared file location (like Dropbox folder) so all browsers see the same data!
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Summary -->
+        <section class="summary-section">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Monthly Salary</h3>
+                        <p class="amount" id="monthlySalary">€0.00</p>
+                        <div class="sub-info" id="salaryMonth"></div>
+                    </div>
+                </div>
+                <div class="summary-card" id="expenseCard">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Total Expenses</h3>
+                        <p class="amount" id="totalExpenses">€0.00</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="expenseProgress"></div>
+                        </div>
+                        <div class="sub-info" id="expensePercentage"></div>
+                    </div>
+                </div>
+                <div class="summary-card" id="balanceCard">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Remaining Balance</h3>
+                        <p class="amount" id="remainingBalance">€0.00</p>
+                        <div class="sub-info" id="balanceStatus"></div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Total Records</h3>
+                        <p class="amount" id="totalRecords">0</p>
+                        <div class="sub-info"><span id="totalCategories">0</span> Categories | <span id="totalRecurring">0</span> Recurring</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search -->
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search expenses by description, category, or member..." oninput="searchExpenses()">
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters-section">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterCategory"><i class="fas fa-filter"></i> Category</label>
+                    <select id="filterCategory" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterMember"><i class="fas fa-user"></i> Member</label>
+                    <select id="filterMember" onchange="applyFilters()">
+                        <option value="">All Members</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStartDate"><i class="fas fa-calendar-alt"></i> Start Date</label>
+                    <input type="date" id="filterStartDate" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="filterEndDate"><i class="fas fa-calendar-alt"></i> End Date</label>
+                    <input type="date" id="filterEndDate" onchange="applyFilters()">
+                </div>
+                <button class="btn btn-clear" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </section>
+
+        <!-- Expenses Table -->
+        <section class="expenses-section">
+            <h2><i class="fas fa-list"></i> Expense Records</h2>
+            <div class="table-container">
+                <table class="expenses-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th id="actionsHeader">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        <tr>
+                            <td colspan="6" class="no-data">No expenses recorded yet. Add your first expense!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Category Summary -->
+        <section class="category-summary-section">
+            <h2><i class="fas fa-chart-bar"></i> Expenses by Category</h2>
+            <div id="categoryChart" class="category-chart"></div>
+        </section>
+    </div>
+
+    <!-- Add/Edit Expense Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> <span id="expenseModalTitle">Add New Expense</span></h2>
+                <button class="close-btn" onclick="closeModal('expenseModal')">&times;</button>
+            </div>
+            <form id="expenseForm" onsubmit="handleExpense(event)">
+                <input type="hidden" id="expenseId">
+                <div class="form-group">
+                    <label for="expenseAmount">Amount (€) *</label>
+                    <input type="number" id="expenseAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseCategory">Category *</label>
+                    <select id="expenseCategory" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDate">Date *</label>
+                    <input type="date" id="expenseDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDescription">Description *</label>
+                    <input type="text" id="expenseDescription" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseMember">Family Member *</label>
+                    <input type="text" id="expenseMember" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Expense
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recurring Expenses Modal -->
+    <div id="recurringModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sync-alt"></i> Recurring Expenses</h2>
+                <button class="close-btn" onclick="closeModal('recurringModal')">&times;</button>
+            </div>
+            <div style="padding: 32px;">
+                <button class="btn btn-primary" onclick="showAddRecurringModal()" id="btnAddRecurring" style="margin-bottom: 20px;">
+                    <i class="fas fa-plus"></i> Add Recurring Expense
+                </button>
+                <div class="table-container">
+                    <table class="expenses-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Category</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th id="recurringActionsHeader">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recurringTableBody">
+                            <tr>
+                                <td colspan="6" class="no-data">No recurring expenses set up.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Recurring Expense Modal -->
+    <div id="addRecurringModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sync-alt"></i> <span id="recurringModalTitle">Add Recurring Expense</span></h2>
+                <button class="close-btn" onclick="closeModal('addRecurringModal')">&times;</button>
+            </div>
+            <form id="addRecurringForm" onsubmit="handleRecurring(event)">
+                <input type="hidden" id="recurringId">
+                <div class="form-group">
+                    <label for="recurringName">Expense Name *</label>
+                    <input type="text" id="recurringName" placeholder="e.g., Monthly Rent" required>
+                </div>
+                <div class="form-group">
+                    <label for="recurringAmount">Amount (€) *</label>
+                    <input type="number" id="recurringAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="recurringCategory">Category *</label>
+                    <select id="recurringCategory" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="recurringMember">Family Member *</label>
+                    <input type="text" id="recurringMember" required>
+                </div>
+                <div class="form-group">
+                    <label for="recurringDay">Day of Month (1-31) *</label>
+                    <input type="number" id="recurringDay" min="1" max="31" required>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="recurringActive" checked>
+                        <span>Active (Auto-remind on due date)</span>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addRecurringModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manageCategoriesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-tags"></i> Manage Categories</h2>
+                <button class="close-btn" onclick="closeModal('manageCategoriesModal')">&times;</button>
+            </div>
+            <div class="categories-container">
+                <form id="addCategoryForm" onsubmit="handleAddCategory(event)" class="add-category-form">
+                    <input type="text" id="newCategoryName" placeholder="New category name" required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </form>
+                <div id="categoriesList" class="categories-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-Sync Setup Modal -->
+    <div id="autoSyncModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sync"></i> Setup Auto-Sync</h2>
+                <button class="close-btn" onclick="closeModal('autoSyncModal')">&times;</button>
+            </div>
+            <div style="padding: 32px;">
+                <div class="alert-box warning" style="margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Why Different Data in Different Browsers?</div>
+                        <div class="alert-message">Each browser stores data separately. To sync data across browsers, select a shared location (like Dropbox folder) below.</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 16px; font-size: 18px;">Select Sync Location:</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                    <label class="checkbox-label" style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="syncMethod" value="manual" checked onchange="updateSyncMethod()">
+                        <div style="margin-left: 12px;">
+                            <strong>Manual Sync (Current)</strong>
+                            <p style="font-size: 13px; color: #718096; margin-top: 4px;">Use Export/Import buttons to manually sync between browsers</p>
+                        </div>
+                    </label>
+                    
+                    <label class="checkbox-label" style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="syncMethod" value="file" onchange="updateSyncMethod()">
+                        <div style="margin-left: 12px;">
+                            <strong>File-Based Sync (Recommended)</strong>
+                            <p style="font-size: 13px; color: #718096; margin-top: 4px;">Select a shared file location (Dropbox, USB drive, network folder)</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="fileSyncOptions" style="display: none;">
+                    <button class="btn btn-primary" onclick="selectSyncFile()" style="margin-bottom: 16px;">
+                        <i class="fas fa-folder-open"></i> Select/Create Sync File
+                    </button>
+                    <div id="syncFileStatus" style="padding: 12px; background: #f7fafc; border-radius: 8px; font-size: 14px; display: none;">
+                        <strong>Sync File:</strong> <span id="syncFileName">Not selected</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 16px; background: #e6fffa; border-left: 4px solid #38a169; border-radius: 8px;">
+                    <strong style="color: #2d3748;">💡 How to sync across browsers:</strong>
+                    <ol style="margin-top: 8px; margin-left: 20px; color: #4a5568; font-size: 14px;">
+                        <li>Select a shared location (Dropbox folder, USB drive, or network folder)</li>
+                        <li>Choose/create file: <code>family-expenses.json</code></li>
+                        <li>Open app in any browser and select the SAME file</li>
+                        <li>All browsers will now use the same data!</li>
+                    </ol>
+                </div>
+
+                <div class="form-actions" style="margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('autoSyncModal')">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Salary Modal -->
+    <div id="salaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-money-bill-wave"></i> Set Monthly Salary</h2>
+                <button class="close-btn" onclick="closeModal('salaryModal')">&times;</button>
+            </div>
+            <form id="salaryForm" onsubmit="handleSetSalary(event)">
+                <div class="form-group">
+                    <label for="salaryAmount">Monthly Salary (€) *</label>
+                    <input type="number" id="salaryAmount" step="0.01" required placeholder="2700">
+                </div>
+                <div class="form-group">
+                    <label for="salaryMonth">For Month *</label>
+                    <input type="month" id="salaryMonth" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('salaryModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Salary
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // User configuration with PINs
+        const users = {
+            harish: { name: 'Harish', pin: '1234', role: 'admin', permissions: ['add', 'edit', 'delete', 'manage_categories', 'manage_salary', 'manage_recurring'] },
+            bhavani: { name: 'Bhavani', pin: '5678', role: 'contributor', permissions: ['add'] },
+            guest: { name: 'Guest', pin: '0000', role: 'viewer', permissions: [] }
+        };
+
+        let selectedUsername = null;
+        let currentUser = null;
+        let allData = { categories: [], expenses: [], salaries: {}, recurring: [] };
+        let filteredExpenses = [];
+        let editingExpenseId = null;
+        let editingRecurringId = null;
+        let syncFileHandle = null;
+        let syncMethod = 'manual';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            setupPinInputs();
+            loadSyncSettings();
+        });
+
+        function checkLogin() {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser && users[savedUser]) {
+                currentUser = users[savedUser];
+                showMainApp();
+            } else {
+                showLoginPage();
+            }
+        }
+
+        function selectUser(username) {
+            selectedUsername = username;
+            document.getElementById('pinUsername').querySelector('strong').textContent = users[username].name;
+            document.getElementById('pinModal').classList.add('active');
+            document.getElementById('pin1').focus();
+        }
+
+        function setupPinInputs() {
+            const pinInputs = document.querySelectorAll('.pin-digit');
+            pinInputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < 3) {
+                        pinInputs[index + 1].focus();
+                    }
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        pinInputs[index - 1].focus();
+                    }
+                    if (e.key === 'Enter') {
+                        verifyPin();
+                    }
+                });
+            });
+        }
+
+        function verifyPin() {
+            const pin = Array.from(document.querySelectorAll('.pin-digit')).map(input => input.value).join('');
+            
+            if (pin.length !== 4) {
+                showNotification('Please enter 4-digit PIN', 'error');
+                return;
+            }
+
+            if (users[selectedUsername].pin === pin) {
+                currentUser = users[selectedUsername];
+                sessionStorage.setItem('currentUser', selectedUsername);
+                document.getElementById('pinModal').classList.remove('active');
+                clearPinInputs();
+                showMainApp();
+            } else {
+                showNotification('Incorrect PIN. Please try again.', 'error');
+                clearPinInputs();
+                document.getElementById('pin1').focus();
+            }
+        }
+
+        function cancelPinEntry() {
+            document.getElementById('pinModal').classList.remove('active');
+            clearPinInputs();
+            selectedUsername = null;
+        }
+
+        function clearPinInputs() {
+            document.querySelectorAll('.pin-digit').forEach(input => input.value = '');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                currentUser = null;
+                showLoginPage();
+            }
+        }
+
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        function showMainApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('currentUserName').textContent = currentUser.name;
+            
+            loadData();
+            setDefaultDates();
+            updateUIPermissions();
+            checkRecurringDueDates();
+            checkBudgetAlerts();
+            showBrowserNotice();
+        }
+
+        function showBrowserNotice() {
+            // Show notice if not using file sync
+            if (syncMethod === 'manual') {
+                document.getElementById('browserNotice').style.display = 'flex';
+            } else {
+                document.getElementById('browserNotice').style.display = 'none';
+            }
+        }
+
+        function hasPermission(permission) {
+            return currentUser && currentUser.permissions.includes(permission);
+        }
+
+        function updateUIPermissions() {
+            document.getElementById('btnAddExpense').disabled = !hasPermission('add');
+            document.getElementById('btnManageCategories').disabled = !hasPermission('manage_categories');
+            document.getElementById('btnManageSalary').disabled = !hasPermission('manage_salary');
+            document.getElementById('btnRecurring').disabled = !hasPermission('manage_recurring');
+            
+            if (!hasPermission('edit') && !hasPermission('delete')) {
+                document.getElementById('actionsHeader').style.display = 'none';
+            } else {
+                document.getElementById('actionsHeader').style.display = '';
+            }
+
+            if (!hasPermission('manage_recurring')) {
+                const recurringHeader = document.getElementById('recurringActionsHeader');
+                if (recurringHeader) recurringHeader.style.display = 'none';
+            }
+        }
+
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = today;
+            
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            document.getElementById('salaryMonth').value = currentMonth;
+        }
+
+        // Sync Settings Management
+        function loadSyncSettings() {
+            const savedSyncMethod = localStorage.getItem('syncMethod');
+            if (savedSyncMethod) {
+                syncMethod = savedSyncMethod;
+            }
+        }
+
+        function saveSyncSettings() {
+            localStorage.setItem('syncMethod', syncMethod);
+        }
+
+        async function setupAutoSync() {
+            document.getElementById('autoSyncModal').classList.add('active');
+            
+            // Set current sync method
+            const radioButtons = document.querySelectorAll('input[name="syncMethod"]');
+            radioButtons.forEach(radio => {
+                if (radio.value === syncMethod) {
+                    radio.checked = true;
+                }
+            });
+            updateSyncMethod();
+        }
+
+        function updateSyncMethod() {
+            const selected = document.querySelector('input[name="syncMethod"]:checked').value;
+            syncMethod = selected;
+            saveSyncSettings();
+            
+            const fileSyncOptions = document.getElementById('fileSyncOptions');
+            if (syncMethod === 'file') {
+                fileSyncOptions.style.display = 'block';
+            } else {
+                fileSyncOptions.style.display = 'none';
+            }
+        }
+
+        async function selectSyncFile() {
+            try {
+                // Check if File System Access API is supported
+                if (!('showSaveFilePicker' in window)) {
+                    alert('Your browser doesn\\'t support this feature. Please use Export/Import buttons instead, or try Chrome/Edge browser.');
+                    return;
+                }
+
+                const options = {
+                    types: [{
+                        description: 'JSON Files',
+                        accept: { 'application/json': ['.json'] }
+                    }],
+                    suggestedName: 'family-expenses.json'
+                };
+
+                syncFileHandle = await window.showSaveFilePicker(options);
+                
+                // Save to the selected file
+                await saveToSyncFile();
+                
+                document.getElementById('syncFileStatus').style.display = 'block';
+                document.getElementById('syncFileName').textContent = syncFileHandle.name;
+                
+                showNotification('Sync file selected! Data will auto-save to this location.', 'success');
+                
+                // Update button text
+                document.getElementById('btnAutoSync').innerHTML = '<i class=\"fas fa-check-circle\"></i> Syncing';
+                document.getElementById('btnAutoSync').style.background = '#48bb78';
+                document.getElementById('btnAutoSync').style.color = 'white';
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Error selecting sync file:', err);
+                    showNotification('Error setting up sync file', 'error');
+                }
+            }
+        }
+
+        async function saveToSyncFile() {
+            if (!syncFileHandle) return;
+
+            try {
+                const writable = await syncFileHandle.createWritable();
+                await writable.write(JSON.stringify(allData, null, 2));
+                await writable.close();
+                console.log('Data saved to sync file');
+            } catch (err) {
+                console.error('Error saving to sync file:', err);
+                showNotification('Error saving to sync file. Using browser storage.', 'error');
+            }
+        }
+
+        async function loadFromSyncFile() {
+            if (!syncFileHandle) return false;
+
+            try {
+                const file = await syncFileHandle.getFile();
+                const contents = await file.text();
+                const parsed = JSON.parse(contents);
+                
+                if (parsed.expenses || parsed.categories) {
+                    allData = parsed;
+                    if (!allData.recurring) allData.recurring = [];
+                    if (!allData.salaries) allData.salaries = {};
+                    return true;
+                }
+            } catch (err) {
+                console.error('Error loading from sync file:', err);
+            }
+            return false;
+        }
+
+        // Data Management
+        async function loadData() {
+            // Try to load from sync file first if using file sync
+            if (syncMethod === 'file' && syncFileHandle) {
+                const loaded = await loadFromSyncFile();
+                if (loaded) {
+                    filteredExpenses = [...allData.expenses];
+                    updateUI();
+                    return;
+                }
+            }
+
+            // Fall back to localStorage
+            const savedData = localStorage.getItem('familyExpenseData');
+            if (savedData) {
+                try {
+                    allData = JSON.parse(savedData);
+                    // Ensure all required fields exist
+                    if (!allData.recurring) allData.recurring = [];
+                    if (!allData.salaries) allData.salaries = {};
+                    if (!allData.categories) allData.categories = ["Rent", "Electricity", "Groceries", "Transport", "Entertainment"];
+                    if (!allData.expenses) allData.expenses = [];
+                } catch (e) {
+                    console.error('Error parsing data:', e);
+                    initializeDefaultData();
+                }
+            } else {
+                initializeDefaultData();
+            }
+            filteredExpenses = [...allData.expenses];
+            updateUI();
+        }
+
+        function initializeDefaultData() {
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            allData = {
+                categories: ["Rent", "Electricity", "Groceries", "Transport", "Entertainment"],
+                expenses: [],
+                salaries: {},
+                recurring: []
+            };
+            allData.salaries[currentMonth] = 2700;
+            saveData();
+        }
+
+        async function saveData() {
+            try {
+                // Save to localStorage
+                localStorage.setItem('familyExpenseData', JSON.stringify(allData));
+                
+                // Also save to sync file if configured
+                if (syncMethod === 'file' && syncFileHandle) {
+                    await saveToSyncFile();
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showNotification('Error saving data. Please export your data as backup.', 'error');
+                return false;
+            }
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `family-expenses-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!', 'success');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (confirm('This will replace all current data. Continue?')) {
+                        allData = imported;
+                        if (!allData.recurring) allData.recurring = [];
+                        if (!allData.salaries) allData.salaries = {};
+                        saveData();
+                        loadData();
+                        showNotification('Data imported successfully!', 'success');
+                    }
+                } catch (err) {
+                    showNotification('Invalid file format. Please select a valid JSON file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function updateUI() {
+            updateSummary();
+            updateFilters();
+            updateExpensesTable();
+            updateCategoryChart();
+            updateCategorySelects();
+            updateRecurringTable();
+        }
+
+        function getCurrentMonthSalary() {
+            const now = new Date();
+            const currentMonth = now.toISOString().slice(0, 7);
+            return allData.salaries[currentMonth] || 2700;
+        }
+
+        function updateSummary() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const monthKey = now.toISOString().slice(0, 7);
+            
+            const monthlySalary = getCurrentMonthSalary();
+            document.getElementById('monthlySalary').textContent = `€${monthlySalary.toFixed(2)}`;
+            document.getElementById('salaryMonth').textContent = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+            
+            const monthExpenses = allData.expenses.filter(exp => {
+                const expDate = new Date(exp.date);
+                return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+            });
+            
+            const monthTotal = monthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            
+            document.getElementById('totalExpenses').textContent = `€${monthTotal.toFixed(2)}`;
+            
+            const percentage = monthlySalary > 0 ? (monthTotal / monthlySalary) * 100 : 0;
+            const remaining = monthlySalary - monthTotal;
+            
+            const progressBar = document.getElementById('expenseProgress');
+            progressBar.style.width = `${Math.min(percentage, 100)}%`;
+            
+            if (percentage >= 100) {
+                progressBar.classList.add('danger');
+                progressBar.classList.remove('warning');
+            } else if (percentage >= 80) {
+                progressBar.classList.add('warning');
+                progressBar.classList.remove('danger');
+            } else {
+                progressBar.classList.remove('warning', 'danger');
+            }
+            
+            document.getElementById('expensePercentage').textContent = `${percentage.toFixed(1)}% of salary`;
+            
+            document.getElementById('remainingBalance').textContent = `€${remaining.toFixed(2)}`;
+            const balanceStatus = document.getElementById('balanceStatus');
+            
+            if (remaining < 0) {
+                balanceStatus.textContent = '⚠️ Over budget!';
+                balanceStatus.style.color = '#c53030';
+                document.getElementById('balanceCard').classList.add('alert');
+            } else if (remaining < monthlySalary * 0.2) {
+                balanceStatus.textContent = '⚡ Running low';
+                balanceStatus.style.color = '#d69e2e';
+                document.getElementById('balanceCard').classList.remove('alert');
+            } else {
+                balanceStatus.textContent = '✓ Looking good';
+                balanceStatus.style.color = '#38a169';
+                document.getElementById('balanceCard').classList.remove('alert');
+            }
+            
+            document.getElementById('totalCategories').textContent = allData.categories.length;
+            document.getElementById('totalRecords').textContent = allData.expenses.length;
+            document.getElementById('totalRecurring').textContent = allData.recurring.filter(r => r.active).length;
+        }
+
+        function checkBudgetAlerts() {
+            const alertsContainer = document.getElementById('alertsContainer');
+            alertsContainer.innerHTML = '';
+
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const monthlySalary = getCurrentMonthSalary();
+            const monthExpenses = allData.expenses.filter(exp => {
+                const expDate = new Date(exp.date);
+                return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+            });
+            
+            const monthTotal = monthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+            const percentage = monthlySalary > 0 ? (monthTotal / monthlySalary) * 100 : 0;
+
+            if (percentage >= 100) {
+                alertsContainer.innerHTML += `
+                    <div class="alert-box danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="alert-content">
+                            <div class="alert-title">Budget Exceeded!</div>
+                            <div class="alert-message">You have spent €${(monthTotal - monthlySalary).toFixed(2)} more than your monthly salary.</div>
+                        </div>
+                    </div>
+                `;
+            } else if (percentage >= 80) {
+                alertsContainer.innerHTML += `
+                    <div class="alert-box warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="alert-content">
+                            <div class="alert-title">Budget Warning</div>
+                            <div class="alert-message">You have used ${percentage.toFixed(1)}% of your monthly budget. €${(monthlySalary - monthTotal).toFixed(2)} remaining.</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function checkRecurringDueDates() {
+            if (!hasPermission('manage_recurring')) return;
+
+            const today = new Date();
+            const currentDay = today.getDate();
+            let dueCount = 0;
+
+            allData.recurring.forEach(recurring => {
+                if (recurring.active && recurring.dayOfMonth === currentDay) {
+                    dueCount++;
+                }
+            });
+
+            const notification = document.getElementById('recurringNotification');
+            if (dueCount > 0) {
+                notification.innerHTML = `<span class="badge">${dueCount}</span>`;
+                document.getElementById('btnRecurring').classList.add('pulse');
+            } else {
+                notification.innerHTML = '';
+                document.getElementById('btnRecurring').classList.remove('pulse');
+            }
+        }
+
+        function updateFilters() {
+            const categoryFilter = document.getElementById('filterCategory');
+            const currentValue = categoryFilter.value;
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            allData.categories.forEach(cat => {
+                categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+            categoryFilter.value = currentValue;
+            
+            const memberFilter = document.getElementById('filterMember');
+            const currentMemberValue = memberFilter.value;
+            const members = [...new Set(allData.expenses.map(exp => exp.member))];
+            memberFilter.innerHTML = '<option value="">All Members</option>';
+            members.forEach(member => {
+                memberFilter.innerHTML += `<option value="${member}">${member}</option>`;
+            });
+            memberFilter.value = currentMemberValue;
+        }
+
+        function searchExpenses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!searchTerm) {
+                applyFilters();
+                return;
+            }
+
+            filteredExpenses = allData.expenses.filter(exp => {
+                return exp.description.toLowerCase().includes(searchTerm) ||
+                       exp.category.toLowerCase().includes(searchTerm) ||
+                       exp.member.toLowerCase().includes(searchTerm);
+            });
+
+            updateExpensesTable();
+            updateCategoryChart();
+        }
+
+        function applyFilters() {
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const memberFilter = document.getElementById('filterMember').value;
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredExpenses = allData.expenses.filter(exp => {
+                let match = true;
+                if (categoryFilter && exp.category !== categoryFilter) match = false;
+                if (memberFilter && exp.member !== memberFilter) match = false;
+                if (startDate && exp.date < startDate) match = false;
+                if (endDate && exp.date > endDate) match = false;
+                if (searchTerm) {
+                    if (!exp.description.toLowerCase().includes(searchTerm) &&
+                        !exp.category.toLowerCase().includes(searchTerm) &&
+                        !exp.member.toLowerCase().includes(searchTerm)) {
+                        match = false;
+                    }
+                }
+                return match;
+            });
+            
+            updateExpensesTable();
+            updateCategoryChart();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterMember').value = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('searchInput').value = '';
+            filteredExpenses = [...allData.expenses];
+            updateExpensesTable();
+            updateCategoryChart();
+        }
+
+        function updateExpensesTable() {
+            const tbody = document.getElementById('expensesTableBody');
+            
+            if (filteredExpenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No expenses found.</td></tr>';
+                return;
+            }
+            
+            const sortedExpenses = [...filteredExpenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const canEdit = hasPermission('edit');
+            const canDelete = hasPermission('delete');
+            
+            tbody.innerHTML = sortedExpenses.map(exp => `
+                <tr>
+                    <td>${formatDate(exp.date)}</td>
+                    <td>${exp.description}</td>
+                    <td><span class="category-badge">${exp.category}</span></td>
+                    <td>${exp.member}</td>
+                    <td class="amount-cell">€${parseFloat(exp.amount).toFixed(2)}</td>
+                    ${(canEdit || canDelete) ? `<td>
+                        ${canEdit ? `<button class="btn btn-edit" onclick="editExpense('${exp.id}')"><i class="fas fa-edit"></i></button>` : ''}
+                        ${canDelete ? `<button class="btn btn-delete" onclick="deleteExpense('${exp.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>` : '<td style="display:none;"></td>'}
+                </tr>
+            `).join('');
+        }
+
+        function updateCategoryChart() {
+            const chartContainer = document.getElementById('categoryChart');
+            
+            if (filteredExpenses.length === 0) {
+                chartContainer.innerHTML = '<p class="no-data">No data available for chart</p>';
+                return;
+            }
+            
+            const categoryTotals = {};
+            filteredExpenses.forEach(exp => {
+                if (!categoryTotals[exp.category]) categoryTotals[exp.category] = 0;
+                categoryTotals[exp.category] += parseFloat(exp.amount);
+            });
+            
+            const maxAmount = Math.max(...Object.values(categoryTotals));
+            
+            chartContainer.innerHTML = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .map(([category, amount]) => {
+                    const percentage = (amount / maxAmount) * 100;
+                    return `
+                        <div class="category-bar">
+                            <div class="category-name">${category}</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentage}%">
+                                    €${amount.toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function updateCategorySelects() {
+            ['expenseCategory', 'recurringCategory'].forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const currentValue = select.value;
+                    select.innerHTML = allData.categories.map(cat => 
+                        `<option value="${cat}">${cat}</option>`
+                    ).join('');
+                    if (currentValue) select.value = currentValue;
+                }
+            });
+        }
+
+        function updateRecurringTable() {
+            const tbody = document.getElementById('recurringTableBody');
+            if (!tbody) return;
+
+            if (allData.recurring.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No recurring expenses set up.</td></tr>';
+                return;
+            }
+
+            const today = new Date();
+            const currentDay = today.getDate();
+
+            tbody.innerHTML = allData.recurring.map(recurring => {
+                let statusBadge = '';
+                let statusText = '';
+
+                if (!recurring.active) {
+                    statusBadge = 'status-badge';
+                    statusText = 'Inactive';
+                } else if (recurring.dayOfMonth === currentDay) {
+                    statusBadge = 'status-badge overdue';
+                    statusText = 'Due Today!';
+                } else if (Math.abs(recurring.dayOfMonth - currentDay) <= 3) {
+                    statusBadge = 'status-badge due-soon';
+                    statusText = `Due on ${recurring.dayOfMonth}${getOrdinalSuffix(recurring.dayOfMonth)}`;
+                } else {
+                    statusBadge = 'status-badge active';
+                    statusText = `Due: Day ${recurring.dayOfMonth}`;
+                }
+
+                const canManage = hasPermission('manage_recurring');
+
+                return `
+                    <tr>
+                        <td>${recurring.name}</td>
+                        <td class="amount-cell">€${parseFloat(recurring.amount).toFixed(2)}</td>
+                        <td><span class="category-badge">${recurring.category}</span></td>
+                        <td>${recurring.dayOfMonth}${getOrdinalSuffix(recurring.dayOfMonth)} of each month</td>
+                        <td><span class="${statusBadge}">${statusText}</span></td>
+                        ${canManage ? `<td>
+                            <button class="btn btn-edit" onclick="editRecurring('${recurring.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-delete" onclick="deleteRecurring('${recurring.id}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-success btn-small" onclick="payRecurring('${recurring.id}')"><i class="fas fa-check"></i> Pay</button>
+                        </td>` : '<td style="display:none;"></td>'}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return 'th';
+            switch (day % 10) {
+                case 1: return "st";
+                case 2: return "nd";
+                case 3: return "rd";
+                default: return "th";
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        // Modal functions
+        function showAddExpenseModal() {
+            if (!hasPermission('add')) {
+                showNotification('You do not have permission to add expenses', 'error');
+                return;
+            }
+            editingExpenseId = null;
+            document.getElementById('expenseModalTitle').textContent = 'Add New Expense';
+            document.getElementById('expenseForm').reset();
+            document.getElementById('expenseId').value = '';
+            setDefaultDates();
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function editExpense(id) {
+            if (!hasPermission('edit')) {
+                showNotification('You do not have permission to edit expenses', 'error');
+                return;
+            }
+
+            const expense = allData.expenses.find(e => e.id === id);
+            if (!expense) return;
+
+            editingExpenseId = id;
+            document.getElementById('expenseModalTitle').textContent = 'Edit Expense';
+            document.getElementById('expenseId').value = id;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('expenseCategory').value = expense.category;
+            document.getElementById('expenseDate').value = expense.date;
+            document.getElementById('expenseDescription').value = expense.description;
+            document.getElementById('expenseMember').value = expense.member;
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function showRecurringModal() {
+            if (!hasPermission('manage_recurring')) {
+                showNotification('You do not have permission to manage recurring expenses', 'error');
+                return;
+            }
+            document.getElementById('recurringModal').classList.add('active');
+            updateRecurringTable();
+        }
+
+        function showAddRecurringModal() {
+            editingRecurringId = null;
+            document.getElementById('recurringModalTitle').textContent = 'Add Recurring Expense';
+            document.getElementById('addRecurringForm').reset();
+            document.getElementById('recurringId').value = '';
+            document.getElementById('recurringActive').checked = true;
+            document.getElementById('addRecurringModal').classList.add('active');
+        }
+
+        function editRecurring(id) {
+            const recurring = allData.recurring.find(r => r.id === id);
+            if (!recurring) return;
+
+            editingRecurringId = id;
+            document.getElementById('recurringModalTitle').textContent = 'Edit Recurring Expense';
+            document.getElementById('recurringId').value = id;
+            document.getElementById('recurringName').value = recurring.name;
+            document.getElementById('recurringAmount').value = recurring.amount;
+            document.getElementById('recurringCategory').value = recurring.category;
+            document.getElementById('recurringMember').value = recurring.member;
+            document.getElementById('recurringDay').value = recurring.dayOfMonth;
+            document.getElementById('recurringActive').checked = recurring.active;
+            document.getElementById('addRecurringModal').classList.add('active');
+        }
+
+        function showManageCategoriesModal() {
+            if (!hasPermission('manage_categories')) {
+                showNotification('You do not have permission to manage categories', 'error');
+                return;
+            }
+            document.getElementById('manageCategoriesModal').classList.add('active');
+            renderCategoriesList();
+        }
+
+        function showSalaryModal() {
+            if (!hasPermission('manage_salary')) {
+                showNotification('You do not have permission to manage salary', 'error');
+                return;
+            }
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            document.getElementById('salaryAmount').value = getCurrentMonthSalary();
+            document.getElementById('salaryMonth').value = currentMonth;
+            document.getElementById('salaryModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal') || event.target.classList.contains('pin-modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Form handlers
+        function handleExpense(event) {
+            event.preventDefault();
+            
+            const expenseId = document.getElementById('expenseId').value;
+            const expense = {
+                id: expenseId || Date.now().toString(),
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                category: document.getElementById('expenseCategory').value,
+                date: document.getElementById('expenseDate').value,
+                description: document.getElementById('expenseDescription').value,
+                member: document.getElementById('expenseMember').value,
+                addedBy: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+
+            if (expenseId) {
+                const index = allData.expenses.findIndex(e => e.id === expenseId);
+                if (index !== -1) {
+                    allData.expenses[index] = { ...allData.expenses[index], ...expense };
+                    showNotification('Expense updated successfully!', 'success');
+                }
+            } else {
+                allData.expenses.push(expense);
+                showNotification('Expense added successfully!', 'success');
+            }
+            
+            if (saveData()) {
+                closeModal('expenseModal');
+                loadData();
+                checkBudgetAlerts();
+            }
+        }
+
+        function deleteExpense(id) {
+            if (!hasPermission('delete')) {
+                showNotification('You do not have permission to delete expenses', 'error');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to delete this expense?')) return;
+            
+            allData.expenses = allData.expenses.filter(exp => exp.id !== id);
+            
+            if (saveData()) {
+                showNotification('Expense deleted successfully!', 'success');
+                loadData();
+                checkBudgetAlerts();
+            }
+        }
+
+        function handleRecurring(event) {
+            event.preventDefault();
+
+            const recurringId = document.getElementById('recurringId').value;
+            const recurring = {
+                id: recurringId || Date.now().toString(),
+                name: document.getElementById('recurringName').value,
+                amount: parseFloat(document.getElementById('recurringAmount').value),
+                category: document.getElementById('recurringCategory').value,
+                member: document.getElementById('recurringMember').value,
+                dayOfMonth: parseInt(document.getElementById('recurringDay').value),
+                active: document.getElementById('recurringActive').checked,
+                createdBy: currentUser.name
+            };
+
+            if (recurringId) {
+                const index = allData.recurring.findIndex(r => r.id === recurringId);
+                if (index !== -1) {
+                    allData.recurring[index] = recurring;
+                    showNotification('Recurring expense updated!', 'success');
+                }
+            } else {
+                allData.recurring.push(recurring);
+                showNotification('Recurring expense added!', 'success');
+            }
+
+            if (saveData()) {
+                closeModal('addRecurringModal');
+                updateRecurringTable();
+                updateUI();
+                checkRecurringDueDates();
+            }
+        }
+
+        function deleteRecurring(id) {
+            if (!confirm('Delete this recurring expense?')) return;
+
+            allData.recurring = allData.recurring.filter(r => r.id !== id);
+            
+            if (saveData()) {
+                showNotification('Recurring expense deleted!', 'success');
+                updateRecurringTable();
+                updateUI();
+                checkRecurringDueDates();
+            }
+        }
+
+        function payRecurring(id) {
+            const recurring = allData.recurring.find(r => r.id === id);
+            if (!recurring) return;
+
+            if (!confirm(`Add ${recurring.name} (€${recurring.amount}) as an expense?`)) return;
+
+            const expense = {
+                id: Date.now().toString(),
+                amount: recurring.amount,
+                category: recurring.category,
+                date: new Date().toISOString().split('T')[0],
+                description: `${recurring.name} (Recurring)`,
+                member: recurring.member,
+                addedBy: currentUser.name,
+                timestamp: new Date().toISOString(),
+                fromRecurring: true
+            };
+
+            allData.expenses.push(expense);
+            
+            if (saveData()) {
+                showNotification('Recurring expense paid and added!', 'success');
+                loadData();
+                checkBudgetAlerts();
+            }
+        }
+
+        function renderCategoriesList() {
+            const list = document.getElementById('categoriesList');
+            const canDelete = hasPermission('manage_categories');
+            
+            list.innerHTML = allData.categories.map(cat => `
+                <div class="category-item">
+                    <span>${cat}</span>
+                    ${canDelete ? `<button class="btn btn-delete" onclick="deleteCategory('${cat}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function handleAddCategory(event) {
+            event.preventDefault();
+            
+            if (!hasPermission('manage_categories')) {
+                showNotification('You do not have permission to manage categories', 'error');
+                return;
+            }
+            
+            const categoryName = document.getElementById('newCategoryName').value.trim();
+            
+            if (!categoryName) return;
+            
+            if (allData.categories.includes(categoryName)) {
+                showNotification('Category already exists!', 'error');
+                return;
+            }
+            
+            allData.categories.push(categoryName);
+            
+            if (saveData()) {
+                showNotification('Category added successfully!', 'success');
+                document.getElementById('addCategoryForm').reset();
+                loadData();
+                renderCategoriesList();
+            }
+        }
+
+        function deleteCategory(categoryName) {
+            if (!hasPermission('manage_categories')) {
+                showNotification('You do not have permission to manage categories', 'error');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete "${categoryName}"?`)) return;
+            
+            allData.categories = allData.categories.filter(cat => cat !== categoryName);
+            
+            if (saveData()) {
+                showNotification('Category deleted successfully!', 'success');
+                loadData();
+                renderCategoriesList();
+            }
+        }
+
+        function handleSetSalary(event) {
+            event.preventDefault();
+            
+            if (!hasPermission('manage_salary')) {
+                showNotification('You do not have permission to manage salary', 'error');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('salaryAmount').value);
+            const month = document.getElementById('salaryMonth').value;
+            
+            if (amount <= 0) {
+                showNotification('Please enter a valid salary amount', 'error');
+                return;
+            }
+            
+            allData.salaries[month] = amount;
+            
+            if (saveData()) {
+                showNotification('Salary updated successfully!', 'success');
+                closeModal('salaryModal');
+                loadData();
+                checkBudgetAlerts();
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? '#48bb78' : '#f56565'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-save reminder
+        let lastSaveTime = Date.now();
+        setInterval(() => {
+            if (Date.now() - lastSaveTime > 1800000) { // 30 minutes
+                if (allData.expenses.length > 0) {
+                    showNotification('💾 Reminder: Export your data for backup!', 'success');
+                    lastSaveTime = Date.now();
+                }
+            }
+        }, 600000); // Check every 10 minutes
+    </script>
+</body>
+</html>
