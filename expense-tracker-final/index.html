@@ -1639,6 +1639,16 @@
             updateUIPermissions();
             checkRecurringDueDates();
             checkBudgetAlerts();
+            showBrowserNotice();
+        }
+
+        function showBrowserNotice() {
+            // Show notice if not using file sync
+            if (syncMethod === 'manual') {
+                document.getElementById('browserNotice').style.display = 'flex';
+            } else {
+                document.getElementById('browserNotice').style.display = 'none';
+            }
         }
 
         function hasPermission(permission) {
