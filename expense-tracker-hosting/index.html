@@ -3359,6 +3359,238 @@
                 }
             }
         }, 600000); // Check every 10 minutes
+
+        // ============================================
+        // PWA FUNCTIONALITY
+        // ============================================
+
+        let deferredPrompt;
+        let swRegistration = null;
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration);
+                        swRegistration = registration;
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    showUpdateBanner();
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+
+                // Listen for messages from service worker
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data.type === 'SYNC_COMPLETE') {
+                        showNotification('✅ Data synced successfully!', 'success');
+                    }
+                });
+            });
+        }
+
+        // Install PWA prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💡 Install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallBanner();
+        });
+
+        function showInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner && !localStorage.getItem('pwa-install-dismissed')) {
+                setTimeout(() => {
+                    banner.classList.add('show');
+                }, 2000);
+            }
+        }
+
+        function closeInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            banner.classList.remove('show');
+            localStorage.setItem('pwa-install-dismissed', 'true');
+        }
+
+        async function installPWA() {
+            if (!deferredPrompt) {
+                showNotification('App is already installed or browser doesn\'t support installation', 'info');
+                return;
+            }
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                showNotification('🎉 App installed successfully!', 'success');
+                closeInstallBanner();
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            
+            deferredPrompt = null;
+        }
+
+        // Detect if app is installed
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA was installed');
+            showNotification('🎉 App installed! You can now use it offline.', 'success');
+            closeInstallBanner();
+        });
+
+        // Online/Offline detection
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('offlineIndicator');
+            
+            if (navigator.onLine) {
+                indicator.classList.remove('show');
+                indicator.classList.add('online');
+                indicator.innerHTML = '<i class="fas fa-wifi"></i><span>Back online!</span>';
+                
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 3000);
+
+                // Trigger background sync if available
+                if ('serviceWorker' in navigator && 'sync' in swRegistration) {
+                    swRegistration.sync.register('sync-expenses')
+                        .then(() => console.log('✅ Background sync registered'))
+                        .catch(err => console.log('❌ Background sync failed:', err));
+                }
+            } else {
+                indicator.classList.add('show');
+                indicator.classList.remove('online');
+                indicator.innerHTML = '<i class="fas fa-wifi-slash"></i><span>You\'re offline</span>';
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Show update banner
+        function showUpdateBanner() {
+            const banner = document.getElementById('updateBanner');
+            banner.classList.add('show');
+        }
+
+        // Update app
+        function updateApp() {
+            if (swRegistration && swRegistration.waiting) {
+                swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        }
+
+        // Request notification permission
+        async function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('✅ Notification permission granted');
+                    showNotification('🔔 Notifications enabled!', 'success');
+                }
+            }
+        }
+
+        // Send push notification (for due bills)
+        function sendDueBillNotification(billName, daysUntilDue) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                if ('serviceWorker' in navigator && swRegistration) {
+                    const options = {
+                        body: `${billName} is due in ${daysUntilDue} days`,
+                        icon: './icon-192x192.png',
+                        badge: './icon-96x96.png',
+                        tag: 'due-bill-' + billName,
+                        requireInteraction: true,
+                        actions: [
+                            { action: 'view', title: 'View', icon: './icon-96x96.png' },
+                            { action: 'dismiss', title: 'Dismiss', icon: './icon-96x96.png' }
+                        ]
+                    };
+                    
+                    swRegistration.showNotification('💸 Bill Due Soon', options);
+                }
+            }
+        }
+
+        // Enhanced checkRecurringDueDates with notifications
+        const originalCheckRecurringDueDates = checkRecurringDueDates;
+        checkRecurringDueDates = function() {
+            originalCheckRecurringDueDates();
+
+            // Send notifications for due bills
+            if (allData.recurring) {
+                const today = new Date();
+                allData.recurring.forEach(bill => {
+                    if (!bill.active) return;
+                    
+                    const dueDate = new Date(today.getFullYear(), today.getMonth(), bill.dayOfMonth);
+                    if (dueDate < today) {
+                        dueDate.setMonth(dueDate.getMonth() + 1);
+                    }
+                    
+                    const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    // Notify 3 days before due date
+                    if (daysUntil <= 3 && daysUntil > 0) {
+                        sendDueBillNotification(bill.name, daysUntil);
+                    }
+                });
+            }
+        };
+
+        // Ask for notification permission after login
+        const originalShowMainApp = showMainApp;
+        showMainApp = function() {
+            originalShowMainApp();
+            
+            // Ask for notification permission once
+            if (!localStorage.getItem('notification-permission-asked')) {
+                setTimeout(() => {
+                    requestNotificationPermission();
+                    localStorage.setItem('notification-permission-asked', 'true');
+                }, 5000);
+            }
+        };
+
+        // Handle shortcuts from PWA manifest
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'add') {
+            // Wait for login then open add expense modal
+            document.addEventListener('DOMContentLoaded', () => {
+                const checkLogin = setInterval(() => {
+                    if (currentUser) {
+                        clearInterval(checkLogin);
+                        setTimeout(() => showAddExpenseModal(), 1000);
+                    }
+                }, 500);
+            });
+        } else if (urlParams.get('action') === 'report') {
+            // Scroll to report section
+            document.addEventListener('DOMContentLoaded', () => {
+                const checkLogin = setInterval(() => {
+                    if (currentUser) {
+                        clearInterval(checkLogin);
+                        setTimeout(() => {
+                            document.querySelector('.expenses-section').scrollIntoView({ behavior: 'smooth' });
+                        }, 1000);
+                    }
+                }, 500);
+            });
+        }
+
+        console.log('✅ PWA features initialized');
     </script>
 </body>
 </html>
