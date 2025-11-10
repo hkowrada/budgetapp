@@ -1602,10 +1602,18 @@
         // Data Management - Load from PHP API
         async function loadData() {
             try {
+                console.log('Loading data from:', API_URL);
                 const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Failed to load data');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`Failed to load data (${response.status})`);
+                }
                 
                 const data = await response.json();
+                console.log('Data loaded:', data);
+                
                 allData = data;
                 
                 // Ensure all required fields exist
@@ -1616,9 +1624,10 @@
                 
                 filteredExpenses = [...allData.expenses];
                 updateUI();
+                console.log('UI updated successfully');
             } catch (error) {
                 console.error('Error loading data:', error);
-                showNotification('Error loading data from server', 'error');
+                showNotification(`Error: ${error.message}. Check if api.php and data.json exist.`, 'error');
                 initializeDefaultData();
             }
         }
