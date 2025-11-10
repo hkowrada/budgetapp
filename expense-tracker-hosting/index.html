@@ -1847,12 +1847,10 @@
     </div>
 
     <script>
-        // User configuration with PINs
-        const users = {
-            harish: { name: 'Harish', pin: '1234', role: 'admin', permissions: ['add', 'edit', 'delete', 'manage_categories', 'manage_salary', 'manage_recurring'] },
-            bhavani: { name: 'Bhavani', pin: '5678', role: 'contributor', permissions: ['add'] },
-            guest: { name: 'Guest', pin: '0000', role: 'viewer', permissions: [] }
-        };
+        // ============================================
+        // SECURE AUTHENTICATION SYSTEM
+        // PINs are now stored securely on the server
+        // ============================================
 
         let selectedUsername = null;
         let currentUser = null;
@@ -1863,6 +1861,14 @@
         
         // Auto-detect API URL based on current page location
         const API_URL = window.location.pathname.replace('/index.html', '/api.php').replace(/\/$/, '/api.php');
+        const AUTH_URL = window.location.pathname.replace('/index.html', '/auth.php').replace(/\/$/, '/auth.php');
+
+        // User display information (for UI only - NO sensitive data)
+        const userDisplayInfo = {
+            harish: { name: 'Harish', role: 'Administrator', icon: 'crown', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', description: 'Full Access' },
+            bhavani: { name: 'Bhavani', role: 'Contributor', icon: 'user-edit', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', description: 'Can Add Only' },
+            guest: { name: 'Guest', role: 'Viewer', icon: 'eye', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', description: 'Read-Only' }
+        };
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -1870,19 +1876,35 @@
             setupPinInputs();
         });
 
-        function checkLogin() {
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser && users[savedUser]) {
-                currentUser = users[savedUser];
-                showMainApp();
-            } else {
-                showLoginPage();
+        async function checkLogin() {
+            // Check if we have a valid server session
+            try {
+                const response = await fetch(AUTH_URL + '?action=check', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.user) {
+                    currentUser = result.data.user;
+                    showMainApp();
+                    return;
+                }
+            } catch (error) {
+                console.log('No active session, showing login page');
             }
+            
+            showLoginPage();
         }
 
         function selectUser(username) {
             selectedUsername = username;
-            document.getElementById('pinUsername').querySelector('strong').textContent = users[username].name;
+            const displayInfo = userDisplayInfo[username];
+            document.getElementById('pinUsername').querySelector('strong').textContent = displayInfo.name;
             document.getElementById('pinModal').classList.add('active');
             document.getElementById('pin1').focus();
         }
@@ -1906,7 +1928,7 @@
             });
         }
 
-        function verifyPin() {
+        async function verifyPin() {
             const pin = Array.from(document.querySelectorAll('.pin-digit')).map(input => input.value).join('');
             
             if (pin.length !== 4) {
@@ -1914,16 +1936,45 @@
                 return;
             }
 
-            if (users[selectedUsername].pin === pin) {
-                currentUser = users[selectedUsername];
-                sessionStorage.setItem('currentUser', selectedUsername);
-                document.getElementById('pinModal').classList.remove('active');
-                clearPinInputs();
-                showMainApp();
-            } else {
-                showNotification('Incorrect PIN. Please try again.', 'error');
-                clearPinInputs();
-                document.getElementById('pin1').focus();
+            // Show loading state
+            const loginBtn = document.querySelector('.pin-buttons .btn-primary');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch(AUTH_URL + '?action=login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: selectedUsername,
+                        pin: pin
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentUser = result.data.user;
+                    document.getElementById('pinModal').classList.remove('active');
+                    clearPinInputs();
+                    showMainApp();
+                    showNotification('Welcome back, ' + currentUser.name + '! 🎉', 'success');
+                } else {
+                    showNotification(result.message, 'error');
+                    clearPinInputs();
+                    document.getElementById('pin1').focus();
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Login failed. Please check your connection and try again.', 'error');
+            } finally {
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
             }
         }
 
@@ -1937,11 +1988,23 @@
             document.querySelectorAll('.pin-digit').forEach(input => input.value = '');
         }
 
-        function logout() {
+        async function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                sessionStorage.removeItem('currentUser');
+                try {
+                    await fetch(AUTH_URL + '?action=logout', {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                
                 currentUser = null;
                 showLoginPage();
+                showNotification('Logged out successfully', 'success');
             }
         }
 
