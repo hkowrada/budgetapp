@@ -2223,6 +2223,7 @@
             document.getElementById('recurringModalTitle').textContent = 'Add Recurring Expense';
             document.getElementById('addRecurringForm').reset();
             document.getElementById('recurringId').value = '';
+            document.getElementById('recurringMember').value = currentUser.name; // Auto-fill with current user
             document.getElementById('recurringActive').checked = true;
             document.getElementById('addRecurringModal').classList.add('active');
         }
