@@ -1421,6 +1421,68 @@
         </div>
     </div>
 
+    <!-- Auto-Sync Setup Modal -->
+    <div id="autoSyncModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sync"></i> Setup Auto-Sync</h2>
+                <button class="close-btn" onclick="closeModal('autoSyncModal')">&times;</button>
+            </div>
+            <div style="padding: 32px;">
+                <div class="alert-box warning" style="margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Why Different Data in Different Browsers?</div>
+                        <div class="alert-message">Each browser stores data separately. To sync data across browsers, select a shared location (like Dropbox folder) below.</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 16px; font-size: 18px;">Select Sync Location:</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                    <label class="checkbox-label" style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="syncMethod" value="manual" checked onchange="updateSyncMethod()">
+                        <div style="margin-left: 12px;">
+                            <strong>Manual Sync (Current)</strong>
+                            <p style="font-size: 13px; color: #718096; margin-top: 4px;">Use Export/Import buttons to manually sync between browsers</p>
+                        </div>
+                    </label>
+                    
+                    <label class="checkbox-label" style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="syncMethod" value="file" onchange="updateSyncMethod()">
+                        <div style="margin-left: 12px;">
+                            <strong>File-Based Sync (Recommended)</strong>
+                            <p style="font-size: 13px; color: #718096; margin-top: 4px;">Select a shared file location (Dropbox, USB drive, network folder)</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="fileSyncOptions" style="display: none;">
+                    <button class="btn btn-primary" onclick="selectSyncFile()" style="margin-bottom: 16px;">
+                        <i class="fas fa-folder-open"></i> Select/Create Sync File
+                    </button>
+                    <div id="syncFileStatus" style="padding: 12px; background: #f7fafc; border-radius: 8px; font-size: 14px; display: none;">
+                        <strong>Sync File:</strong> <span id="syncFileName">Not selected</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 16px; background: #e6fffa; border-left: 4px solid #38a169; border-radius: 8px;">
+                    <strong style="color: #2d3748;">💡 How to sync across browsers:</strong>
+                    <ol style="margin-top: 8px; margin-left: 20px; color: #4a5568; font-size: 14px;">
+                        <li>Select a shared location (Dropbox folder, USB drive, or network folder)</li>
+                        <li>Choose/create file: <code>family-expenses.json</code></li>
+                        <li>Open app in any browser and select the SAME file</li>
+                        <li>All browsers will now use the same data!</li>
+                    </ol>
+                </div>
+
+                <div class="form-actions" style="margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('autoSyncModal')">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Manage Salary Modal -->
     <div id="salaryModal" class="modal">
         <div class="modal-content">
