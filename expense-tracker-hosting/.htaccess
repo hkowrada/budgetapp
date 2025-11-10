@@ -1,22 +1,44 @@
-# Security settings
-<Files "data.json">
+# Security Configuration for Family Expense Tracker
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Protect sensitive files
+<FilesMatch "(login_attempts\.json|data\.json\.bak)">
     Order Allow,Deny
     Deny from all
-</Files>
+</FilesMatch>
 
 # Prevent directory listing
 Options -Indexes
 
-# Enable PHP error logging (disable display for production)
+# Protect against clickjacking
+Header always append X-Frame-Options SAMEORIGIN
+
+# XSS Protection
+Header set X-XSS-Protection "1; mode=block"
+
+# Prevent MIME type sniffing
+Header set X-Content-Type-Options "nosniff"
+
+# Enable HTTPS Strict Transport Security (if using HTTPS)
+# Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+# Disable server signature
+ServerSignature Off
+
+# Set PHP session settings
+php_value session.cookie_httponly 1
+php_value session.use_only_cookies 1
+php_value session.cookie_samesite Strict
+
+# File upload settings
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+
+# Error handling - hide errors in production
 php_flag display_errors Off
 php_flag log_errors On
 
-# Set default file
-DirectoryIndex index.html
-
-# Enable CORS for API
-<FilesMatch "api\.php$">
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    Header set Access-Control-Allow-Headers "Content-Type"
-</FilesMatch>
+# Set default file types
+AddType application/json .json
