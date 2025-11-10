@@ -193,17 +193,50 @@ Edit `index.html`, add to `users` object and HTML login cards.
 
 ## 🐛 Troubleshooting
 
-### Data not saving?
-- Check `data.json` permissions (must be 666)
-- Check PHP error logs in hosting panel
+### FIRST: Run the Test Page!
+Visit: `https://yourdomain.com/test.html`
+- Click "Run All Tests"
+- Follow the fix instructions for any failed tests
+
+### Error: "Cannot save data"
+**Cause:** data.json is not writable
+
+**Fix:**
+1. Login to Hostinger File Manager
+2. Right-click `data.json`
+3. Click "Permissions" or "Change Permissions"
+4. Set to **666** or check boxes for:
+   - Owner: Read + Write
+   - Group: Read + Write  
+   - Public: Read + Write
+5. Click Save
+6. Refresh your app
+
+### Error: "Cannot load data"
+**Cause:** api.php or data.json missing
+
+**Fix:**
+1. Check if api.php exists in folder
+2. Check if data.json exists in folder
+3. Re-upload if missing
+4. Clear browser cache
+
+### Categories not working
+**Cause:** Usually data not saving
+
+**Fix:**
+1. Run test.html to diagnose
+2. Check data.json permissions (666)
+3. Check browser console (F12) for errors
 
 ### Different data in browsers?
-- Clear browser cache
+- Clear browser cache (Ctrl+Shift+Delete)
 - Check all browsers accessing same domain
-- Verify API is working: visit `yourdomain.com/api.php`
+- Test API: visit `yourdomain.com/api.php` (should show JSON)
 
 ### Can't access data.json directly?
 - ✅ Good! .htaccess is working (security feature)
+- This is correct - only PHP should access it
 
 ---
 
