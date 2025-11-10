@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .test-item.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .test-item.warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .test-item.pending {
+            background: #e7f3ff;
+            border-left-color: #0066cc;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .fix-button {
+            background: #28a745;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+        .fix-button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Expense Tracker - System Test</h1>
+        
+        <div class="info">
+            <strong>What does this do?</strong><br>
+            This page tests if your hosting setup is correct. Click "Run All Tests" below.
+        </div>
+
+        <div>
+            <button onclick="runAllTests()">🚀 Run All Tests</button>
+            <button onclick="location.reload()">🔄 Refresh Page</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'api.php';
+        
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>Running Tests...</h2>';
+            
+            const tests = [];
+            
+            // Test 1: Check if api.php exists
+            tests.push(await testAPIExists());
+            
+            // Test 2: Check if data.json exists
+            tests.push(await testDataFileExists());
+            
+            // Test 3: Test READ operation
+            tests.push(await testRead());
+            
+            // Test 4: Test WRITE operation
+            tests.push(await testWrite());
+            
+            // Test 5: Check permissions
+            tests.push(await testPermissions());
+            
+            // Display results
+            displayResults(tests);
+        }
+        
+        async function testAPIExists() {
+            try {
+                const response = await fetch(API_URL);
+                if (response.ok) {
+                    return {
+                        name: 'API File Check',
+                        status: 'success',
+                        message: '✅ api.php file exists and is accessible'
+                    };
+                } else {
+                    return {
+                        name: 'API File Check',
+                        status: 'error',
+                        message: `❌ api.php returned error: ${response.status}`,
+                        fix: 'Make sure api.php is uploaded to the same folder as test.html'
+                    };
+                }
+            } catch (e) {
+                return {
+                    name: 'API File Check',
+                    status: 'error',
+                    message: `❌ Cannot access api.php: ${e.message}`,
+                    fix: 'Upload api.php file to your hosting'
+                };
+            }
+        }
+        
+        async function testDataFileExists() {
+            try {
+                const response = await fetch('data.json');
+                // data.json should be blocked by .htaccess (403)
+                if (response.status === 403) {
+                    return {
+                        name: 'Data File Security',
+                        status: 'success',
+                        message: '✅ data.json is protected (403 Forbidden) - Good!'
+                    };
+                } else if (response.ok) {
+                    return {
+                        name: 'Data File Security',
+                        status: 'warning',
+                        message: '⚠️ data.json is publicly accessible - Security risk!',
+                        fix: 'Make sure .htaccess file is uploaded'
+                    };
+                } else {
+                    return {
+                        name: 'Data File Check',
+                        status: 'error',
+                        message: '❌ data.json file not found',
+                        fix: 'Upload data.json file'
+                    };
+                }
+            } catch (e) {
+                return {
+                    name: 'Data File Check',
+                    status: 'pending',
+                    message: `⏳ Cannot test data.json directly (${e.message})`
+                };
+            }
+        }
+        
+        async function testRead() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    return {
+                        name: 'Read Test',
+                        status: 'error',
+                        message: `❌ Cannot read data: HTTP ${response.status}`,
+                        fix: 'Check PHP error logs'
+                    };
+                }
+                
+                const data = await response.json();
+                
+                if (data.categories && data.expenses !== undefined) {
+                    return {
+                        name: 'Read Test',
+                        status: 'success',
+                        message: `✅ Successfully read data: ${data.expenses.length} expenses, ${data.categories.length} categories`
+                    };
+                } else {
+                    return {
+                        name: 'Read Test',
+                        status: 'error',
+                        message: '❌ Data format is incorrect',
+                        fix: 'Re-upload data.json file'
+                    };
+                }
+            } catch (e) {
+                return {
+                    name: 'Read Test',
+                    status: 'error',
+                    message: `❌ Read failed: ${e.message}`,
+                    fix: 'Check if api.php and data.json exist'
+                };
+            }
+        }
+        
+        async function testWrite() {
+            try {
+                const testData = {
+                    categories: ['Test'],
+                    expenses: [],
+                    salaries: {},
+                    recurring: [],
+                    _testWrite: Date.now()
+                };
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    return {
+                        name: 'Write Test',
+                        status: 'error',
+                        message: `❌ Write failed: HTTP ${response.status}`,
+                        details: errorText,
+                        fix: 'Set data.json permissions to 666 (read/write for all)'
+                    };
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    return {
+                        name: 'Write Test',
+                        status: 'success',
+                        message: `✅ Successfully wrote data (${result.data.bytes} bytes)`
+                    };
+                } else {
+                    return {
+                        name: 'Write Test',
+                        status: 'error',
+                        message: `❌ Write failed: ${result.message}`,
+                        fix: result.message.includes('permissions') ? 
+                            'Set data.json permissions to 666' : 
+                            'Check PHP error logs'
+                    };
+                }
+            } catch (e) {
+                return {
+                    name: 'Write Test',
+                    status: 'error',
+                    message: `❌ Write test failed: ${e.message}`,
+                    fix: 'Check data.json file permissions (should be 666)'
+                };
+            }
+        }
+        
+        async function testPermissions() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // Try to write the same data back
+                const writeResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const writeResult = await writeResponse.json();
+                
+                if (writeResult.success) {
+                    return {
+                        name: 'Permissions Test',
+                        status: 'success',
+                        message: '✅ File permissions are correct'
+                    };
+                } else {
+                    return {
+                        name: 'Permissions Test',
+                        status: 'error',
+                        message: `❌ Permission error: ${writeResult.message}`,
+                        fix: 'Right-click data.json → Properties → Permissions → Set to 666'
+                    };
+                }
+            } catch (e) {
+                return {
+                    name: 'Permissions Test',
+                    status: 'error',
+                    message: `❌ Permission test failed: ${e.message}`
+                };
+            }
+        }
+        
+        function displayResults(tests) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = '<h2>Test Results:</h2>';
+            
+            const hasErrors = tests.some(t => t.status === 'error');
+            const hasWarnings = tests.some(t => t.status === 'warning');
+            
+            if (!hasErrors && !hasWarnings) {
+                html += '<div class="test-item success"><strong>🎉 All tests passed!</strong><br>Your setup is correct. You can now use the expense tracker.</div>';
+            } else if (hasErrors) {
+                html += '<div class="test-item error"><strong>⚠️ Some tests failed.</strong><br>Please fix the issues below:</div>';
+            } else {
+                html += '<div class="test-item warning"><strong>⚡ Setup works but has warnings.</strong><br>Consider fixing for better security:</div>';
+            }
+            
+            tests.forEach(test => {
+                html += `
+                    <div class="test-item ${test.status}">
+                        <strong>${test.name}:</strong><br>
+                        ${test.message}
+                        ${test.details ? `<pre>${test.details}</pre>` : ''}
+                        ${test.fix ? `<div style="margin-top: 10px;"><strong>How to fix:</strong> ${test.fix}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="info" style="margin-top: 30px;">
+                    <strong>Common Fixes:</strong><br><br>
+                    <strong>1. data.json not writable:</strong><br>
+                    - Login to Hostinger File Manager<br>
+                    - Right-click data.json → Permissions<br>
+                    - Set to 666 or check "Read & Write" for all<br><br>
+                    
+                    <strong>2. api.php not found:</strong><br>
+                    - Make sure api.php is uploaded<br>
+                    - Check it's in the same folder as index.html<br><br>
+                    
+                    <strong>3. Security warning about data.json:</strong><br>
+                    - Make sure .htaccess is uploaded<br>
+                    - Check if your hosting supports .htaccess files<br><br>
+                    
+                    <strong>4. Still not working?</strong><br>
+                    - Check PHP error logs in Hostinger panel<br>
+                    - Make sure PHP version is 7.4 or higher<br>
+                    - Contact hosting support
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
