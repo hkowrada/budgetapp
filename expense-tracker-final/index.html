@@ -1523,6 +1523,8 @@
         let filteredExpenses = [];
         let editingExpenseId = null;
         let editingRecurringId = null;
+        let syncFileHandle = null;
+        let syncMethod = 'manual';
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
