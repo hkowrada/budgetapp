@@ -2184,6 +2184,7 @@
             document.getElementById('expenseModalTitle').textContent = 'Add New Expense';
             document.getElementById('expenseForm').reset();
             document.getElementById('expenseId').value = '';
+            document.getElementById('expenseMember').value = currentUser.name; // Auto-fill with current user
             setDefaultDates();
             document.getElementById('expenseModal').classList.add('active');
         }
