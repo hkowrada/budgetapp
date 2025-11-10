@@ -18,10 +18,16 @@ This version uses **PHP + JSON file storage** for automatic synchronization.
 1. Login to your hosting (Hostinger, Bluehost, etc.)
 2. Open File Manager
 3. Go to `public_html` or `www` folder
-4. Upload all 4 files
-5. Right-click `data.json` → Set permissions to **666**
-6. Visit: `https://yourdomain.com/index.html`
-7. ✅ Done!
+4. Upload all 5 files:
+   - index.html
+   - api.php
+   - data.json
+   - .htaccess
+   - test.html (for testing)
+5. **IMPORTANT:** Right-click `data.json` → Set permissions to **666**
+6. Test first: Visit `https://yourdomain.com/test.html` and click "Run All Tests"
+7. If all tests pass: Visit `https://yourdomain.com/index.html`
+8. ✅ Done!
 
 ---
 
