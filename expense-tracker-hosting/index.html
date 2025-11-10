@@ -967,51 +967,415 @@
             color: #4a5568;
         }
 
-        /* Responsive */
+        /* Mobile-First Responsive Design */
         @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            /* Compact Header */
+            .header {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
             .header-content {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .logo i {
+                font-size: 24px;
             }
             
             .user-info {
                 width: 100%;
                 flex-direction: column;
+                gap: 8px;
+            }
+
+            .current-user {
+                font-size: 13px;
+                padding: 6px 12px;
             }
             
             .header-actions {
                 width: 100%;
-                flex-direction: column;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
             
             .header-actions .btn {
                 width: 100%;
                 justify-content: center;
+                padding: 10px 8px;
+                font-size: 13px;
             }
-            
+
+            .header-actions .btn i {
+                font-size: 12px;
+            }
+
+            /* Compact Summary Cards - 2 columns on mobile */
+            .summary-section {
+                margin-bottom: 12px;
+            }
+
             .summary-cards {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
             }
             
+            .summary-card {
+                padding: 12px;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .card-content h3 {
+                font-size: 11px;
+            }
+
+            .card-content .amount {
+                font-size: 18px;
+            }
+
+            .card-content .sub-info {
+                font-size: 10px;
+            }
+
+            .progress-bar {
+                height: 4px;
+            }
+
+            /* Compact Alerts */
+            .alert-box {
+                padding: 12px;
+                font-size: 13px;
+                margin-bottom: 12px;
+            }
+
+            .alert-box i {
+                font-size: 18px;
+            }
+
+            .alert-title {
+                font-size: 14px;
+            }
+
+            .alert-message {
+                font-size: 12px;
+            }
+
+            /* Due Bills - Compact */
+            .expenses-section, .recurring-section, .category-summary-section {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .expenses-section h2, .recurring-section h2, .category-summary-section h2 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            /* Monthly Reports - Stack on mobile */
+            #monthlyReport > div:first-child {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            #monthlyReport > div:first-child > div {
+                padding: 12px !important;
+            }
+
+            /* Search Section */
+            .search-section {
+                padding: 12px 16px;
+                margin-bottom: 12px;
+            }
+
+            .search-box input {
+                padding: 10px 12px 10px 38px;
+                font-size: 13px;
+            }
+
+            .search-box i {
+                left: 12px;
+            }
+
+            /* Filters - Compact */
+            .filters-section {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
             .filters {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .filter-group label {
+                font-size: 12px;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .btn-clear {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            /* Table - Card View on Mobile */
+            .table-container {
+                overflow-x: visible;
+            }
+
+            .expenses-table {
+                font-size: 11px;
             }
             
+            .expenses-table thead {
+                display: none; /* Hide headers on mobile */
+            }
+
+            .expenses-table tbody tr {
+                display: block;
+                margin-bottom: 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 12px;
+                background: white;
+            }
+
+            .expenses-table td {
+                display: block;
+                text-align: left;
+                padding: 4px 0;
+                border: none;
+            }
+
+            .expenses-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                margin-right: 8px;
+                color: #718096;
+                font-size: 11px;
+            }
+
+            .expenses-table td:last-child {
+                padding-top: 8px;
+                margin-top: 8px;
+                border-top: 1px solid #e2e8f0;
+            }
+
+            .amount-cell {
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .btn-delete, .btn-edit {
+                padding: 6px 12px;
+                font-size: 11px;
+                margin-right: 6px;
+            }
+
+            /* Category Chart */
+            .category-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .category-name {
+                min-width: auto;
+                font-size: 12px;
+            }
+
+            .bar-fill {
+                font-size: 11px;
+                padding-right: 8px;
+            }
+
+            /* Forms - Optimized for mobile */
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
-            .expenses-table {
-                font-size: 12px;
+
+            form {
+                padding: 20px;
             }
-            
-            .expenses-table th,
-            .expenses-table td {
-                padding: 10px 8px;
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+            /* Modals */
+            .modal-content {
+                width: 95%;
+                max-height: 85vh;
+            }
+
+            .modal-header {
+                padding: 16px 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .close-btn {
+                font-size: 24px;
+            }
+
+            /* Categories Management */
+            .categories-container {
+                padding: 20px;
+            }
+
+            .add-category-form {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .add-category-form .btn {
+                width: 100%;
+            }
+
+            .category-item {
+                padding: 12px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .category-item span {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            /* Login Page */
+            .login-container {
+                padding: 16px;
             }
 
             .login-box {
-                padding: 32px 24px;
+                padding: 24px 20px;
+            }
+
+            .login-logo i {
+                font-size: 48px;
+            }
+
+            .login-logo h1 {
+                font-size: 22px;
+            }
+
+            .user-card {
+                padding: 16px 18px;
+            }
+
+            .user-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .user-card h3 {
+                font-size: 16px;
+            }
+
+            .user-role {
+                font-size: 12px;
+            }
+
+            .user-permissions {
+                font-size: 11px;
+            }
+
+            /* PIN Modal */
+            .pin-box {
+                padding: 24px 20px;
+            }
+
+            .pin-box h2 {
+                font-size: 20px;
+            }
+
+            .pin-digit {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            /* Touch-friendly buttons */
+            .btn-small {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* Notifications */
+            .notification-badge .badge {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
+        }
+
+        /* Extra small devices (< 380px) */
+        @media (max-width: 380px) {
+            .summary-cards {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+
+            .header-actions {
+                grid-template-columns: 1fr; /* Stack all buttons */
+            }
+
+            .card-content .amount {
+                font-size: 20px;
+            }
+
+            .logo h1 {
+                font-size: 18px;
             }
         }
 
