@@ -1707,10 +1707,12 @@
 
         async function saveData() {
             try {
-                const response = await fetch(API_URL, {
+                // Try to save using the API
+                const response = await fetch('api.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(allData)
                 });
@@ -1718,7 +1720,19 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Server response:', errorText);
-                    throw new Error(`Server error (${response.status}): ${errorText}`);
+                    
+                    // Try to parse error message
+                    let errorMsg = `Server error (${response.status})`;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        if (errorJson.message) {
+                            errorMsg = errorJson.message;
+                        }
+                    } catch (e) {
+                        errorMsg = errorText.substring(0, 100);
+                    }
+                    
+                    throw new Error(errorMsg);
                 }
                 
                 const result = await response.json();
@@ -1726,11 +1740,28 @@
                     throw new Error(result.message || 'Failed to save data');
                 }
                 
-                console.log('Data saved successfully:', result);
+                console.log('✅ Data saved successfully:', result);
                 return true;
             } catch (e) {
-                console.error('Error saving data:', e);
-                showNotification(`Error: ${e.message}. Please check file permissions (data.json must be writable).`, 'error');
+                console.error('❌ Error saving data:', e);
+                
+                // Show detailed error message
+                let errorDetail = e.message;
+                let fixInstructions = '';
+                
+                if (errorDetail.includes('writable')) {
+                    fixInstructions = 'Fix: Set data.json permissions to 666 in File Manager';
+                } else if (errorDetail.includes('Failed to fetch')) {
+                    fixInstructions = 'Fix: Make sure api.php is uploaded and accessible';
+                } else if (errorDetail.includes('403')) {
+                    fixInstructions = 'Fix: Check .htaccess configuration';
+                } else if (errorDetail.includes('500')) {
+                    fixInstructions = 'Fix: Check PHP error logs in hosting panel';
+                } else {
+                    fixInstructions = 'Fix: Run test.html to diagnose the issue';
+                }
+                
+                showNotification(`❌ ${errorDetail}. ${fixInstructions}`, 'error');
                 return false;
             }
         }
