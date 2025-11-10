@@ -1645,17 +1645,22 @@
                     body: JSON.stringify(allData)
                 });
                 
-                if (!response.ok) throw new Error('Failed to save data');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`Server error (${response.status}): ${errorText}`);
+                }
                 
                 const result = await response.json();
                 if (!result.success) {
                     throw new Error(result.message || 'Failed to save data');
                 }
                 
+                console.log('Data saved successfully:', result);
                 return true;
             } catch (e) {
                 console.error('Error saving data:', e);
-                showNotification('Error saving data to server. Please export your data as backup.', 'error');
+                showNotification(`Error: ${e.message}. Please check file permissions (data.json must be writable).`, 'error');
                 return false;
             }
         }
