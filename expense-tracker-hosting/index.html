@@ -1472,7 +1472,9 @@
         let filteredExpenses = [];
         let editingExpenseId = null;
         let editingRecurringId = null;
-        const API_URL = 'api.php'; // PHP API endpoint
+        
+        // Auto-detect API URL based on current page location
+        const API_URL = window.location.pathname.replace('/index.html', '/api.php').replace(/\/$/, '/api.php');
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
