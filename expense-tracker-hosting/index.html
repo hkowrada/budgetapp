@@ -1539,8 +1539,7 @@
         let filteredExpenses = [];
         let editingExpenseId = null;
         let editingRecurringId = null;
-        let syncFileHandle = null;
-        let syncMethod = 'manual';
+        const API_URL = 'api.php'; // PHP API endpoint
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
