@@ -1,0 +1,182 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║              FAMILY EXPENSE TRACKER - QUICK REFERENCE                 ║
+║                     Security Version 2.0                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 📁 REQUIRED FILES (Must Upload)                                       │
+├───────────────────────────────────────────────────────────────────────┤
+│ ✓ index.html       - Main application                                 │
+│ ✓ api.php          - Data management API                              │
+│ ✓ auth.php         - Authentication API ⭐ NEW                         │
+│ ✓ data.json        - Database file                                    │
+│ ✓ .htaccess        - Security config ⭐ NEW                            │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🔐 DEFAULT LOGIN CREDENTIALS (Change After Deployment!)               │
+├───────────────────────────────────────────────────────────────────────┤
+│ User: Harish   | PIN: 1234 | Role: Administrator | Full Access        │
+│ User: Bhavani  | PIN: 5678 | Role: Contributor   | Add Only           │
+│ User: Guest    | PIN: 0000 | Role: Viewer        | Read Only          │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 📝 FILE PERMISSIONS                                                    │
+├───────────────────────────────────────────────────────────────────────┤
+│ data.json    → 666 (read/write for all) ⚠️ CRITICAL                  │
+│ index.html   → 644 (default)                                           │
+│ api.php      → 644 (default)                                           │
+│ auth.php     → 644 (default)                                           │
+│ .htaccess    → 644 (default)                                           │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ ✅ QUICK DEPLOYMENT (5 Steps)                                         │
+├───────────────────────────────────────────────────────────────────────┤
+│ 1. Upload all 5 required files to web hosting                         │
+│ 2. Set data.json permissions to 666                                   │
+│ 3. Open index.html in browser                                         │
+│ 4. Run security-test.html (verify 6/6 pass)                          │
+│ 5. Change default PINs immediately!                                   │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🔒 SECURITY FEATURES                                                   │
+├───────────────────────────────────────────────────────────────────────┤
+│ ✓ Bcrypt password hashing                                             │
+│ ✓ Server-side authentication                                          │
+│ ✓ PHP sessions (30-min timeout)                                       │
+│ ✓ Brute-force protection (5 attempts, 15-min lockout)                │
+│ ✓ HttpOnly cookies (prevents JS access)                               │
+│ ✓ SameSite=Strict (CSRF protection)                                   │
+│ ✓ Security headers (.htaccess)                                        │
+│ ✓ NO PINs in page source ⭐                                            │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🧪 QUICK SECURITY TEST                                                │
+├───────────────────────────────────────────────────────────────────────┤
+│ 1. View Page Source (Ctrl+U)                                          │
+│ 2. Search for "1234" → Should NOT be found ✓                         │
+│ 3. Open security-test.html                                            │
+│ 4. Click "Run All Tests"                                              │
+│ 5. Verify: 6/6 tests pass ✓                                          │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 📚 DOCUMENTATION FILES                                                 │
+├───────────────────────────────────────────────────────────────────────┤
+│ SECURITY-UPGRADE-SUMMARY.md    - Overview of changes ⭐ START HERE    │
+│ SECURITY-IMPLEMENTATION.md     - Technical security details           │
+│ MANUAL-TESTING-GUIDE.md        - 10 comprehensive tests               │
+│ DEPLOYMENT-CHECKLIST.md        - Complete deployment guide            │
+│ TROUBLESHOOTING.md             - Common issues & solutions            │
+│ README.md                      - General overview                     │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🆘 TROUBLESHOOTING QUICK FIXES                                        │
+├───────────────────────────────────────────────────────────────────────┤
+│ Issue: Cannot reach auth.php                                          │
+│ Fix:   Verify auth.php uploaded & PHP enabled                         │
+│                                                                        │
+│ Issue: Login always fails                                             │
+│ Fix:   Delete 'users' object from data.json, reload page              │
+│                                                                        │
+│ Issue: Account locked                                                 │
+│ Fix:   Wait 15 min OR delete login_attempts.json                      │
+│                                                                        │
+│ Issue: 500 error                                                      │
+│ Fix:   Check file permissions, temporarily disable .htaccess          │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🔧 HOW TO CHANGE DEFAULT PINS                                         │
+├───────────────────────────────────────────────────────────────────────┤
+│ 1. Create PHP file with:                                              │
+│    <?php echo password_hash('YOUR_NEW_PIN', PASSWORD_BCRYPT); ?>     │
+│                                                                        │
+│ 2. Run in browser, copy the hash                                      │
+│                                                                        │
+│ 3. Download data.json                                                 │
+│                                                                        │
+│ 4. Replace password hash for user:                                    │
+│    "harish": { "password": "PASTE_NEW_HASH_HERE" }                   │
+│                                                                        │
+│ 5. Upload modified data.json                                          │
+│                                                                        │
+│ 6. Test new PIN                                                       │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ ⚡ BEFORE VS AFTER                                                     │
+├───────────────────────────────────────────────────────────────────────┤
+│ Feature              │ Before (v1.0) │ After (v2.0)                   │
+│──────────────────────┼───────────────┼────────────────────────────────│
+│ PIN Storage          │ Plain text ❌ │ Bcrypt hashed ✅               │
+│ View Source          │ PINs shown ❌ │ No PINs ✅                     │
+│ Authentication       │ Client-side❌ │ Server-side ✅                 │
+│ Brute-Force Block    │ None ❌       │ 5 attempts ✅                  │
+│ Session Management   │ None ❌       │ 30-min timeout ✅              │
+│ Security Headers     │ None ❌       │ Full suite ✅                  │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 📊 TESTING TOOLS                                                       │
+├───────────────────────────────────────────────────────────────────────┤
+│ security-test.html  - Automated 6-test security suite ⭐              │
+│ check.php           - PHP environment diagnostic                      │
+│ test.html           - General functionality test                      │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🎯 DEPLOYMENT SUCCESS CHECKLIST                                       │
+├───────────────────────────────────────────────────────────────────────┤
+│ □ All files uploaded                                                  │
+│ □ data.json permissions = 666                                         │
+│ □ security-test.html shows 6/6 pass                                  │
+│ □ No PINs in page source                                              │
+│ □ Login works with correct PIN                                        │
+│ □ Wrong PIN rejected                                                  │
+│ □ 5+ wrong attempts = locked                                          │
+│ □ Default PINs changed                                                │
+│ □ HTTPS enabled (recommended)                                         │
+│ □ Backup created                                                      │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🚨 CRITICAL SECURITY REMINDERS                                        │
+├───────────────────────────────────────────────────────────────────────┤
+│ ⚠️ Change default PINs IMMEDIATELY after deployment                  │
+│ ⚠️ Use HTTPS (SSL certificate) for production                        │
+│ ⚠️ Backup data.json regularly                                        │
+│ ⚠️ Monitor login_attempts.json for suspicious activity               │
+│ ⚠️ Never share PINs via insecure channels                            │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 📞 SUPPORT RESOURCES                                                   │
+├───────────────────────────────────────────────────────────────────────┤
+│ For detailed help, check these files:                                 │
+│ • SECURITY-UPGRADE-SUMMARY.md - Executive overview                    │
+│ • MANUAL-TESTING-GUIDE.md - Step-by-step testing                     │
+│ • TROUBLESHOOTING.md - Common issues                                  │
+│ • DEPLOYMENT-CHECKLIST.md - Complete deployment guide                │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│ 🌟 YOU'RE NOW SECURE!                                                 │
+├───────────────────────────────────────────────────────────────────────┤
+│ Your Family Expense Tracker now has enterprise-grade security!        │
+│                                                                        │
+│ From: Plain-text PINs visible to anyone ❌                            │
+│ To:   Bank-level bcrypt encryption ✅                                 │
+│                                                                        │
+│ Congratulations on prioritizing security! 🔒✨                        │
+└───────────────────────────────────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                    Version 2.0 - Security Update                      ║
+║                      November 2024 Release                            ║
+╚═══════════════════════════════════════════════════════════════════════╝
