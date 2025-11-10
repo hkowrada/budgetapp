@@ -1,0 +1,148 @@
+================================================================================
+           EXPENSE TRACKER - QUICK START GUIDE
+================================================================================
+
+📁 FILES TO UPLOAD (5 files):
+   ✓ index.html
+   ✓ api.php
+   ✓ data.json
+   ✓ .htaccess
+   ✓ test.html
+
+================================================================================
+🚀 STEP-BY-STEP SETUP:
+================================================================================
+
+1. LOGIN TO HOSTINGER
+   → Go to: https://hpanel.hostinger.com/
+   → Enter your credentials
+
+2. OPEN FILE MANAGER
+   → Click "File Manager" button
+   → Navigate to: public_html (or www)
+
+3. UPLOAD FILES
+   → Click "Upload" button
+   → Select all 5 files listed above
+   → Wait for upload to complete (should take 5-10 seconds)
+
+4. SET PERMISSIONS (VERY IMPORTANT!)
+   → Right-click on "data.json"
+   → Select "Permissions" or "Change Permissions"
+   → Enter: 666
+   → OR check boxes: Read/Write for Owner, Group, Public
+   → Click "Apply" or "Save"
+
+5. TEST YOUR SETUP
+   → Open browser
+   → Go to: https://YOURDOMAIN.com/test.html
+   → Click "Run All Tests" button
+   → Check if all tests pass ✅
+
+6. IF TESTS PASS:
+   → Go to: https://YOURDOMAIN.com/index.html
+   → Login with PIN:
+      - Harish: 1234 (Admin)
+      - Bhavani: 5678 (Add only)
+      - Guest: 0000 (View only)
+   → Start adding expenses!
+
+7. IF TESTS FAIL:
+   → Read error messages on test.html
+   → Follow the "How to fix" instructions
+   → Most common issue: data.json permissions not set to 666
+   → Re-run tests after fixing
+
+================================================================================
+⚠️ COMMON ISSUES & FIXES:
+================================================================================
+
+ISSUE: "Cannot write to data.json"
+FIX: Set permissions to 666 (see step 4 above)
+
+ISSUE: "API not found"
+FIX: Make sure api.php is uploaded to correct folder
+
+ISSUE: "Nothing saves"
+FIX: 
+  1. Run test.html to see exact error
+  2. Check data.json permissions
+  3. Check PHP version (needs 7.4+)
+
+ISSUE: "Security warning about data.json"
+FIX: Make sure .htaccess is uploaded (it protects data.json)
+
+================================================================================
+✅ VERIFICATION CHECKLIST:
+================================================================================
+
+Before using the app, verify:
+□ All 5 files uploaded
+□ data.json permissions set to 666
+□ test.html shows all tests passing
+□ Can login to index.html
+□ Can add an expense
+□ Expense appears after page refresh
+□ Opening in different browser shows same data
+
+================================================================================
+📞 NEED HELP?
+================================================================================
+
+1. Run test.html first - it will tell you exactly what's wrong
+2. Check Hostinger documentation: hostinger.com/tutorials
+3. Contact Hostinger support (24/7 live chat)
+4. Check PHP error logs in Hostinger control panel
+
+================================================================================
+🎯 FILE PERMISSIONS GUIDE:
+================================================================================
+
+File              Permissions    Why?
+---------------------------------------------------------
+index.html        644 (default)  Public read, owner write
+api.php           644 (default)  Public read, owner write
+data.json         666 (MUST!)    Everyone read/write (PHP needs this)
+.htaccess         644 (default)  Public read, owner write
+test.html         644 (default)  Public read, owner write
+
+Note: 666 for data.json is REQUIRED or saving won't work!
+
+How to set 666:
+- Method 1: Right-click → Permissions → Enter "666"
+- Method 2: Right-click → Permissions → Check all Read + Write boxes
+- Method 3: Use FTP client (FileZilla) → Right-click → Permissions → 666
+
+================================================================================
+🌐 ACCESS URLs:
+================================================================================
+
+Replace YOURDOMAIN.com with your actual domain:
+
+Test page:  https://YOURDOMAIN.com/test.html
+Main app:   https://YOURDOMAIN.com/index.html
+API check:  https://YOURDOMAIN.com/api.php (should show JSON)
+Data file:  https://YOURDOMAIN.com/data.json (should show 403 Forbidden - Good!)
+
+================================================================================
+💡 PRO TIPS:
+================================================================================
+
+✓ Always test first using test.html
+✓ Bookmark the expense tracker URL for easy access
+✓ Export data weekly using Export button
+✓ Keep backups in Google Drive or Dropbox
+✓ Share the URL with family members
+✓ Add to phone home screen for app-like experience
+
+================================================================================
+🎉 THAT'S IT!
+================================================================================
+
+Total setup time: 5 minutes
+Difficulty: Easy
+Works on: All hosting with PHP support
+
+Once set up, all browsers and devices automatically sync!
+
+================================================================================
