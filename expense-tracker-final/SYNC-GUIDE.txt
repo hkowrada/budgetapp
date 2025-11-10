@@ -1,0 +1,228 @@
+================================================================================
+   FAMILY EXPENSE TRACKER - BROWSER SYNC GUIDE
+================================================================================
+
+WHY DO I SEE DIFFERENT DATA IN CHROME VS FIREFOX?
+--------------------------------------------------
+This is NORMAL browser behavior!
+
+Each browser (Chrome, Firefox, Safari, Edge) has its OWN storage.
+They don't share data automatically.
+
+Think of it like this:
+- Chrome = One notebook
+- Firefox = Another notebook
+- Safari = Yet another notebook
+
+Each has different data unless you sync them!
+
+
+SOLUTION: SYNC YOUR DATA ACROSS BROWSERS
+--------------------------------------------------
+
+METHOD 1: AUTO-SYNC (RECOMMENDED) ⭐
+-----------------------------------
+Best for: Using multiple browsers regularly
+
+Steps:
+1. Open app in FIRST BROWSER (e.g., Chrome)
+2. Login (any user)
+3. Click "Setup Auto-Sync" button (orange)
+4. Select "File-Based Sync"
+5. Click "Select/Create Sync File"
+6. Choose a SHARED LOCATION:
+   
+   Recommended locations:
+   ✓ Dropbox folder: C:\Users\YourName\Dropbox\
+   ✓ Google Drive: C:\Users\YourName\Google Drive\
+   ✓ USB Drive: D:\ or E:\
+   ✓ Network folder: \\network\shared\
+
+7. Create file name: family-expenses.json
+8. Click Save
+
+9. Open app in SECOND BROWSER (e.g., Firefox)
+10. Login
+11. Click "Setup Auto-Sync" button
+12. Select "File-Based Sync"
+13. Click "Select/Create Sync File"
+14. SELECT THE SAME FILE from step 7 ⚠️ IMPORTANT!
+15. Done!
+
+✅ Result: Both browsers now use the SAME data file!
+✅ Any changes in one browser appear in the other!
+
+Note: Works in Chrome, Edge, Opera (Chromium browsers)
+Firefox/Safari: Use Method 2 below
+
+
+METHOD 2: MANUAL EXPORT/IMPORT
+-----------------------------------
+Best for: Occasional sync or unsupported browsers
+
+Steps:
+BROWSER 1 (Export):
+1. Open app in first browser
+2. Add your expenses
+3. Click "Export" button
+4. Download file: family-expenses-2025-11-10.json
+5. Save this file somewhere safe
+
+BROWSER 2 (Import):
+1. Open app in second browser
+2. Click "Import" button
+3. Select the file you downloaded in step 4
+4. Confirm to replace data
+5. Done!
+
+⚠️ Note: You need to repeat this every time you want to sync
+
+
+METHOD 3: USE ONE BROWSER ONLY
+-----------------------------------
+Best for: Simple solution, no sync needed
+
+Steps:
+1. Choose your favorite browser (Chrome/Firefox/Safari/Edge)
+2. ONLY use that browser for expense tracking
+3. Don't open the app in other browsers
+
+✅ Result: No confusion, always see the same data!
+
+
+WHICH METHOD SHOULD I USE?
+--------------------------------------------------
+Use Method 1 (Auto-Sync) if:
+✓ You use Chrome/Edge regularly
+✓ You have Dropbox or Google Drive
+✓ You want automatic sync
+✓ You use multiple browsers
+
+Use Method 2 (Manual) if:
+✓ You use Firefox or Safari
+✓ You only occasionally need to sync
+✓ You want full control
+
+Use Method 3 (One Browser) if:
+✓ You want the simplest solution
+✓ You don't need to switch browsers
+
+
+FREQUENTLY ASKED QUESTIONS
+--------------------------------------------------
+
+Q: Why doesn't the app sync automatically?
+A: Browser security prevents automatic cross-browser sync.
+   You must use one of the methods above.
+
+Q: I added expenses in Chrome, but don't see them in Firefox
+A: This is normal! Follow Method 1 or 2 above to sync.
+
+Q: Can I use different data in each browser?
+A: Yes! Just don't sync them. Each will have separate data.
+
+Q: What if I accidentally deleted data in one browser?
+A: If you set up Auto-Sync, data is in the sync file.
+   If not, you can restore from Export backup.
+
+Q: Which browser is best for this app?
+A: Chrome and Edge work best (support Auto-Sync)
+   Firefox and Safari work too (use Manual sync)
+
+Q: Can I sync between phone and computer?
+A: Yes! Use Method 2 (Export/Import)
+   Export from computer → Email to yourself → Import on phone
+
+
+BACKUP RECOMMENDATIONS
+--------------------------------------------------
+ALWAYS keep backups, regardless of sync method:
+
+1. Weekly: Click "Export" button
+2. Save file to multiple locations:
+   - Dropbox/Google Drive
+   - Email to yourself
+   - USB drive
+   - External hard drive
+
+3. Keep last 3 months of backups
+
+
+TROUBLESHOOTING
+--------------------------------------------------
+
+Problem: "Select/Create Sync File" button doesn't work
+Solution: Your browser doesn't support this feature.
+          Use Chrome or Edge, or use Method 2 (Manual sync)
+
+Problem: Selected sync file but still seeing different data
+Solution: Make sure you selected the EXACT SAME FILE in both browsers
+          Check the file path is identical
+
+Problem: Data syncs one way but not the other
+Solution: Close and reopen both browsers
+          Make sure you saved data in first browser before opening second
+
+Problem: Lost the sync file
+Solution: Export data from any browser
+          Create new sync file
+          Re-setup sync in all browsers
+
+
+STEP-BY-STEP EXAMPLE
+--------------------------------------------------
+Scenario: Sync between Chrome (work laptop) and Firefox (home computer)
+
+Day 1 - Setup on Chrome (work):
+1. Open index.html in Chrome
+2. Login as Harish (PIN: 1234)
+3. Add expenses for the week
+4. Click "Export" button
+5. Save to: C:\Users\Me\Dropbox\family-expenses.json
+6. Also click "Setup Auto-Sync" → File-Based → Select that file
+
+Day 2 - Setup on Firefox (home):
+1. Open index.html in Firefox
+2. Login as Harish (PIN: 1234)
+3. Click "Import" button
+4. Select: C:\Users\Me\Dropbox\family-expenses.json
+5. Now you see all expenses from work!
+
+Day 3 - Add expenses at home:
+1. Add new expenses in Firefox
+2. Click "Export"
+3. Save to: C:\Users\Me\Dropbox\family-expenses.json
+   (Replace the old file)
+
+Day 4 - View at work:
+1. Open Chrome
+2. Click "Import"
+3. Select: C:\Users\Me\Dropbox\family-expenses.json
+4. Now you see home expenses too!
+
+
+QUICK REFERENCE
+--------------------------------------------------
+Export Button: Download backup file
+Import Button: Load backup file
+Setup Auto-Sync: Configure automatic sync location
+
+File Name: family-expenses.json
+File Location: Your Dropbox/Google Drive folder
+
+PINs:
+- Harish (Admin): 1234
+- Bhavani (Add only): 5678
+- Guest (View only): 0000
+
+
+NEED MORE HELP?
+--------------------------------------------------
+Read the full README.md file for detailed instructions
+on all features of the expense tracker.
+
+
+================================================================================
+Last Updated: November 2025
+Version: 3.1 with Auto-Sync Feature
+================================================================================
