@@ -2418,14 +2418,14 @@
             
             tbody.innerHTML = sortedExpenses.map(exp => `
                 <tr>
-                    <td>${formatDate(exp.date)}</td>
-                    <td>${exp.description}</td>
-                    <td><span class="category-badge">${exp.category}</span></td>
-                    <td>${exp.member}</td>
-                    <td class="amount-cell">€${parseFloat(exp.amount).toFixed(2)}</td>
-                    ${(canEdit || canDelete) ? `<td>
-                        ${canEdit ? `<button class="btn btn-edit" onclick="editExpense('${exp.id}')"><i class="fas fa-edit"></i></button>` : ''}
-                        ${canDelete ? `<button class="btn btn-delete" onclick="deleteExpense('${exp.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                    <td data-label="Date:">${formatDate(exp.date)}</td>
+                    <td data-label="Description:">${exp.description}</td>
+                    <td data-label="Category:"><span class="category-badge">${exp.category}</span></td>
+                    <td data-label="Member:">${exp.member}</td>
+                    <td data-label="Amount:" class="amount-cell">€${parseFloat(exp.amount).toFixed(2)}</td>
+                    ${(canEdit || canDelete) ? `<td data-label="Actions:">
+                        ${canEdit ? `<button class="btn btn-edit" onclick="editExpense('${exp.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                        ${canDelete ? `<button class="btn btn-delete" onclick="deleteExpense('${exp.id}')"><i class="fas fa-trash"></i> Delete</button>` : ''}
                     </td>` : '<td style="display:none;"></td>'}
                 </tr>
             `).join('');
