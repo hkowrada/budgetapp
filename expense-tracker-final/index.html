@@ -1655,8 +1655,129 @@
             document.getElementById('salaryMonth').value = currentMonth;
         }
 
+        // Sync Settings Management
+        function loadSyncSettings() {
+            const savedSyncMethod = localStorage.getItem('syncMethod');
+            if (savedSyncMethod) {
+                syncMethod = savedSyncMethod;
+            }
+        }
+
+        function saveSyncSettings() {
+            localStorage.setItem('syncMethod', syncMethod);
+        }
+
+        async function setupAutoSync() {
+            document.getElementById('autoSyncModal').classList.add('active');
+            
+            // Set current sync method
+            const radioButtons = document.querySelectorAll('input[name="syncMethod"]');
+            radioButtons.forEach(radio => {
+                if (radio.value === syncMethod) {
+                    radio.checked = true;
+                }
+            });
+            updateSyncMethod();
+        }
+
+        function updateSyncMethod() {
+            const selected = document.querySelector('input[name="syncMethod"]:checked').value;
+            syncMethod = selected;
+            saveSyncSettings();
+            
+            const fileSyncOptions = document.getElementById('fileSyncOptions');
+            if (syncMethod === 'file') {
+                fileSyncOptions.style.display = 'block';
+            } else {
+                fileSyncOptions.style.display = 'none';
+            }
+        }
+
+        async function selectSyncFile() {
+            try {
+                // Check if File System Access API is supported
+                if (!('showSaveFilePicker' in window)) {
+                    alert('Your browser doesn\\'t support this feature. Please use Export/Import buttons instead, or try Chrome/Edge browser.');
+                    return;
+                }
+
+                const options = {
+                    types: [{
+                        description: 'JSON Files',
+                        accept: { 'application/json': ['.json'] }
+                    }],
+                    suggestedName: 'family-expenses.json'
+                };
+
+                syncFileHandle = await window.showSaveFilePicker(options);
+                
+                // Save to the selected file
+                await saveToSyncFile();
+                
+                document.getElementById('syncFileStatus').style.display = 'block';
+                document.getElementById('syncFileName').textContent = syncFileHandle.name;
+                
+                showNotification('Sync file selected! Data will auto-save to this location.', 'success');
+                
+                // Update button text
+                document.getElementById('btnAutoSync').innerHTML = '<i class=\"fas fa-check-circle\"></i> Syncing';
+                document.getElementById('btnAutoSync').style.background = '#48bb78';
+                document.getElementById('btnAutoSync').style.color = 'white';
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Error selecting sync file:', err);
+                    showNotification('Error setting up sync file', 'error');
+                }
+            }
+        }
+
+        async function saveToSyncFile() {
+            if (!syncFileHandle) return;
+
+            try {
+                const writable = await syncFileHandle.createWritable();
+                await writable.write(JSON.stringify(allData, null, 2));
+                await writable.close();
+                console.log('Data saved to sync file');
+            } catch (err) {
+                console.error('Error saving to sync file:', err);
+                showNotification('Error saving to sync file. Using browser storage.', 'error');
+            }
+        }
+
+        async function loadFromSyncFile() {
+            if (!syncFileHandle) return false;
+
+            try {
+                const file = await syncFileHandle.getFile();
+                const contents = await file.text();
+                const parsed = JSON.parse(contents);
+                
+                if (parsed.expenses || parsed.categories) {
+                    allData = parsed;
+                    if (!allData.recurring) allData.recurring = [];
+                    if (!allData.salaries) allData.salaries = {};
+                    return true;
+                }
+            } catch (err) {
+                console.error('Error loading from sync file:', err);
+            }
+            return false;
+        }
+
         // Data Management
-        function loadData() {
+        async function loadData() {
+            // Try to load from sync file first if using file sync
+            if (syncMethod === 'file' && syncFileHandle) {
+                const loaded = await loadFromSyncFile();
+                if (loaded) {
+                    filteredExpenses = [...allData.expenses];
+                    updateUI();
+                    return;
+                }
+            }
+
+            // Fall back to localStorage
             const savedData = localStorage.getItem('familyExpenseData');
             if (savedData) {
                 try {
