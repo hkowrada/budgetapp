@@ -1227,6 +1227,30 @@
             </div>
         </section>
 
+        <!-- Due Bills Section -->
+        <section class="expenses-section" id="dueBillsSection" style="display: none;">
+            <h2><i class="fas fa-bell"></i> Bills Due Soon</h2>
+            <div id="dueBillsContainer"></div>
+        </section>
+
+        <!-- Monthly Reports Section -->
+        <section class="expenses-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                <h2><i class="fas fa-calendar-alt"></i> Monthly Reports</h2>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary btn-small" onclick="changeMonth(-1)">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <select id="monthSelector" onchange="changeToMonth()" style="padding: 8px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                    </select>
+                    <button class="btn btn-secondary btn-small" onclick="changeMonth(1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="monthlyReport"></div>
+        </section>
+
         <!-- Search -->
         <section class="search-section">
             <div class="search-box">
