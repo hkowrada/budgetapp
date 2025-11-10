@@ -1,0 +1,22 @@
+# Security settings
+<Files "data.json">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Prevent directory listing
+Options -Indexes
+
+# Enable PHP error logging (disable display for production)
+php_flag display_errors Off
+php_flag log_errors On
+
+# Set default file
+DirectoryIndex index.html
+
+# Enable CORS for API
+<FilesMatch "api\.php$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+</FilesMatch>
