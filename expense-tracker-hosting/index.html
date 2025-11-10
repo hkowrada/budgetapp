@@ -1717,18 +1717,25 @@
 
         async function saveData() {
             try {
-                // Save to localStorage
-                localStorage.setItem('familyExpenseData', JSON.stringify(allData));
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(allData)
+                });
                 
-                // Also save to sync file if configured
-                if (syncMethod === 'file' && syncFileHandle) {
-                    await saveToSyncFile();
+                if (!response.ok) throw new Error('Failed to save data');
+                
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.message || 'Failed to save data');
                 }
                 
                 return true;
             } catch (e) {
                 console.error('Error saving data:', e);
-                showNotification('Error saving data. Please export your data as backup.', 'error');
+                showNotification('Error saving data to server. Please export your data as backup.', 'error');
                 return false;
             }
         }
