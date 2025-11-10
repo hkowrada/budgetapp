@@ -1435,6 +1435,122 @@
         .pulse {
             animation: pulse 2s ease-in-out infinite;
         }
+
+        /* PWA Install Button */
+        .pwa-install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            max-width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+
+        .pwa-install-banner.show {
+            display: flex;
+        }
+
+        .pwa-install-banner button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pwa-install-banner button:hover {
+            transform: scale(1.05);
+        }
+
+        .pwa-install-banner .close-install {
+            background: transparent;
+            color: white;
+            padding: 4px 8px;
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ed8936;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .offline-indicator.show {
+            display: flex;
+        }
+
+        .offline-indicator.online {
+            background: #48bb78;
+        }
+
+        /* Update Available Banner */
+        .update-banner {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4299e1;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .update-banner.show {
+            display: flex;
+        }
+
+        .update-banner button {
+            background: white;
+            color: #4299e1;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .pwa-install-banner {
+                bottom: 10px;
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .pwa-install-banner button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
