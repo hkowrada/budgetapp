@@ -430,9 +430,17 @@ Or add through UI (Admin → Categories → Add)
 ### Issue: PIN not working
 **Solution:** Check caps lock, refresh page, or check PIN in code
 
+### Issue: Different data in different browsers
+**Solution:**
+- This is NORMAL - each browser has separate storage
+- Use **"Setup Auto-Sync"** to share data across browsers
+- OR use Export/Import to manually sync
+- OR use only one browser
+
 ### Issue: Data disappeared
 **Solution:** 
 - Don't clear browser cache
+- Check if you're in a different browser
 - Check if imported wrong file
 - Restore from backup
 
