@@ -1810,9 +1810,16 @@
             saveData();
         }
 
-        function saveData() {
+        async function saveData() {
             try {
+                // Save to localStorage
                 localStorage.setItem('familyExpenseData', JSON.stringify(allData));
+                
+                // Also save to sync file if configured
+                if (syncMethod === 'file' && syncFileHandle) {
+                    await saveToSyncFile();
+                }
+                
                 return true;
             } catch (e) {
                 console.error('Error saving data:', e);
