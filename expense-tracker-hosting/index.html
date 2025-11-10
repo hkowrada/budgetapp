@@ -1607,13 +1607,38 @@
         // Data Management - Load from PHP API
         async function loadData() {
             try {
-                console.log('Loading data from:', API_URL);
-                const response = await fetch(API_URL);
+                // Try multiple possible API paths
+                const apiPaths = [
+                    'api.php',
+                    './api.php',
+                    window.location.pathname.replace('index.html', 'api.php')
+                ];
                 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Server response:', errorText);
-                    throw new Error(`Failed to load data (${response.status})`);
+                let response = null;
+                let apiUrl = '';
+                
+                for (const path of apiPaths) {
+                    try {
+                        console.log('Trying API path:', path);
+                        response = await fetch(path, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            apiUrl = path;
+                            console.log('✅ Found working API at:', apiUrl);
+                            break;
+                        }
+                    } catch (e) {
+                        console.log('❌ Failed to fetch from:', path, e.message);
+                    }
+                }
+                
+                if (!response || !response.ok) {
+                    throw new Error('Cannot reach api.php. Make sure it is uploaded to the same folder as index.html');
                 }
                 
                 const data = await response.json();
@@ -1632,7 +1657,38 @@
                 console.log('UI updated successfully');
             } catch (error) {
                 console.error('Error loading data:', error);
-                showNotification(`Error: ${error.message}. Check if api.php and data.json exist.`, 'error');
+                
+                // Show user-friendly error with specific instructions
+                const errorMsg = document.createElement('div');
+                errorMsg.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    max-width: 500px;
+                    text-align: center;
+                `;
+                errorMsg.innerHTML = `
+                    <h2 style="color: #c53030; margin-bottom: 15px;">⚠️ Setup Required</h2>
+                    <p style="margin-bottom: 20px;"><strong>${error.message}</strong></p>
+                    <div style="text-align: left; background: #f7fafc; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                        <strong>Quick Fix:</strong><br>
+                        1. Make sure <code>api.php</code> is uploaded<br>
+                        2. Make sure <code>data.json</code> is uploaded<br>
+                        3. Set data.json permissions to <strong>666</strong><br>
+                        4. Refresh this page
+                    </div>
+                    <a href="test.html" style="display: inline-block; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        🔧 Run Diagnostic Test
+                    </a>
+                `;
+                document.body.appendChild(errorMsg);
+                
                 initializeDefaultData();
             }
         }
