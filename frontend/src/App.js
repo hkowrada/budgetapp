@@ -173,12 +173,12 @@ function App() {
       </section>
 
       {/* Core Pillars Section */}
-      <section id="pillars" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="pillars" className="elegant-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Our Core Pillars</span>
             <h2 className="display-medium">Five <span className="gold-gradient">Interconnected</span> Technologies</h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               Driving rural innovation through integrated technological excellence
             </p>
@@ -187,7 +187,7 @@ function App() {
             {siteData.corePillars.map((pillar, index) => {
               const IconComponent = iconMap[pillar.icon];
               return (
-                <div key={pillar.id} className={`pillar-modern reveal fade-in-scale animate-delay-${index + 1}`}>
+                <div key={pillar.id} className={`pillar-refined reveal fade-in-scale animate-delay-${index + 1}`}>
                   <div className="pillar-icon">
                     <IconComponent size={40} />
                   </div>
@@ -201,17 +201,17 @@ function App() {
       </section>
 
       {/* Ecosystem Section */}
-      <section id="ecosystem" className="ultra-section">
+      <section id="ecosystem" className="elegant-section">
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Our Ecosystem</span>
             <h2 className="display-medium">Unified <span className="gold-gradient">Innovation</span> Network</h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               AGLOUD connects multiple stakeholders through a unified innovation network
             </p>
           </div>
-          <div className="modern-table reveal fade-in-up">
+          <div className="refined-table reveal fade-in-up">
             <table>
               <thead>
                 <tr>
@@ -233,19 +233,19 @@ function App() {
       </section>
 
       {/* Technology Stack Section */}
-      <section id="technology" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="technology" className="elegant-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Technology Stack</span>
             <h2 className="display-medium">Cutting-Edge <span className="gold-gradient">Technologies</span></h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               Powering rural transformation with advanced tech infrastructure
             </p>
           </div>
           <div className="grid-3">
             {siteData.technology.map((tech, index) => (
-              <div key={index} className={`ultra-card reveal fade-in-up animate-delay-${(index % 3) + 1}`}>
+              <div key={index} className={`elegant-card reveal fade-in-up animate-delay-${(index % 3) + 1}`}>
                 <h3 className="heading-3" style={{ color: 'var(--gold-primary)', marginBottom: '12px' }}>{tech.name}</h3>
                 <p className="body-medium">{tech.description}</p>
               </div>
@@ -255,12 +255,12 @@ function App() {
       </section>
 
       {/* Flagship Programs Section */}
-      <section id="programs" className="ultra-section">
+      <section id="programs" className="elegant-section">
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Flagship Programs</span>
             <h2 className="display-medium">Transforming <span className="gold-gradient">Rural India</span></h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               Innovative initiatives creating sustainable impact
             </p>
@@ -269,7 +269,7 @@ function App() {
             {siteData.flagshipPrograms.map((program, index) => {
               const IconComponent = iconMap[program.icon];
               return (
-                <div key={program.id} className={`pillar-modern reveal fade-in-scale animate-delay-${(index % 4) + 1}`}>
+                <div key={program.id} className={`pillar-refined reveal fade-in-scale animate-delay-${(index % 4) + 1}`}>
                   <div className="pillar-icon" style={{ width: '70px', height: '70px' }}>
                     <IconComponent size={32} />
                   </div>
@@ -283,19 +283,19 @@ function App() {
       </section>
 
       {/* Team Section */}
-      <section id="team" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="team" className="elegant-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Leadership</span>
             <h2 className="display-medium">Meet Our <span className="gold-gradient">Visionaries</span></h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               The leaders driving AGLOUD's mission forward
             </p>
           </div>
           <div className="grid-3">
             {siteData.team.map((member, index) => (
-              <div key={member.id} className={`team-modern reveal fade-in-scale animate-delay-${(index % 3) + 1}`}>
+              <div key={member.id} className={`team-refined reveal fade-in-scale animate-delay-${(index % 3) + 1}`}>
                 <div className="team-avatar">
                   {member.name.split(' ')[0][0]}{member.name.split(' ')[1] ? member.name.split(' ')[1][0] : ''}
                 </div>
@@ -308,12 +308,12 @@ function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="ultra-section contact-ultra">
+      <section id="contact" className="elegant-section contact-elegant">
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">Get In Touch</span>
             <h2 className="display-medium">Join the <span className="gold-gradient">Movement</span></h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               Connect with us to be part of rural innovation
             </p>
@@ -411,7 +411,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="ultra-footer">
+      <footer className="elegant-footer">
         <p className="footer-quote reveal fade-in-up">
           {siteData.message.quote}
         </p>
