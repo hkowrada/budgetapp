@@ -64,12 +64,12 @@ chainlit.md
 # Data and databases
 agenthub/agents/youtube/db
 
-# Archive files and large assets
-**/*.zip
-**/*.tar.gz
-**/*.tar
-**/*.tgz
-*.pack
+# Archive files and large assets (commented out to allow zips)
+# **/*.zip
+# **/*.tar.gz
+# **/*.tar
+# **/*.tgz
+# *.pack
 *.deb
 *.dylib
 
