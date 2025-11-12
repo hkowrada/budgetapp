@@ -101,8 +101,8 @@ export const Contact = ({ contact }) => {
                   rows={5}
                 />
               </div>
-              <Button type="submit" className="btn-submit">
-                Send Message
+              <Button type="submit" className="btn-submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Sending...' : 'Send Message'}
                 <Send className="ml-2" size={18} />
               </Button>
             </form>
