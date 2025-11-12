@@ -820,10 +820,21 @@ body::before {
   line-height: 1.5;
 }
 
-/* ===== CONTACT SECTION ===== */
+/* ===== CONTACT SECTION - PURE BLACK ===== */
 .contact-section {
-  padding: var(--spacing-xxl) 0;
-  background: var(--bg-dark);
+  padding: var(--spacing-giant) 0;
+  background: var(--bg-pure-black);
+  position: relative;
+}
+
+.contact-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
 }
 
 .contact-grid {
