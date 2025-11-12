@@ -11,7 +11,7 @@ const programIcons = {
 
 export const Programs = ({ programs }) => {
   return (
-    <section className="programs-section">
+    <section className="programs-section" id="programs">
       <div className="container">
         <h2 className="section-title">Our Flagship Programs</h2>
         <p className="section-subtitle">Transforming rural ecosystems through targeted initiatives</p>
