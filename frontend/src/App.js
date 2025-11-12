@@ -301,18 +301,19 @@ function App() {
       </section>
 
       {/* Team Section */}
-      <section id="team" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="team" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Leadership</p>
+            <span className="section-badge">Leadership</span>
             <h2 className="display-medium">Meet Our <span className="gold-gradient">Visionaries</span></h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               The leaders driving AGLOUD's mission forward
             </p>
           </div>
           <div className="grid-3">
             {siteData.team.map((member, index) => (
-              <div key={member.id} className={`team-card reveal animate-delay-${(index % 3) + 1}`}>
+              <div key={member.id} className={`team-modern reveal fade-in-scale animate-delay-${(index % 3) + 1}`}>
                 <div className="team-avatar">
                   {member.name.split(' ')[0][0]}{member.name.split(' ')[1] ? member.name.split(' ')[1][0] : ''}
                 </div>
