@@ -3089,28 +3089,43 @@
             }
         }
 
-        function showNotification(message, type) {
+        function showNotification(message, type = 'info') {
+            // Remove any existing notifications first
+            const existing = document.querySelectorAll('.custom-notification');
+            existing.forEach(n => n.remove());
+            
             const notification = document.createElement('div');
+            notification.className = 'custom-notification';
+            
+            let bgColor = '#48bb78'; // success - green
+            if (type === 'error') bgColor = '#f56565'; // error - red
+            if (type === 'info') bgColor = '#4299e1'; // info - blue
+            if (type === 'warning') bgColor = '#ed8936'; // warning - orange
+            
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
-                right: 20px;
+                left: 50%;
+                transform: translateX(-50%);
                 padding: 16px 24px;
-                background: ${type === 'success' ? '#48bb78' : '#f56565'};
+                background: ${bgColor};
                 color: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+                z-index: 99999;
                 font-weight: 600;
-                animation: slideIn 0.3s ease;
-                max-width: 400px;
+                font-size: 15px;
+                text-align: center;
+                animation: slideDown 0.3s ease;
+                max-width: 90%;
+                min-width: 250px;
             `;
             notification.textContent = message;
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
+                notification.style.animation = 'slideUp 0.3s ease';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
