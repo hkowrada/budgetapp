@@ -2868,7 +2868,7 @@
         }
 
         // Form handlers
-        function handleExpense(event) {
+        async function handleExpense(event) {
             event.preventDefault();
             
             const expenseId = document.getElementById('expenseId').value;
@@ -2887,17 +2887,19 @@
                 const index = allData.expenses.findIndex(e => e.id === expenseId);
                 if (index !== -1) {
                     allData.expenses[index] = { ...allData.expenses[index], ...expense };
-                    showNotification('Expense updated successfully!', 'success');
                 }
             } else {
                 allData.expenses.push(expense);
-                showNotification('Expense added successfully!', 'success');
             }
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
+                showNotification(expenseId ? 'Expense updated successfully!' : 'Expense added successfully!', 'success');
                 closeModal('expenseModal');
-                loadData();
+                await loadData();
                 checkBudgetAlerts();
+            } else {
+                showNotification('Failed to save expense. Please try again.', 'error');
             }
         }
 
