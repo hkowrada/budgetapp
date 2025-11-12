@@ -11,7 +11,7 @@ const stakeholderIcons = {
 
 export const Stakeholders = ({ stakeholders }) => {
   return (
-    <section className="stakeholders-section">
+    <section className="stakeholders-section" id="ecosystem">
       <div className="container">
         <h2 className="section-title">Our Ecosystem</h2>
         <p className="section-subtitle">Connecting multiple stakeholders through unified innovation</p>
