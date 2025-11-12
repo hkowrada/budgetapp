@@ -191,11 +191,12 @@ function App() {
       </section>
 
       {/* Core Pillars Section */}
-      <section id="pillars" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="pillars" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Our Core Pillars</p>
+            <span className="section-badge">Our Core Pillars</span>
             <h2 className="display-medium">Five <span className="gold-gradient">Interconnected</span> Technologies</h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               Driving rural innovation through integrated technological excellence
             </p>
@@ -204,7 +205,7 @@ function App() {
             {siteData.corePillars.map((pillar, index) => {
               const IconComponent = iconMap[pillar.icon];
               return (
-                <div key={pillar.id} className={`pillar-card reveal animate-delay-${index + 1}`}>
+                <div key={pillar.id} className={`pillar-modern reveal fade-in-scale animate-delay-${index + 1}`}>
                   <div className="pillar-icon">
                     <IconComponent size={40} />
                   </div>
