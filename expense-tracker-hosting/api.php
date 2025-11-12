@@ -70,13 +70,21 @@ try {
             sendResponse(false, 'Data file contains invalid JSON', null, 500);
         }
         
-        // Ensure salaries is an object, not an array
+        // Fix: Ensure salaries is an object, not an array
+        // Empty arrays [] in JSON become empty PHP arrays, which re-encode as []
+        // We need them to be objects {} 
         if (isset($jsonData['salaries']) && is_array($jsonData['salaries']) && empty($jsonData['salaries'])) {
+            // Convert empty array to empty object for JSON
             $jsonData['salaries'] = new stdClass();
         }
         
-        // Re-encode to ensure proper format
-        echo json_encode($jsonData, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
+        // Re-encode with proper formatting
+        $output = json_encode($jsonData, JSON_PRETTY_PRINT);
+        
+        // Additional fix: Replace empty salaries array with empty object
+        $output = preg_replace('/"salaries":\s*\[\s*\]/', '"salaries": {}', $output);
+        
+        echo $output;
         
     } elseif ($method === 'POST') {
         // Check if file is writable
