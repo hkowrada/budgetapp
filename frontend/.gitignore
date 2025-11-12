@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production - COMMENTED OUT TO ALLOW BUILD FOLDER IN GIT
+# /build
 
 # misc
 .DS_Store
