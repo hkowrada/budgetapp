@@ -147,32 +147,33 @@ function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="luxury-section">
+      <section id="about" className="ultra-section">
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">What Makes Us Different</p>
+            <span className="section-badge">What Makes Us Different</span>
             <h2 className="display-medium">A Connected <span className="gold-gradient">Ecosystem</span></h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               Unlike conventional agritech platforms, AGLOUD operates as a connected ecosystem, not just a marketplace.
             </p>
           </div>
           
           <div className="grid-2">
-            <div className="premium-card reveal">
+            <div className="ultra-card reveal slide-in-left">
               <h3 className="heading-2 gold-gradient">{siteData.about.vision.title}</h3>
-              <div className="decorative-line"></div>
+              <div className="glow-line"></div>
               <p className="body-medium">{siteData.about.vision.description}</p>
             </div>
-            <div className="premium-card reveal">
+            <div className="ultra-card reveal slide-in-right">
               <h3 className="heading-2 gold-gradient">{siteData.about.mission.title}</h3>
-              <div className="decorative-line"></div>
+              <div className="glow-line"></div>
               <p className="body-medium">{siteData.about.mission.description}</p>
             </div>
           </div>
 
-          <div className="premium-card reveal">
-            <h3 className="heading-3">Our Key Differentiators</h3>
-            <div className="decorative-line"></div>
+          <div className="ultra-card reveal fade-in-scale">
+            <h3 className="heading-3 gold-text">Our Key Differentiators</h3>
+            <div className="glow-line"></div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {siteData.about.differentiators.map((item, index) => (
                 <div key={index} style={{ 
