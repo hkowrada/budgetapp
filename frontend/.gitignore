@@ -9,7 +9,7 @@
 /coverage
 
 # production
-/build
+# /build  # Commented out - we want to include build folder for deployment
 
 # misc
 .DS_Store
