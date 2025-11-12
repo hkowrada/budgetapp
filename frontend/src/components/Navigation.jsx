@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { name: 'Home', href: '#home' },
@@ -25,37 +35,36 @@ const Navigation = () => {
 
   return (
     <>
-      <header className="network-header">
-        <div className="nav-wrapper">
-          <a href="#home" className="network-logo" onClick={handleNavClick}>
+      <nav className={`luxury-nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="nav-container">
+          <a href="#home" className="nav-logo" onClick={handleNavClick}>
             <img 
               src="https://customer-assets.emergentagent.com/job_65e6e754-d23c-4d26-9f24-cf537fa4f9cb/artifacts/4g57b1ph_logooo-removebg-preview.png" 
-              alt="AGLOUD Logo" 
-              className="logo-image"
+              alt="AGLOUD Logo"
             />
-            <span>AGLOUD</span>
+            <span className="nav-logo-text">AGLOUD</span>
           </a>
-          <nav className="network-nav">
+          <div className="nav-links">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="network-nav-link"
+                className="nav-link"
                 onClick={handleNavClick}
               >
                 {link.name}
               </a>
             ))}
-          </nav>
+          </div>
           <button 
-            className="mobile-menu-button"
+            className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </header>
-      <div className={`mobile-nav ${mobileMenuOpen ? 'active' : ''}`}>
+      </nav>
+      <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
         {navLinks.map((link) => (
           <a
             key={link.name}

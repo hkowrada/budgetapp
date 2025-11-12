@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import Navigation from './components/Navigation';
+import CustomCursor from './components/CustomCursor';
 import { siteData } from './data/mock';
 import { 
   Sprout, 
@@ -37,6 +38,41 @@ function App() {
     message: ''
   });
 
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Parallax effect
+    const handleParallax = () => {
+      const scrolled = window.pageYOffset;
+      document.querySelectorAll('.parallax').forEach(el => {
+        const speed = el.dataset.speed || 0.5;
+        el.style.transform = `translateY(${scrolled * speed}px)`;
+      });
+    };
+
+    window.addEventListener('scroll', handleParallax);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleParallax);
+    };
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -47,7 +83,6 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Store in localStorage as JSON
     const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
     submissions.push({
       ...formData,
@@ -55,107 +90,100 @@ function App() {
     });
     localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
     
-    alert('Thank you for your message! We will get back to you soon.');
+    alert('Thank you for reaching out! We will contact you soon.');
     setFormData({ name: '', email: '', message: '' });
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in-up');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    document.querySelectorAll('.network-card, .pillar-card, .team-card').forEach(el => {
-      observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <div className="App">
+      <CustomCursor />
       <Navigation />
 
       {/* Hero Section */}
-      <section id="home" className="hero-section">
+      <section id="home" className="hero-luxury">
         <div className="hero-content">
-          <p className="hero-tagline">{siteData.hero.tagline}</p>
-          <h1 className="hero-headline">{siteData.hero.headline}</h1>
-          <p className="hero-description">{siteData.hero.description}</p>
-          <a href="#contact" className="btn-primary" onClick={(e) => {
-            e.preventDefault();
-            document.querySelector('#contact').scrollIntoView({ behavior: 'smooth' });
-          }}>
-            {siteData.hero.cta}
-          </a>
+          <p className="hero-tag reveal">{siteData.hero.tagline}</p>
+          <h1 className="display-luxury gold-gradient reveal">{siteData.hero.headline}</h1>
+          <p className="body-large reveal">{siteData.hero.description}</p>
+          <div className="hero-buttons reveal">
+            <a href="#contact" className="btn-primary" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#contact').scrollIntoView({ behavior: 'smooth' });
+            }}>
+              {siteData.hero.cta}
+            </a>
+            <a href="#about" className="btn-secondary" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#about').scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Learn More
+            </a>
+          </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="section">
+      <section id="about" className="luxury-section">
         <div className="container">
-          <h2 className="section-title">What Makes AGLOUD Different</h2>
-          <p className="section-subtitle">
-            Unlike conventional agritech platforms, AGLOUD operates as a connected ecosystem, not just a marketplace.
-          </p>
+          <div className="section-header reveal">
+            <p className="section-tag">What Makes Us Different</p>
+            <h2 className="display-medium">A Connected <span className="gold-gradient">Ecosystem</span></h2>
+            <p className="body-large section-description">
+              Unlike conventional agritech platforms, AGLOUD operates as a connected ecosystem, not just a marketplace.
+            </p>
+          </div>
           
-          <div className="grid-2" style={{ marginBottom: '48px' }}>
-            <div className="network-card">
-              <h3 className="heading-2">{siteData.about.vision.title}</h3>
+          <div className="grid-2">
+            <div className="premium-card reveal">
+              <h3 className="heading-2 gold-gradient">{siteData.about.vision.title}</h3>
+              <div className="decorative-line"></div>
               <p className="body-medium">{siteData.about.vision.description}</p>
             </div>
-            <div className="network-card">
-              <h3 className="heading-2">{siteData.about.mission.title}</h3>
+            <div className="premium-card reveal">
+              <h3 className="heading-2 gold-gradient">{siteData.about.mission.title}</h3>
+              <div className="decorative-line"></div>
               <p className="body-medium">{siteData.about.mission.description}</p>
             </div>
           </div>
 
-          <div className="network-card">
-            <h3 className="heading-3" style={{ marginBottom: '16px' }}>Our Key Differentiators</h3>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
+          <div className="premium-card reveal">
+            <h3 className="heading-3">Our Key Differentiators</h3>
+            <div className="decorative-line"></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {siteData.about.differentiators.map((item, index) => (
-                <li key={index} style={{ 
-                  fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-                  color: 'var(--text-secondary)',
-                  marginBottom: '12px',
-                  paddingLeft: '24px',
-                  position: 'relative'
+                <div key={index} style={{ 
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px'
                 }}>
-                  <span style={{
-                    position: 'absolute',
-                    left: 0,
-                    color: 'var(--brand-dark)'
-                  }}>✓</span>
-                  {item}
-                </li>
+                  <span style={{ color: 'var(--gold-primary)', fontSize: '20px' }}>✦</span>
+                  <p className="body-medium">{item}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Core Pillars Section */}
-      <section id="pillars" className="section" style={{ background: 'var(--bg-subtle)' }}>
+      <section id="pillars" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
-          <h2 className="section-title">Our Core Pillars</h2>
-          <p className="section-subtitle">
-            Five interconnected technologies driving rural innovation
-          </p>
+          <div className="section-header reveal">
+            <p className="section-tag">Our Core Pillars</p>
+            <h2 className="display-medium">Five <span className="gold-gradient">Interconnected</span> Technologies</h2>
+            <p className="body-large section-description">
+              Driving rural innovation through integrated technological excellence
+            </p>
+          </div>
           <div className="grid-3">
-            {siteData.corePillars.map((pillar) => {
+            {siteData.corePillars.map((pillar, index) => {
               const IconComponent = iconMap[pillar.icon];
               return (
-                <div key={pillar.id} className="pillar-card">
+                <div key={pillar.id} className={`pillar-card reveal animate-delay-${index + 1}`}>
                   <div className="pillar-icon">
-                    <IconComponent size={32} />
+                    <IconComponent size={40} />
                   </div>
-                  <h3 className="pillar-title">{pillar.title}</h3>
+                  <h3 className="heading-3 pillar-title">{pillar.title}</h3>
                   <p className="pillar-description">{pillar.description}</p>
                 </div>
               );
@@ -165,13 +193,16 @@ function App() {
       </section>
 
       {/* Ecosystem Section */}
-      <section id="ecosystem" className="section">
+      <section id="ecosystem" className="luxury-section">
         <div className="container">
-          <h2 className="section-title">Our Ecosystem</h2>
-          <p className="section-subtitle">
-            AGLOUD connects multiple stakeholders through a unified innovation network
-          </p>
-          <div className="ecosystem-table">
+          <div className="section-header reveal">
+            <p className="section-tag">Our Ecosystem</p>
+            <h2 className="display-medium">Unified <span className="gold-gradient">Innovation</span> Network</h2>
+            <p className="body-large section-description">
+              AGLOUD connects multiple stakeholders through a unified innovation network
+            </p>
+          </div>
+          <div className="luxury-table reveal">
             <table>
               <thead>
                 <tr>
@@ -182,7 +213,7 @@ function App() {
               <tbody>
                 {siteData.ecosystem.map((item, index) => (
                   <tr key={index}>
-                    <td><strong>{item.stakeholder}</strong></td>
+                    <td><strong style={{ color: 'var(--gold-primary)' }}>{item.stakeholder}</strong></td>
                     <td>{item.role}</td>
                   </tr>
                 ))}
@@ -193,16 +224,19 @@ function App() {
       </section>
 
       {/* Technology Stack Section */}
-      <section id="technology" className="section" style={{ background: 'var(--bg-subtle)' }}>
+      <section id="technology" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
-          <h2 className="section-title">Technology Stack</h2>
-          <p className="section-subtitle">
-            Cutting-edge technologies powering rural transformation
-          </p>
+          <div className="section-header reveal">
+            <p className="section-tag">Technology Stack</p>
+            <h2 className="display-medium">Cutting-Edge <span className="gold-gradient">Technologies</span></h2>
+            <p className="body-large section-description">
+              Powering rural transformation with advanced tech infrastructure
+            </p>
+          </div>
           <div className="grid-3">
             {siteData.technology.map((tech, index) => (
-              <div key={index} className="network-card">
-                <h3 className="heading-3" style={{ marginBottom: '8px' }}>{tech.name}</h3>
+              <div key={index} className={`premium-card reveal animate-delay-${(index % 3) + 1}`}>
+                <h3 className="heading-3" style={{ color: 'var(--gold-primary)', marginBottom: '12px' }}>{tech.name}</h3>
                 <p className="body-medium">{tech.description}</p>
               </div>
             ))}
@@ -211,21 +245,24 @@ function App() {
       </section>
 
       {/* Flagship Programs Section */}
-      <section id="programs" className="section">
+      <section id="programs" className="luxury-section">
         <div className="container">
-          <h2 className="section-title">Our Flagship Programs</h2>
-          <p className="section-subtitle">
-            Innovative initiatives transforming rural India
-          </p>
+          <div className="section-header reveal">
+            <p className="section-tag">Flagship Programs</p>
+            <h2 className="display-medium">Transforming <span className="gold-gradient">Rural India</span></h2>
+            <p className="body-large section-description">
+              Innovative initiatives creating sustainable impact
+            </p>
+          </div>
           <div className="grid-4">
-            {siteData.flagshipPrograms.map((program) => {
+            {siteData.flagshipPrograms.map((program, index) => {
               const IconComponent = iconMap[program.icon];
               return (
-                <div key={program.id} className="pillar-card">
-                  <div className="pillar-icon">
+                <div key={program.id} className={`pillar-card reveal animate-delay-${(index % 4) + 1}`}>
+                  <div className="pillar-icon" style={{ width: '70px', height: '70px' }}>
                     <IconComponent size={32} />
                   </div>
-                  <h3 className="pillar-title">{program.name}</h3>
+                  <h3 className="heading-3 pillar-title" style={{ fontSize: 'clamp(1.125rem, 2vw, 1.25rem)' }}>{program.name}</h3>
                   <p className="pillar-description">{program.description}</p>
                 </div>
               );
@@ -235,19 +272,22 @@ function App() {
       </section>
 
       {/* Team Section */}
-      <section id="team" className="section" style={{ background: 'var(--bg-subtle)' }}>
+      <section id="team" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
-          <h2 className="section-title">Our Team</h2>
-          <p className="section-subtitle">
-            Meet the leaders driving AGLOUD's vision
-          </p>
+          <div className="section-header reveal">
+            <p className="section-tag">Leadership</p>
+            <h2 className="display-medium">Meet Our <span className="gold-gradient">Visionaries</span></h2>
+            <p className="body-large section-description">
+              The leaders driving AGLOUD's mission forward
+            </p>
+          </div>
           <div className="grid-3">
-            {siteData.team.map((member) => (
-              <div key={member.id} className="team-card">
+            {siteData.team.map((member, index) => (
+              <div key={member.id} className={`team-card reveal animate-delay-${(index % 3) + 1}`}>
                 <div className="team-avatar">
                   {member.name.split(' ')[0][0]}{member.name.split(' ')[1] ? member.name.split(' ')[1][0] : ''}
                 </div>
-                <h3 className="team-name">{member.name}</h3>
+                <h3 className="heading-3 team-name">{member.name}</h3>
                 <p className="team-designation">{member.designation}</p>
               </div>
             ))}
@@ -256,18 +296,21 @@ function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="section contact-section">
+      <section id="contact" className="luxury-section contact-luxury">
         <div className="container">
-          <h2 className="section-title">Get In Touch</h2>
-          <p className="section-subtitle">
-            Join the future of rural innovation
-          </p>
-          <div className="contact-content">
-            <div className="contact-form">
-              <h3 className="heading-3" style={{ marginBottom: '24px' }}>Send us a message</h3>
+          <div className="section-header reveal">
+            <p className="section-tag">Get In Touch</p>
+            <h2 className="display-medium">Join the <span className="gold-gradient">Movement</span></h2>
+            <p className="body-large section-description">
+              Connect with us to be part of rural innovation
+            </p>
+          </div>
+          <div className="contact-grid">
+            <div className="contact-form reveal">
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '32px' }}>Send Message</h3>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label htmlFor="name" className="form-label">Name</label>
+                  <label htmlFor="name" className="form-label">Your Name</label>
                   <input
                     type="text"
                     id="name"
@@ -279,7 +322,7 @@ function App() {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="email" className="form-label">Email</label>
+                  <label htmlFor="email" className="form-label">Email Address</label>
                   <input
                     type="email"
                     id="email"
@@ -291,7 +334,7 @@ function App() {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="message" className="form-label">Message</label>
+                  <label htmlFor="message" className="form-label">Your Message</label>
                   <textarea
                     id="message"
                     name="message"
@@ -307,11 +350,11 @@ function App() {
               </form>
             </div>
 
-            <div className="contact-info">
+            <div className="contact-info reveal">
               <h3>Contact Information</h3>
               <div className="contact-item">
                 <div className="contact-icon">
-                  <Mail size={20} />
+                  <Mail size={24} />
                 </div>
                 <div className="contact-details">
                   <h4>Email</h4>
@@ -320,7 +363,7 @@ function App() {
               </div>
               <div className="contact-item">
                 <div className="contact-icon">
-                  <MapPin size={20} />
+                  <MapPin size={24} />
                 </div>
                 <div className="contact-details">
                   <h4>Location</h4>
@@ -329,7 +372,7 @@ function App() {
               </div>
               <div className="contact-item">
                 <div className="contact-icon">
-                  <Youtube size={20} />
+                  <Youtube size={24} />
                 </div>
                 <div className="contact-details">
                   <h4>YouTube</h4>
@@ -340,7 +383,7 @@ function App() {
               </div>
               <div className="contact-item">
                 <div className="contact-icon">
-                  <Linkedin size={20} />
+                  <Linkedin size={24} />
                 </div>
                 <div className="contact-details">
                   <h4>LinkedIn</h4>
@@ -355,23 +398,21 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <p className="footer-message">
-            {siteData.message.quote}
-          </p>
-          <div className="footer-social">
-            <a href={siteData.contact.youtube} target="_blank" rel="noopener noreferrer" className="social-link">
-              <Youtube size={24} />
-            </a>
-            <a href={siteData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">
-              <Linkedin size={24} />
-            </a>
-          </div>
-          <p className="footer-copyright">
-            © {new Date().getFullYear()} AGLOUD. All rights reserved.
-          </p>
+      <footer className="luxury-footer">
+        <p className="footer-quote reveal">
+          {siteData.message.quote}
+        </p>
+        <div className="footer-social reveal">
+          <a href={siteData.contact.youtube} target="_blank" rel="noopener noreferrer" className="social-icon">
+            <Youtube size={24} />
+          </a>
+          <a href={siteData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="social-icon">
+            <Linkedin size={24} />
+          </a>
         </div>
+        <p className="footer-copyright reveal">
+          © {new Date().getFullYear()} AGLOUD. All Rights Reserved.
+        </p>
       </footer>
     </div>
   );
