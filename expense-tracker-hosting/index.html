@@ -3050,7 +3050,7 @@
             }
         }
 
-        function handleSetSalary(event) {
+        async function handleSetSalary(event) {
             event.preventDefault();
             
             if (!hasPermission('manage_salary')) {
@@ -3068,11 +3068,14 @@
             
             allData.salaries[month] = amount;
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
                 showNotification('Salary updated successfully!', 'success');
                 closeModal('salaryModal');
-                loadData();
+                await loadData();
                 checkBudgetAlerts();
+            } else {
+                showNotification('Failed to save salary. Please try again.', 'error');
             }
         }
 
