@@ -12,7 +12,7 @@ const iconMap = {
 
 export const CorePillars = ({ pillars }) => {
   return (
-    <section className="core-pillars-section">
+    <section className="core-pillars-section" id="pillars">
       <div className="container">
         <h2 className="section-title">Our Core Pillars</h2>
         <p className="section-subtitle">Five interconnected pillars driving rural innovation</p>
