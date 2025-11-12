@@ -219,16 +219,17 @@ function App() {
       </section>
 
       {/* Ecosystem Section */}
-      <section id="ecosystem" className="luxury-section">
+      <section id="ecosystem" className="ultra-section">
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Our Ecosystem</p>
+            <span className="section-badge">Our Ecosystem</span>
             <h2 className="display-medium">Unified <span className="gold-gradient">Innovation</span> Network</h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               AGLOUD connects multiple stakeholders through a unified innovation network
             </p>
           </div>
-          <div className="luxury-table reveal">
+          <div className="modern-table reveal fade-in-up">
             <table>
               <thead>
                 <tr>
