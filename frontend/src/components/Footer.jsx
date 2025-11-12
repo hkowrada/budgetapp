@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, MapPin } from 'lucide-react';
+import { SocialLinks } from './SocialLinks';
 
 export const Footer = ({ contact }) => {
   return (
