@@ -429,8 +429,8 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="luxury-footer">
-        <p className="footer-quote reveal">
+      <footer className="ultra-footer">
+        <p className="footer-quote reveal fade-in-up">
           {siteData.message.quote}
         </p>
         <div className="footer-social reveal">
