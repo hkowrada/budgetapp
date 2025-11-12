@@ -251,18 +251,19 @@ function App() {
       </section>
 
       {/* Technology Stack Section */}
-      <section id="technology" className="luxury-section" style={{ background: 'var(--bg-secondary)' }}>
+      <section id="technology" className="ultra-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Technology Stack</p>
+            <span className="section-badge">Technology Stack</span>
             <h2 className="display-medium">Cutting-Edge <span className="gold-gradient">Technologies</span></h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               Powering rural transformation with advanced tech infrastructure
             </p>
           </div>
           <div className="grid-3">
             {siteData.technology.map((tech, index) => (
-              <div key={index} className={`premium-card reveal animate-delay-${(index % 3) + 1}`}>
+              <div key={index} className={`ultra-card reveal fade-in-up animate-delay-${(index % 3) + 1}`}>
                 <h3 className="heading-3" style={{ color: 'var(--gold-primary)', marginBottom: '12px' }}>{tech.name}</h3>
                 <p className="body-medium">{tech.description}</p>
               </div>
