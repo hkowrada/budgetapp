@@ -65,7 +65,7 @@ chainlit.md
 agenthub/agents/youtube/db
 
 # Archive files and large assets
-**/*.zip
+# **/*.zip  # Commented out to allow agloud-website.zip
 **/*.tar.gz
 **/*.tar
 **/*.tgz
