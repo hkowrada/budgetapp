@@ -1,0 +1,111 @@
+{
+  "hero": {
+    "tagline": "India's First Rural Innovation Platform",
+    "subtitle": "Not improving farming. Reinventing it",
+    "description": "Agriculture + Aquaculture + BioTech + NanoTech + AI + Carbon + IoT"
+  },
+  "vision": {
+    "title": "Our Vision",
+    "content": "To empower rural communities with the tools, technologies, and ecosystems needed to produce smarter, cleaner, and higher-value crops, while creating a carbon-positive and economically resilient India."
+  },
+  "mission": {
+    "title": "Our Mission",
+    "content": "AGLOUD's mission is to turn every acre into an innovation-driven ecosystem by integrating precision agriculture, smart aquaculture, biotech innovations, nanotechnology, artificial intelligence, and carbon tracking to build sustainable, measurable green impact.",
+    "points": [
+      "Precision Agriculture using IoT and sensors",
+      "Smart Aquaculture for water-efficient protein production",
+      "Biotech innovations for plant resilience and soil health",
+      "Nanotechnology for advanced fertilizers and preservation",
+      "Artificial Intelligence for predictive analytics and automation",
+      "Carbon tracking to build sustainable, measurable green impact"
+    ]
+  },
+  "corePillars": [
+    {
+      "id": "agriculture",
+      "title": "Smart Agriculture",
+      "description": "Sensor-driven soil and crop management with real-time AI insights. Helps farmers make data-backed irrigation, fertilizer, and yield decisions.",
+      "icon": "Sprout"
+    },
+    {
+      "id": "aquaculture",
+      "title": "Aquaculture & Hydroponics",
+      "description": "Modern water farming for shrimp, fish, and plant proteins using minimal water footprint and precision monitoring systems.",
+      "icon": "Fish"
+    },
+    {
+      "id": "biotech",
+      "title": "Biotech & Nanotech",
+      "description": "Leveraging biotechnology for disease-resistant crops and nanotech for controlled nutrient release — combining science with soil.",
+      "icon": "Microscope"
+    },
+    {
+      "id": "ai",
+      "title": "AI, IoT & Data Analytics",
+      "description": "Connecting farms, labs, and markets through intelligent networks for remote monitoring, automation, and market forecasting.",
+      "icon": "Brain"
+    },
+    {
+      "id": "carbon",
+      "title": "Carbon & Sustainability",
+      "description": "Tracking, measuring, and monetizing carbon reduction at every level — empowering rural producers to earn from sustainable practices.",
+      "icon": "Leaf"
+    }
+  ],
+  "programs": [
+    {
+      "id": "smart-village",
+      "title": "Smart Village Project",
+      "description": "Creating pilot hubs integrating tech, training, and sustainability for holistic rural transformation."
+    },
+    {
+      "id": "greenhouse",
+      "title": "GreenHouse 24x7",
+      "description": "Climate-controlled high-yield farming using nanotech for year-round optimal production."
+    },
+    {
+      "id": "blue-protein",
+      "title": "BlueProtein",
+      "description": "AI-based aquaculture farms for fish and prawns with precision monitoring and sustainable practices."
+    },
+    {
+      "id": "carbon-plus",
+      "title": "Carbon+",
+      "description": "A digital carbon tracking and monetization platform empowering farmers to earn from green practices."
+    }
+  ],
+  "stakeholders": [
+    {
+      "role": "Farmers",
+      "description": "Use AGLOUD tools, sensors, and AI dashboards for real-time decision-making"
+    },
+    {
+      "role": "Researchers",
+      "description": "Partner for biotech, soil health, and nanotech experiments"
+    },
+    {
+      "role": "Businesses & Pharma",
+      "description": "Source high-value, traceable, and organic crops"
+    },
+    {
+      "role": "Investors & NGOs",
+      "description": "Fund and scale sustainable agri-clusters"
+    },
+    {
+      "role": "Governments",
+      "description": "Collaborate for policy-backed green initiatives"
+    }
+  ],
+  "techStack": [
+    "IoT Sensors – Soil, water, and weather tracking",
+    "AI Models – Predictive crop yield & disease alerts",
+    "Blockchain – Traceability & carbon credits",
+    "Cloud Analytics – Farm-to-market visibility",
+    "Mobile App – Local language interface for farmers"
+  ],
+  "contact": {
+    "email": "connect@agloud.in",
+    "location": "Pasumarru, Andhra Pradesh, India",
+    "message": "Innovation should begin where the soil breathes — in the villages. AGLOUD is not just a company; it's a movement towards a new kind of rural intelligence — one that connects technology, nature, and people."
+  }
+}
