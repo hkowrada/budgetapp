@@ -2903,7 +2903,7 @@
             }
         }
 
-        function deleteExpense(id) {
+        async function deleteExpense(id) {
             if (!hasPermission('delete')) {
                 showNotification('You do not have permission to delete expenses', 'error');
                 return;
@@ -2913,10 +2913,13 @@
             
             allData.expenses = allData.expenses.filter(exp => exp.id !== id);
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
                 showNotification('Expense deleted successfully!', 'success');
-                loadData();
+                await loadData();
                 checkBudgetAlerts();
+            } else {
+                showNotification('Failed to delete expense. Please try again.', 'error');
             }
         }
 
