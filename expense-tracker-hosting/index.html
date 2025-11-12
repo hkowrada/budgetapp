@@ -3038,7 +3038,7 @@
             `).join('');
         }
 
-        function handleAddCategory(event) {
+        async function handleAddCategory(event) {
             event.preventDefault();
             
             if (!hasPermission('manage_categories')) {
@@ -3057,15 +3057,18 @@
             
             allData.categories.push(categoryName);
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
                 showNotification('Category added successfully!', 'success');
                 document.getElementById('addCategoryForm').reset();
-                loadData();
+                await loadData();
                 renderCategoriesList();
+            } else {
+                showNotification('Failed to add category. Please try again.', 'error');
             }
         }
 
-        function deleteCategory(categoryName) {
+        async function deleteCategory(categoryName) {
             if (!hasPermission('manage_categories')) {
                 showNotification('You do not have permission to manage categories', 'error');
                 return;
@@ -3075,10 +3078,13 @@
             
             allData.categories = allData.categories.filter(cat => cat !== categoryName);
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
                 showNotification('Category deleted successfully!', 'success');
-                loadData();
+                await loadData();
                 renderCategoriesList();
+            } else {
+                showNotification('Failed to delete category. Please try again.', 'error');
             }
         }
 
