@@ -35,7 +35,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className={`luxury-nav ${scrolled ? 'scrolled' : ''}`}>
+      <nav className={`ultra-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <a href="#home" className="nav-logo" onClick={handleNavClick}>
             <img 
