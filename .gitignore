@@ -25,10 +25,10 @@ node_modules/
 next-env.d.ts
 *.tsbuildinfo
 
-# Production builds
-/build
-dist/
-dist
+# Production builds (commented out to allow build folder in git)
+# /build
+# dist/
+# dist
 
 # Environment files (comprehensive coverage)
 
