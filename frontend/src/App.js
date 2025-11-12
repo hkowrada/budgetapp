@@ -273,11 +273,12 @@ function App() {
       </section>
 
       {/* Flagship Programs Section */}
-      <section id="programs" className="luxury-section">
+      <section id="programs" className="ultra-section">
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Flagship Programs</p>
+            <span className="section-badge">Flagship Programs</span>
             <h2 className="display-medium">Transforming <span className="gold-gradient">Rural India</span></h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               Innovative initiatives creating sustainable impact
             </p>
@@ -286,7 +287,7 @@ function App() {
             {siteData.flagshipPrograms.map((program, index) => {
               const IconComponent = iconMap[program.icon];
               return (
-                <div key={program.id} className={`pillar-card reveal animate-delay-${(index % 4) + 1}`}>
+                <div key={program.id} className={`pillar-modern reveal fade-in-scale animate-delay-${(index % 4) + 1}`}>
                   <div className="pillar-icon" style={{ width: '70px', height: '70px' }}>
                     <IconComponent size={32} />
                   </div>
