@@ -55,6 +55,10 @@ export const Footer = ({ contact }) => {
                   <span>{contact.location}</span>
                 </li>
               </ul>
+              <div className="footer-social-container">
+                <h4 className="footer-heading">Follow Us</h4>
+                <SocialLinks className="footer-social" />
+              </div>
             </div>
           </div>
         </div>
