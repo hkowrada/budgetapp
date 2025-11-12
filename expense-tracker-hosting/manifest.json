@@ -73,10 +73,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Add Expense",
-      "short_name": "Add",
-      "description": "Quickly add a new expense",
-      "url": "./index.html?action=add",
+      "name": "Expense Tracker",
+      "short_name": "Tracker",
+      "description": "Access expense tracker",
+      "url": "./app.html",
       "icons": [
         {
           "src": "./icon-96x96.png",
@@ -85,10 +85,10 @@
       ]
     },
     {
-      "name": "View Report",
-      "short_name": "Report",
-      "description": "View monthly expense report",
-      "url": "./index.html?action=report",
+      "name": "Add Expense",
+      "short_name": "Add",
+      "description": "Quickly add a new expense",
+      "url": "./app.html?action=add",
       "icons": [
         {
           "src": "./icon-96x96.png",
