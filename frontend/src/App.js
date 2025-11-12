@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import "./App.css";
+import { Navigation } from "./components/Navigation";
 import { Hero } from "./components/Hero";
 import { VisionMission } from "./components/VisionMission";
 import { CorePillars } from "./components/CorePillars";
 import { Programs } from "./components/Programs";
 import { Stakeholders } from "./components/Stakeholders";
 import { TechStack } from "./components/TechStack";
+import { MediaSection } from "./components/MediaSection";
 import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
@@ -27,7 +29,7 @@ function App() {
       });
     }, observerOptions);
 
-    const animateElements = document.querySelectorAll('.pillar-card, .program-card, .stakeholder-item, .tech-item');
+    const animateElements = document.querySelectorAll('.pillar-card, .program-card, .stakeholder-item, .tech-item, .media-card');
     animateElements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
@@ -35,12 +37,14 @@ function App() {
 
   return (
     <div className="App">
+      <Navigation />
       <Hero content={contentData.hero} />
       <VisionMission vision={contentData.vision} mission={contentData.mission} />
       <CorePillars pillars={contentData.corePillars} />
       <Programs programs={contentData.programs} />
       <Stakeholders stakeholders={contentData.stakeholders} />
       <TechStack techStack={contentData.techStack} />
+      <MediaSection />
       <Contact contact={contentData.contact} />
       <Footer contact={contentData.contact} />
       <Toaster />
