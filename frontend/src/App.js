@@ -326,18 +326,19 @@ function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="luxury-section contact-luxury">
+      <section id="contact" className="ultra-section contact-ultra">
         <div className="container">
           <div className="section-header reveal">
-            <p className="section-tag">Get In Touch</p>
+            <span className="section-badge">Get In Touch</span>
             <h2 className="display-medium">Join the <span className="gold-gradient">Movement</span></h2>
+            <div className="glow-line"></div>
             <p className="body-large section-description">
               Connect with us to be part of rural innovation
             </p>
           </div>
           <div className="contact-grid">
-            <div className="contact-form reveal">
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '32px' }}>Send Message</h3>
+            <div className="contact-form reveal fade-in-up">
+              <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '32px' }}>Send Message</h3>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="name" className="form-label">Your Name</label>
