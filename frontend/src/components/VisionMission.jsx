@@ -3,7 +3,7 @@ import { Card } from './ui/card';
 
 export const VisionMission = ({ vision, mission }) => {
   return (
-    <section className="vision-mission-section">
+    <section className="vision-mission-section" id="vision">
       <div className="container">
         <div className="vm-grid">
           <Card className="vm-card vision-card">
