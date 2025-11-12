@@ -696,10 +696,21 @@ body::before {
   line-height: 1.7;
 }
 
-/* ===== STAKEHOLDERS SECTION ===== */
+/* ===== STAKEHOLDERS SECTION - PURE BLACK ===== */
 .stakeholders-section {
-  padding: var(--spacing-xxl) 0;
-  background: var(--bg-dark);
+  padding: var(--spacing-giant) 0;
+  background: var(--bg-pure-black);
+  position: relative;
+}
+
+.stakeholders-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
 }
 
 .stakeholders-grid {
