@@ -141,21 +141,21 @@ function App() {
           </div>
           
           <div className="grid-2">
-            <div className="ultra-card reveal slide-in-left">
+            <div className="elegant-card reveal slide-in-left">
               <h3 className="heading-2 gold-gradient">{siteData.about.vision.title}</h3>
-              <div className="glow-line"></div>
+              <div className="elegant-line"></div>
               <p className="body-medium">{siteData.about.vision.description}</p>
             </div>
-            <div className="ultra-card reveal slide-in-right">
+            <div className="elegant-card reveal slide-in-right">
               <h3 className="heading-2 gold-gradient">{siteData.about.mission.title}</h3>
-              <div className="glow-line"></div>
+              <div className="elegant-line"></div>
               <p className="body-medium">{siteData.about.mission.description}</p>
             </div>
           </div>
 
-          <div className="ultra-card reveal fade-in-scale">
+          <div className="elegant-card reveal fade-in-scale">
             <h3 className="heading-3 gold-text">Our Key Differentiators</h3>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {siteData.about.differentiators.map((item, index) => (
                 <div key={index} style={{ 
