@@ -13,11 +13,13 @@ export const Contact = ({ contact }) => {
     email: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Store in localStorage (simulating JSON storage)
+    // Store in localStorage
     const submissions = JSON.parse(localStorage.getItem('agloud_contacts') || '[]');
     submissions.push({
       ...formData,
@@ -25,16 +27,20 @@ export const Contact = ({ contact }) => {
     });
     localStorage.setItem('agloud_contacts', JSON.stringify(submissions));
     
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. We'll get back to you soon.",
+      title: "Message Sent Successfully!",
+      description: "Thank you for reaching out. We'll get back to you within 24 hours.",
     });
     
     setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(false);
   };
 
   return (
-    <section className="contact-section">
+    <section className="contact-section" id="contact">
       <div className="container">
         <div className="contact-grid">
           <div className="contact-info">
