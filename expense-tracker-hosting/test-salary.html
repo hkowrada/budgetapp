@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Update Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #e6fffa;
+            border-left: 4px solid #48bb78;
+        }
+        .error {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+        }
+        input {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🔧 Salary Update Diagnostic Test</h1>
+        <p>This page will help diagnose why salary updates might not be working.</p>
+        
+        <h3>Test 1: Check API Connection</h3>
+        <button onclick="testAPIConnection()">Test API.php Connection</button>
+        <div id="apiResult" class="result" style="display:none;"></div>
+        
+        <h3>Test 2: Load Current Data</h3>
+        <button onclick="loadCurrentData()">Load Data from Server</button>
+        <div id="loadResult" class="result" style="display:none;"></div>
+        
+        <h3>Test 3: Test Salary Update</h3>
+        <div>
+            <input type="number" id="testAmount" placeholder="Amount (e.g., 3000)" step="0.01">
+            <input type="month" id="testMonth" placeholder="Month">
+            <button onclick="testSalaryUpdate()">Test Update</button>
+        </div>
+        <div id="updateResult" class="result" style="display:none;"></div>
+        
+        <h3>Test 4: Verify Saved Data</h3>
+        <button onclick="verifySavedData()">Check if Salary Was Saved</button>
+        <div id="verifyResult" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        let currentData = null;
+        
+        async function testAPIConnection() {
+            const result = document.getElementById('apiResult');
+            result.style.display = 'block';
+            result.textContent = 'Testing API connection...';
+            
+            try {
+                const response = await fetch('api.php');
+                if (response.ok) {
+                    result.className = 'result success';
+                    result.textContent = '✅ API connection successful!\nStatus: ' + response.status;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ API returned error\nStatus: ' + response.status;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ Cannot connect to API\nError: ' + error.message;
+            }
+        }
+        
+        async function loadCurrentData() {
+            const result = document.getElementById('loadResult');
+            result.style.display = 'block';
+            result.textContent = 'Loading data...';
+            
+            try {
+                const response = await fetch('api.php');
+                if (!response.ok) {
+                    throw new Error('API returned ' + response.status);
+                }
+                
+                currentData = await response.json();
+                result.className = 'result success';
+                result.textContent = '✅ Data loaded successfully!\n\n' + 
+                    'Current salaries:\n' + 
+                    JSON.stringify(currentData.salaries, null, 2) + '\n\n' +
+                    'Categories: ' + currentData.categories.length + '\n' +
+                    'Expenses: ' + currentData.expenses.length;
+                
+                // Set default month to current
+                const now = new Date();
+                const monthStr = now.toISOString().slice(0, 7);
+                document.getElementById('testMonth').value = monthStr;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ Failed to load data\nError: ' + error.message;
+            }
+        }
+        
+        async function testSalaryUpdate() {
+            const result = document.getElementById('updateResult');
+            result.style.display = 'block';
+            result.textContent = 'Testing salary update...';
+            
+            const amount = parseFloat(document.getElementById('testAmount').value);
+            const month = document.getElementById('testMonth').value;
+            
+            if (!amount || amount <= 0) {
+                result.className = 'result error';
+                result.textContent = '❌ Please enter a valid amount';
+                return;
+            }
+            
+            if (!month) {
+                result.className = 'result error';
+                result.textContent = '❌ Please select a month';
+                return;
+            }
+            
+            try {
+                // Load current data first
+                const loadResponse = await fetch('api.php');
+                if (!loadResponse.ok) {
+                    throw new Error('Failed to load current data: ' + loadResponse.status);
+                }
+                
+                const data = await loadResponse.json();
+                
+                // Update salary
+                if (!data.salaries) {
+                    data.salaries = {};
+                }
+                data.salaries[month] = amount;
+                
+                console.log('Updating with data:', data);
+                
+                // Save back
+                const saveResponse = await fetch('api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!saveResponse.ok) {
+                    const errorText = await saveResponse.text();
+                    throw new Error('Save failed (' + saveResponse.status + '): ' + errorText);
+                }
+                
+                const saveResult = await saveResponse.json();
+                
+                if (saveResult.success) {
+                    result.className = 'result success';
+                    result.textContent = '✅ Salary update successful!\n\n' +
+                        'Month: ' + month + '\n' +
+                        'Amount: €' + amount.toFixed(2) + '\n\n' +
+                        'Server response:\n' + JSON.stringify(saveResult, null, 2);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = '❌ Save failed\n\n' + JSON.stringify(saveResult, null, 2);
+                }
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ Error during update\n\nError: ' + error.message;
+                console.error('Full error:', error);
+            }
+        }
+        
+        async function verifySavedData() {
+            const result = document.getElementById('verifyResult');
+            result.style.display = 'block';
+            result.textContent = 'Verifying saved data...';
+            
+            try {
+                const response = await fetch('api.php?t=' + Date.now()); // Cache bust
+                if (!response.ok) {
+                    throw new Error('API returned ' + response.status);
+                }
+                
+                const data = await response.json();
+                result.className = 'result success';
+                result.textContent = '✅ Current data from server:\n\n' + 
+                    'Salaries:\n' + JSON.stringify(data.salaries, null, 2) + '\n\n' +
+                    'If your recent update is here, it worked!\n' +
+                    'If not, there may be a caching or permission issue.';
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = '❌ Failed to verify\nError: ' + error.message;
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            testAPIConnection();
+            setTimeout(() => loadCurrentData(), 500);
+        });
+    </script>
+</body>
+</html>
