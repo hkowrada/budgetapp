@@ -3091,29 +3091,55 @@
         async function handleSetSalary(event) {
             event.preventDefault();
             
+            console.log('handleSetSalary called');
+            
             if (!hasPermission('manage_salary')) {
                 showNotification('You do not have permission to manage salary', 'error');
                 return;
             }
             
-            const amount = parseFloat(document.getElementById('salaryAmount').value);
+            const amountInput = document.getElementById('salaryAmount').value;
             const month = document.getElementById('salaryMonth').value;
             
-            if (amount <= 0) {
+            console.log('Salary input:', { amountInput, month });
+            
+            const amount = parseFloat(amountInput);
+            
+            if (!amountInput || isNaN(amount) || amount <= 0) {
                 showNotification('Please enter a valid salary amount', 'error');
                 return;
             }
             
-            allData.salaries[month] = amount;
+            if (!month) {
+                showNotification('Please select a month', 'error');
+                return;
+            }
             
-            const saved = await saveData();
-            if (saved) {
-                showNotification('Salary updated successfully!', 'success');
-                closeModal('salaryModal');
-                await loadData();
-                checkBudgetAlerts();
-            } else {
-                showNotification('Failed to save salary. Please try again.', 'error');
+            // Ensure salaries object exists
+            if (!allData.salaries) {
+                allData.salaries = {};
+            }
+            
+            // Update salary
+            allData.salaries[month] = amount;
+            console.log('Updated allData.salaries:', allData.salaries);
+            
+            // Save to server
+            try {
+                const saved = await saveData();
+                console.log('Save result:', saved);
+                
+                if (saved) {
+                    showNotification(`Salary €${amount.toFixed(2)} saved for ${month}!`, 'success');
+                    closeModal('salaryModal');
+                    await loadData();
+                    checkBudgetAlerts();
+                } else {
+                    showNotification('Failed to save salary. Check console for details.', 'error');
+                }
+            } catch (error) {
+                console.error('Error in handleSetSalary:', error);
+                showNotification('Error saving salary: ' + error.message, 'error');
             }
         }
 
