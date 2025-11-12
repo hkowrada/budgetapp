@@ -2923,7 +2923,7 @@
             }
         }
 
-        function handleRecurring(event) {
+        async function handleRecurring(event) {
             event.preventDefault();
 
             const recurringId = document.getElementById('recurringId').value;
@@ -2942,31 +2942,36 @@
                 const index = allData.recurring.findIndex(r => r.id === recurringId);
                 if (index !== -1) {
                     allData.recurring[index] = recurring;
-                    showNotification('Recurring expense updated!', 'success');
                 }
             } else {
                 allData.recurring.push(recurring);
-                showNotification('Recurring expense added!', 'success');
             }
 
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
+                showNotification(recurringId ? 'Recurring expense updated!' : 'Recurring expense added!', 'success');
                 closeModal('addRecurringModal');
                 updateRecurringTable();
                 updateUI();
                 checkRecurringDueDates();
+            } else {
+                showNotification('Failed to save recurring expense. Please try again.', 'error');
             }
         }
 
-        function deleteRecurring(id) {
+        async function deleteRecurring(id) {
             if (!confirm('Delete this recurring expense?')) return;
 
             allData.recurring = allData.recurring.filter(r => r.id !== id);
             
-            if (saveData()) {
+            const saved = await saveData();
+            if (saved) {
                 showNotification('Recurring expense deleted!', 'success');
                 updateRecurringTable();
                 updateUI();
                 checkRecurringDueDates();
+            } else {
+                showNotification('Failed to delete recurring expense. Please try again.', 'error');
             }
         }
 
