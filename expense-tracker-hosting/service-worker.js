@@ -8,6 +8,7 @@ const DATA_CACHE_NAME = 'expense-tracker-data-v2.0';
 const FILES_TO_CACHE = [
   './',
   './index.html',
+  './app.html',
   './api.php',
   './auth.php',
   './manifest.json',
