@@ -381,7 +381,7 @@ function App() {
               </form>
             </div>
 
-            <div className="contact-info reveal">
+            <div className="contact-info reveal fade-in-up animate-delay-1">
               <h3>Contact Information</h3>
               <div className="contact-item">
                 <div className="contact-icon">
