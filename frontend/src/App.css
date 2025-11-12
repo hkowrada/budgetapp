@@ -318,41 +318,85 @@ body::before {
 
 .btn-hero-primary {
   background: var(--gold-primary);
-  color: var(--bg-dark);
+  color: var(--bg-pure-black);
   border-radius: var(--radius);
-  padding: 18px 36px;
+  padding: 20px 40px;
   font-size: 18px;
   font-weight: 700;
-  min-height: 54px;
+  min-height: 60px;
   border: none;
   cursor: pointer;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(211, 255, 98, 0.3);
+  animation: fadeInUp 0.8s ease-out 0.8s backwards;
+}
+
+.btn-hero-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-hero-primary:hover::before {
+  left: 100%;
 }
 
 .btn-hero-primary:hover {
-  background: #BFE856;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(211, 255, 98, 0.4);
+  background: #E8FF85;
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 48px rgba(211, 255, 98, 0.5);
+}
+
+.btn-hero-primary:active {
+  transform: translateY(-2px) scale(1.01);
 }
 
 .btn-hero-secondary {
   background: transparent;
   color: var(--text-white);
-  border: 2px solid var(--text-white);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius);
-  padding: 16px 32px;
+  padding: 18px 36px;
   font-size: 18px;
   font-weight: 600;
-  min-height: 54px;
+  min-height: 60px;
   transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.8s ease-out 1s backwards;
+}
+
+.btn-hero-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: var(--text-white);
+  transition: width 0.4s ease;
+  z-index: -1;
+}
+
+.btn-hero-secondary:hover::before {
+  width: 100%;
 }
 
 .btn-hero-secondary:hover {
-  background: var(--text-white);
-  color: var(--bg-dark);
-  transform: translateY(-2px);
+  color: var(--bg-pure-black);
+  border-color: var(--text-white);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2);
 }
 
 /* ===== VISION & MISSION SECTION ===== */
