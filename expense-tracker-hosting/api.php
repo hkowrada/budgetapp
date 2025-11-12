@@ -70,7 +70,13 @@ try {
             sendResponse(false, 'Data file contains invalid JSON', null, 500);
         }
         
-        echo $data;
+        // Ensure salaries is an object, not an array
+        if (isset($jsonData['salaries']) && is_array($jsonData['salaries']) && empty($jsonData['salaries'])) {
+            $jsonData['salaries'] = new stdClass();
+        }
+        
+        // Re-encode to ensure proper format
+        echo json_encode($jsonData, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
         
     } elseif ($method === 'POST') {
         // Check if file is writable
