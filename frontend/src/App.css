@@ -399,30 +399,60 @@ body::before {
   box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2);
 }
 
-/* ===== VISION & MISSION SECTION ===== */
+/* ===== VISION & MISSION SECTION - PURE BLACK ===== */
 .vision-mission-section {
-  padding: var(--spacing-xxl) 0;
-  background-color: var(--bg-dark-secondary);
+  padding: var(--spacing-giant) 0;
+  background-color: var(--bg-pure-black);
+  position: relative;
+}
+
+.vision-mission-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
 }
 
 .vm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: var(--spacing-xl);
 }
 
 .vm-card {
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
   border-radius: 32px;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-xxl);
   transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.vm-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(211, 255, 98, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.vm-card:hover::before {
+  opacity: 1;
 }
 
 .vm-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(211, 255, 98, 0.1);
-  border-color: var(--gold-primary);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(211, 255, 98, 0.15);
+  border-color: var(--border-glow);
+  background: var(--bg-card-hover);
 }
 
 .vm-title {
