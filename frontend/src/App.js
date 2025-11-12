@@ -129,12 +129,12 @@ function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="ultra-section">
+      <section id="about" className="elegant-section">
         <div className="container">
           <div className="section-header reveal">
             <span className="section-badge">What Makes Us Different</span>
             <h2 className="display-medium">A Connected <span className="gold-gradient">Ecosystem</span></h2>
-            <div className="glow-line"></div>
+            <div className="elegant-line"></div>
             <p className="body-large section-description">
               Unlike conventional agritech platforms, AGLOUD operates as a connected ecosystem, not just a marketplace.
             </p>
