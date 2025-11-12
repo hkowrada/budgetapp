@@ -109,8 +109,21 @@ try {
             sendResponse(false, 'Invalid data structure', null, 400);
         }
         
-        // Write to file
-        $result = @file_put_contents($dataFile, json_encode($data, JSON_PRETTY_PRINT));
+        // Ensure salaries is properly initialized
+        if (!isset($data['salaries'])) {
+            $data['salaries'] = new stdClass();
+        } else if (is_array($data['salaries']) && empty($data['salaries'])) {
+            // Convert empty array to object
+            $data['salaries'] = new stdClass();
+        }
+        
+        // Write to file with proper formatting
+        $jsonString = json_encode($data, JSON_PRETTY_PRINT);
+        
+        // Ensure empty salaries is {} not []
+        $jsonString = preg_replace('/"salaries":\s*\[\s*\]/', '"salaries": {}', $jsonString);
+        
+        $result = @file_put_contents($dataFile, $jsonString);
         if ($result === false) {
             sendResponse(false, 'Failed to write data file. Check permissions.', null, 500);
         }
