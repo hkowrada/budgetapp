@@ -1,7 +1,7 @@
 # AGLOUD Website - Deployment Instructions for Hostinger
 
 ## Overview
-This is a modern React website that compiles to static files that can be uploaded directly to Hostinger.
+This is a premium, luxury React website with black and gold theme, custom cursor, and high-end animations that compiles to static files for direct upload to Hostinger.
 
 ## Project Structure
 ```
