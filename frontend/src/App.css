@@ -965,11 +965,23 @@ body::before {
   box-shadow: 0 4px 12px rgba(211, 255, 98, 0.4);
 }
 
-/* ===== FOOTER ===== */
+/* ===== FOOTER - PURE BLACK ===== */
 .footer {
   background: var(--bg-dark-secondary);
-  border-top: 1px solid var(--border-dark);
+  border-top: 1px solid var(--border-glow);
   padding: var(--spacing-xxl) 0 var(--spacing-lg);
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+  opacity: 0.5;
 }
 
 .footer-content {
