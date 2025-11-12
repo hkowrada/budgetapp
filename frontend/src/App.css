@@ -1,22 +1,29 @@
-/* ===== ROOT VARIABLES ===== */
+/* ===== ROOT VARIABLES - PREMIUM DARK THEME ===== */
 :root {
-  --bg-dark: #0A0A0A;
-  --bg-dark-secondary: #141414;
-  --bg-card: #1A1A1A;
+  --bg-pure-black: #000000;
+  --bg-dark: #000000;
+  --bg-dark-secondary: #0A0A0A;
+  --bg-card: #0F0F0F;
+  --bg-card-hover: #151515;
   --gold-primary: #D3FF62;
+  --gold-glow: rgba(211, 255, 98, 0.3);
   --gold-secondary: #C9A35C;
   --text-white: #FFFFFF;
-  --text-gray: #B0B0B0;
-  --text-light-gray: #808080;
-  --border-dark: #2A2A2A;
+  --text-gray: #CCCCCC;
+  --text-light-gray: #999999;
+  --border-dark: #1F1F1F;
+  --border-glow: rgba(211, 255, 98, 0.2);
   --spacing-xs: 8px;
   --spacing-sm: 16px;
   --spacing-md: 24px;
   --spacing-lg: 32px;
   --spacing-xl: 48px;
   --spacing-xxl: 64px;
+  --spacing-giant: 96px;
   --radius: 25px;
-  --transition: all 0.3s ease;
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== GLOBAL STYLES ===== */
