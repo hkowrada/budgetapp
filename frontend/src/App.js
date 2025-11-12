@@ -100,12 +100,36 @@ function App() {
       <Navigation />
 
       {/* Hero Section */}
-      <section id="home" className="hero-luxury">
+      <section id="home" className="hero-epic">
+        <div className="gradient-mesh"></div>
+        <div className="particles">
+          {[...Array(20)].map((_, i) => (
+            <div 
+              key={i} 
+              className="particle" 
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 15}s`,
+                animationDuration: `${10 + Math.random() * 10}s`
+              }}
+            />
+          ))}
+        </div>
         <div className="hero-content">
-          <p className="hero-tag reveal">{siteData.hero.tagline}</p>
-          <h1 className="display-luxury gold-gradient reveal">{siteData.hero.headline}</h1>
-          <p className="body-large reveal">{siteData.hero.description}</p>
-          <div className="hero-buttons reveal">
+          <div className="hero-badge fade-in-up">
+            {siteData.hero.tagline}
+          </div>
+          <h1 className="display-hero fade-in-up animate-delay-1">
+            <span className="line">
+              <span className="word">Redefining</span> <span className="word gold-text glow-text">Rural India</span>
+            </span>
+            <br />
+            <span className="line">
+              <span className="word">Through</span> <span className="word gold-gradient">Science</span> <span className="word">&</span> <span className="word gold-gradient">Technology</span>
+            </span>
+          </h1>
+          <p className="hero-description fade-in-up animate-delay-2">{siteData.hero.description}</p>
+          <div className="hero-buttons fade-in-up animate-delay-3">
             <a href="#contact" className="btn-primary" onClick={(e) => {
               e.preventDefault();
               document.querySelector('#contact').scrollIntoView({ behavior: 'smooth' });
