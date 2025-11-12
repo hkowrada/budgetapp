@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const CustomCursor = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [followerPosition, setFollowerPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const cursorRef = useRef(null);
 
   useEffect(() => {
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+
+    let isHovering = false;
+
     const updateCursor = (e) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-      
-      setTimeout(() => {
-        setFollowerPosition({ x: e.clientX, y: e.clientY });
-      }, 100);
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
     };
 
     const handleMouseOver = (e) => {
@@ -19,12 +19,16 @@ const CustomCursor = () => {
           e.target.tagName === 'BUTTON' || 
           e.target.classList.contains('btn-primary') ||
           e.target.classList.contains('btn-secondary')) {
-        setIsHovering(true);
+        isHovering = true;
+        cursor.classList.add('hover');
       }
     };
 
     const handleMouseOut = () => {
-      setIsHovering(false);
+      if (isHovering) {
+        isHovering = false;
+        cursor.classList.remove('hover');
+      }
     };
 
     window.addEventListener('mousemove', updateCursor);
@@ -38,24 +42,7 @@ const CustomCursor = () => {
     };
   }, []);
 
-  return (
-    <>
-      <div
-        className={`custom-cursor ${isHovering ? 'hover' : ''}`}
-        style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-        }}
-      />
-      <div
-        className="cursor-follower"
-        style={{
-          left: `${followerPosition.x}px`,
-          top: `${followerPosition.y}px`,
-        }}
-      />
-    </>
-  );
+  return <div ref={cursorRef} className="custom-cursor" />;
 };
 
 export default CustomCursor;
