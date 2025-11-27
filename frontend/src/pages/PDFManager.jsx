@@ -42,13 +42,19 @@ export default function PDFManager() {
 
   const loadPDFPages = async (fileObj) => {
     try {
+      // Don't reload if file already has pages (might be modified)
+      if (fileObj.pages !== null && fileObj.pages !== undefined) {
+        console.log(`Skipping page load for ${fileObj.name} - already loaded with ${fileObj.pages} pages`);
+        return;
+      }
+      
       const arrayBuffer = await fileObj.file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pageCount = pdfDoc.getPageCount();
       
       setFiles(prev => prev.map(f => 
         f.id === fileObj.id 
-          ? { ...f, pages: pageCount, pagesData: pdfDoc }
+          ? { ...f, pages: pageCount }
           : f
       ));
     } catch (error) {
