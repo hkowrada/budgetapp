@@ -240,8 +240,15 @@ export default function PDFManager() {
       saveAs(modifiedBlob, `edited-${fileObj.name}`);
       console.log('Download started');
       
+      // Switch to Files tab to show updated file
+      setTimeout(() => {
+        setActiveTab('files');
+      }, 500);
+      
       toast.dismiss(toastId);
-      toast.success(`${pagesToDelete.length} page(s) removed! File updated in app with ${remainingPages} pages. You can now merge it with other files.`);
+      toast.success(`${pagesToDelete.length} page(s) removed! File updated in app with ${remainingPages} pages. You can now merge it with other files.`, {
+        duration: 5000
+      });
     } catch (error) {
       console.error('Error deleting pages:', error);
       console.error('Error details:', error.message, error.stack);
