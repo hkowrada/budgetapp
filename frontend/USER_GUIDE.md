@@ -46,10 +46,12 @@ Then open http://localhost:3000
 4. The compressed PDF will automatically download
 
 **What Happens:**
-- The PDF is optimized to reduce file size
-- Original quality is maintained as much as possible
-- Typical savings: 10-40% depending on the PDF content
+- The PDF is optimized by recreating it with compression
+- Original quality is maintained
+- Typical savings: 5-30% depending on the PDF content
+- Some PDFs (already optimized) may not compress further
 - Progress indication shows during compression
+- If no compression possible, you'll get a notification
 
 ### 3. Merge Multiple PDFs
 
