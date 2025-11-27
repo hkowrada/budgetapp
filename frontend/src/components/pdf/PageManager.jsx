@@ -18,6 +18,13 @@ export const PageManager = ({ files, onDeletePages, disabled }) => {
   const [selectedPages, setSelectedPages] = useState([]);
 
   const currentFile = files.find(f => f.id === selectedFile);
+  
+  // Log when files change
+  React.useEffect(() => {
+    if (currentFile) {
+      console.log(`PageManager - Current file updated: ${currentFile.name}, pages: ${currentFile.pages}`);
+    }
+  }, [files, currentFile]);
 
   const handlePageToggle = (pageIndex) => {
     setSelectedPages(prev => {
