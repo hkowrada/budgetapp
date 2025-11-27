@@ -227,18 +227,27 @@ export default function PDFManager() {
       const modifiedFile = new File([modifiedBlob], fileObj.name, { type: 'application/pdf' });
       
       // Update the file in state with modified version
-      setFiles(prev => prev.map(f => {
-        if (f.id === fileId) {
-          return {
-            ...f,
-            file: modifiedFile,
-            size: modifiedPdfBytes.length,
-            pages: remainingPages,
-            modified: true
-          };
-        }
-        return f;
-      }));
+      setFiles(prev => {
+        const updated = prev.map(f => {
+          if (f.id === fileId) {
+            console.log(`Updating file ${f.name}:`);
+            console.log(`  Old pages: ${f.pages}`);
+            console.log(`  New pages: ${remainingPages}`);
+            console.log(`  Old size: ${f.size}`);
+            console.log(`  New size: ${modifiedPdfBytes.length}`);
+            return {
+              ...f,
+              file: modifiedFile,
+              size: modifiedPdfBytes.length,
+              pages: remainingPages,
+              modified: true
+            };
+          }
+          return f;
+        });
+        console.log('Files after update:', updated.map(f => ({ name: f.name, pages: f.pages, modified: f.modified })));
+        return updated;
+      });
       
       console.log('File updated in app with modified version');
       
