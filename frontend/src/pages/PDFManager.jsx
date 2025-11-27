@@ -114,27 +114,50 @@ export default function PDFManager() {
     try {
       const fileObj = files.find(f => f.id === fileId);
       const arrayBuffer = await fileObj.file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       
-      // Save with compression
-      const compressedPdfBytes = await pdfDoc.save({
-        useObjectStreams: false,
+      // Create a new PDF document for compression
+      const compressedPdf = await PDFDocument.create();
+      
+      // Copy all pages with compression
+      const pages = pdfDoc.getPages();
+      for (let i = 0; i < pages.length; i++) {
+        const [copiedPage] = await compressedPdf.copyPages(pdfDoc, [i]);
+        compressedPdf.addPage(copiedPage);
+      }
+      
+      // Save with compression options
+      const compressedPdfBytes = await compressedPdf.save({
+        useObjectStreams: true,
         addDefaultPage: false,
+        objectsPerTick: 50,
       });
       
       const originalSize = fileObj.size;
       const compressedSize = compressedPdfBytes.length;
-      const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
       
-      const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
-      saveAs(blob, `compressed-${fileObj.name}`);
-      
-      toast.dismiss();
-      toast.success(`PDF compressed! Saved ${savings}% space`);
+      // Check if actually compressed
+      if (compressedSize >= originalSize) {
+        toast.dismiss();
+        toast.warning('PDF is already optimized. No compression possible.');
+        
+        // Still offer download
+        const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+        saveAs(blob, `optimized-${fileObj.name}`);
+      } else {
+        const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+        const savedKB = ((originalSize - compressedSize) / 1024).toFixed(1);
+        
+        const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+        saveAs(blob, `compressed-${fileObj.name}`);
+        
+        toast.dismiss();
+        toast.success(`PDF compressed! Saved ${savings}% (${savedKB} KB)`);
+      }
     } catch (error) {
       console.error('Error compressing PDF:', error);
       toast.dismiss();
-      toast.error('Failed to compress PDF');
+      toast.error('Failed to compress PDF. File may be encrypted or corrupted.');
     } finally {
       setProcessing(false);
     }
