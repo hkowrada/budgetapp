@@ -182,32 +182,54 @@ export default function PDFManager() {
   };
 
   const handleDeletePages = async (fileId, pagesToDelete) => {
+    console.log('Delete pages button clicked!');
+    console.log('File ID:', fileId);
+    console.log('Pages to delete:', pagesToDelete);
+    
     setProcessing(true);
-    toast.loading('Removing pages...');
+    const toastId = toast.loading('Removing pages...');
+    console.log('Starting page deletion process...');
 
     try {
       const fileObj = files.find(f => f.id === fileId);
+      console.log(`Processing file: ${fileObj.name}`);
+      
       const arrayBuffer = await fileObj.file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const totalPages = pdfDoc.getPageCount();
+      console.log(`Total pages in PDF: ${totalPages}`);
+      console.log(`Deleting ${pagesToDelete.length} pages`);
       
       // Remove pages in reverse order to maintain indices
       const sortedPages = [...pagesToDelete].sort((a, b) => b - a);
-      sortedPages.forEach(pageIndex => {
+      console.log('Sorted pages for deletion:', sortedPages);
+      
+      sortedPages.forEach((pageIndex, index) => {
+        console.log(`Removing page ${pageIndex + 1}...`);
         pdfDoc.removePage(pageIndex);
       });
       
+      const remainingPages = pdfDoc.getPageCount();
+      console.log(`Remaining pages after deletion: ${remainingPages}`);
+      
+      console.log('Saving modified PDF...');
       const modifiedPdfBytes = await pdfDoc.save();
+      console.log(`Modified PDF size: ${modifiedPdfBytes.length} bytes`);
+      
       const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
       saveAs(blob, `edited-${fileObj.name}`);
+      console.log('Download started');
       
-      toast.dismiss();
-      toast.success(`${pagesToDelete.length} page(s) removed successfully`);
+      toast.dismiss(toastId);
+      toast.success(`${pagesToDelete.length} page(s) removed successfully! Remaining: ${remainingPages} pages`);
     } catch (error) {
       console.error('Error deleting pages:', error);
-      toast.dismiss();
-      toast.error('Failed to remove pages');
+      console.error('Error details:', error.message, error.stack);
+      toast.dismiss(toastId);
+      toast.error(`Failed to remove pages: ${error.message}`);
     } finally {
       setProcessing(false);
+      console.log('Page deletion process completed');
     }
   };
 
