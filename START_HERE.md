@@ -13,10 +13,14 @@ You've successfully downloaded the project. Here's what to do next:
 **If the `frontend/build/` folder exists:**
 
 1. Go to: `frontend/build/`
-2. Double-click: `index.html`
-3. **That's it!** App opens in your browser 🎉
+2. **Windows:** Double-click `RUN_ME.bat`
+3. **Mac/Linux:** Double-click `RUN_ME.sh`
+4. Browser opens automatically at http://localhost:8080
+5. **That's it!** 🎉
 
 **No installation needed. Works offline. Takes 10 seconds.**
+
+⚠️ **Note:** Don't double-click `index.html` directly - it won't work due to browser security. Use the RUN_ME scripts instead!
 
 ---
 
