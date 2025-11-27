@@ -160,10 +160,12 @@ Each file card displays:
 4. **Browser:** Use modern browsers (Chrome, Firefox, Safari, Edge)
 
 ### Compression Tips
-1. **Already Compressed PDFs:** May not compress much further
-2. **Image-Heavy PDFs:** Typically compress better
-3. **Text-Only PDFs:** May not show significant size reduction
-4. **Save Original:** Compression is non-reversible, keep your original
+1. **Already Compressed PDFs:** May not compress further - you'll be notified
+2. **Image-Heavy PDFs:** May show modest compression (5-15%)
+3. **Text-Only PDFs:** Typically compress better (10-30%)
+4. **Scanned PDFs:** Often already optimized, limited compression
+5. **Save Original:** Compression is non-reversible, keep your original
+6. **Best Results:** PDFs with redundant data or uncompressed content
 
 ### Merging Tips
 1. **Order Matters:** Files merge in selection order
