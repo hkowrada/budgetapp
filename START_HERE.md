@@ -205,10 +205,13 @@ Pick your path:
 
 ## 🚀 Let's Get Started!
 
-**Fastest route:**
+**Fastest way to run:**
 1. Navigate to `frontend/build/`
-2. Double-click `index.html`
-3. Done! 🎉
+2. Double-click `RUN_ME.bat` (Windows) or `RUN_ME.sh` (Mac/Linux)
+3. Browser opens automatically
+4. Done! 🎉
+
+⚠️ **Important:** Don't double-click `index.html` - use the RUN_ME scripts!
 
 **Can't find build folder?**
 1. Install Node.js
