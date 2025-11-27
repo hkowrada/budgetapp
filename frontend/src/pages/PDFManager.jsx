@@ -216,12 +216,32 @@ export default function PDFManager() {
       const modifiedPdfBytes = await pdfDoc.save();
       console.log(`Modified PDF size: ${modifiedPdfBytes.length} bytes`);
       
-      const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
-      saveAs(blob, `edited-${fileObj.name}`);
+      // Create a new File object from the modified PDF
+      const modifiedBlob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      const modifiedFile = new File([modifiedBlob], fileObj.name, { type: 'application/pdf' });
+      
+      // Update the file in state with modified version
+      setFiles(prev => prev.map(f => {
+        if (f.id === fileId) {
+          return {
+            ...f,
+            file: modifiedFile,
+            size: modifiedPdfBytes.length,
+            pages: remainingPages,
+            modified: true
+          };
+        }
+        return f;
+      }));
+      
+      console.log('File updated in app with modified version');
+      
+      // Also download the modified file
+      saveAs(modifiedBlob, `edited-${fileObj.name}`);
       console.log('Download started');
       
       toast.dismiss(toastId);
-      toast.success(`${pagesToDelete.length} page(s) removed successfully! Remaining: ${remainingPages} pages`);
+      toast.success(`${pagesToDelete.length} page(s) removed! File updated in app with ${remainingPages} pages. You can now merge it with other files.`);
     } catch (error) {
       console.error('Error deleting pages:', error);
       console.error('Error details:', error.message, error.stack);
