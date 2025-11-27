@@ -33,13 +33,18 @@ export const FileCard = ({ file, selected, onSelect, onDelete, onCompress, disab
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <div className="p-2 rounded-lg bg-primary/10">
                 <FileText className="h-5 w-5 text-primary" />
               </div>
               {selected && (
                 <Badge variant="default" className="text-xs">
                   Selected
+                </Badge>
+              )}
+              {file.modified && (
+                <Badge variant="secondary" className="text-xs bg-success/10 text-success border-success/20">
+                  Modified
                 </Badge>
               )}
             </div>
