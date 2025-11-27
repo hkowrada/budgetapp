@@ -1,0 +1,259 @@
+import React, { useState } from 'react';
+import { FileText, Merge, Minimize2, Trash2, Download } from 'lucide-react';
+import Header from '@/components/pdf/Header';
+import FileUploadZone from '@/components/pdf/FileUploadZone';
+import FileList from '@/components/pdf/FileList';
+import ActionPanel from '@/components/pdf/ActionPanel';
+import PageManager from '@/components/pdf/PageManager';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { PDFDocument } from 'pdf-lib';
+import { saveAs } from 'file-saver';
+
+export default function PDFManager() {
+  const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [activeTab, setActiveTab] = useState('files');
+  const [processing, setProcessing] = useState(false);
+
+  const handleFilesAdded = (newFiles) => {
+    const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+    
+    if (pdfFiles.length === 0) {
+      toast.error('Please upload PDF files only');
+      return;
+    }
+
+    const filesWithId = pdfFiles.map((file, index) => ({
+      id: Date.now() + index,
+      file,
+      name: file.name,
+      size: file.size,
+      pages: null,
+      selected: false
+    }));
+
+    setFiles(prev => [...prev, ...filesWithId]);
+    toast.success(`${pdfFiles.length} file(s) added successfully`);
+
+    // Load PDF pages info
+    filesWithId.forEach(loadPDFPages);
+  };
+
+  const loadPDFPages = async (fileObj) => {
+    try {
+      const arrayBuffer = await fileObj.file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pageCount = pdfDoc.getPageCount();
+      
+      setFiles(prev => prev.map(f => 
+        f.id === fileObj.id 
+          ? { ...f, pages: pageCount, pagesData: pdfDoc }
+          : f
+      ));
+    } catch (error) {
+      console.error('Error loading PDF:', error);
+      toast.error(`Failed to load ${fileObj.name}`);
+    }
+  };
+
+  const handleFileSelect = (fileId) => {
+    setSelectedFiles(prev => {
+      if (prev.includes(fileId)) {
+        return prev.filter(id => id !== fileId);
+      }
+      return [...prev, fileId];
+    });
+  };
+
+  const handleFileDelete = (fileId) => {
+    setFiles(prev => prev.filter(f => f.id !== fileId));
+    setSelectedFiles(prev => prev.filter(id => id !== fileId));
+    toast.success('File removed');
+  };
+
+  const handleMergePDFs = async () => {
+    if (selectedFiles.length < 2) {
+      toast.error('Please select at least 2 files to merge');
+      return;
+    }
+
+    setProcessing(true);
+    toast.loading('Merging PDFs...');
+
+    try {
+      const mergedPdf = await PDFDocument.create();
+      
+      for (const fileId of selectedFiles) {
+        const fileObj = files.find(f => f.id === fileId);
+        const arrayBuffer = await fileObj.file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
+      }
+
+      const mergedPdfBytes = await mergedPdf.save();
+      const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      saveAs(blob, `merged-${Date.now()}.pdf`);
+      
+      toast.dismiss();
+      toast.success('PDFs merged successfully!');
+    } catch (error) {
+      console.error('Error merging PDFs:', error);
+      toast.dismiss();
+      toast.error('Failed to merge PDFs');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleCompressPDF = async (fileId) => {
+    setProcessing(true);
+    toast.loading('Compressing PDF...');
+
+    try {
+      const fileObj = files.find(f => f.id === fileId);
+      const arrayBuffer = await fileObj.file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      
+      // Save with compression
+      const compressedPdfBytes = await pdfDoc.save({
+        useObjectStreams: false,
+        addDefaultPage: false,
+      });
+      
+      const originalSize = fileObj.size;
+      const compressedSize = compressedPdfBytes.length;
+      const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+      
+      const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+      saveAs(blob, `compressed-${fileObj.name}`);
+      
+      toast.dismiss();
+      toast.success(`PDF compressed! Saved ${savings}% space`);
+    } catch (error) {
+      console.error('Error compressing PDF:', error);
+      toast.dismiss();
+      toast.error('Failed to compress PDF');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleDeletePages = async (fileId, pagesToDelete) => {
+    setProcessing(true);
+    toast.loading('Removing pages...');
+
+    try {
+      const fileObj = files.find(f => f.id === fileId);
+      const arrayBuffer = await fileObj.file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      
+      // Remove pages in reverse order to maintain indices
+      const sortedPages = [...pagesToDelete].sort((a, b) => b - a);
+      sortedPages.forEach(pageIndex => {
+        pdfDoc.removePage(pageIndex);
+      });
+      
+      const modifiedPdfBytes = await pdfDoc.save();
+      const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      saveAs(blob, `edited-${fileObj.name}`);
+      
+      toast.dismiss();
+      toast.success(`${pagesToDelete.length} page(s) removed successfully`);
+    } catch (error) {
+      console.error('Error deleting pages:', error);
+      toast.dismiss();
+      toast.error('Failed to remove pages');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleClearAll = () => {
+    setFiles([]);
+    setSelectedFiles([]);
+    toast.success('All files cleared');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Upload Zone */}
+        <FileUploadZone onFilesAdded={handleFilesAdded} disabled={processing} />
+
+        {/* Action Panel */}
+        {files.length > 0 && (
+          <ActionPanel
+            selectedCount={selectedFiles.length}
+            totalFiles={files.length}
+            onMerge={handleMergePDFs}
+            onClearAll={handleClearAll}
+            disabled={processing}
+          />
+        )}
+
+        {/* Tabs */}
+        {files.length > 0 && (
+          <div className="flex gap-2 mb-6">
+            <Button
+              variant={activeTab === 'files' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('files')}
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Files ({files.length})
+            </Button>
+            <Button
+              variant={activeTab === 'pages' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('pages')}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Page Manager
+            </Button>
+          </div>
+        )}
+
+        {/* Content Area */}
+        {files.length > 0 && (
+          <>
+            {activeTab === 'files' && (
+              <FileList
+                files={files}
+                selectedFiles={selectedFiles}
+                onFileSelect={handleFileSelect}
+                onFileDelete={handleFileDelete}
+                onCompress={handleCompressPDF}
+                disabled={processing}
+              />
+            )}
+            
+            {activeTab === 'pages' && (
+              <PageManager
+                files={files}
+                onDeletePages={handleDeletePages}
+                disabled={processing}
+              />
+            )}
+          </>
+        )}
+
+        {/* Empty State */}
+        {files.length === 0 && (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
+              <FileText className="h-10 w-10 text-primary" />
+            </div>
+            <h3 className="text-2xl font-semibold mb-2">No PDFs uploaded yet</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Upload your PDF files to get started with compression, merging, and page management
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
