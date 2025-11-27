@@ -73,37 +73,55 @@ export default function PDFManager() {
   };
 
   const handleMergePDFs = async () => {
+    console.log('Merge button clicked!');
+    console.log('Selected files:', selectedFiles);
+    console.log('Total files:', files);
+    
     if (selectedFiles.length < 2) {
       toast.error('Please select at least 2 files to merge');
+      console.log('Not enough files selected');
       return;
     }
 
     setProcessing(true);
-    toast.loading('Merging PDFs...');
+    const toastId = toast.loading('Merging PDFs...');
+    console.log('Starting PDF merge process...');
 
     try {
       const mergedPdf = await PDFDocument.create();
+      console.log('Created new PDF document for merging');
       
       for (const fileId of selectedFiles) {
         const fileObj = files.find(f => f.id === fileId);
+        console.log(`Processing file: ${fileObj.name}`);
+        
         const arrayBuffer = await fileObj.file.arrayBuffer();
         const pdf = await PDFDocument.load(arrayBuffer);
+        console.log(`Loaded ${fileObj.name}, pages: ${pdf.getPageCount()}`);
+        
         const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
+        console.log(`Added ${copiedPages.length} pages from ${fileObj.name}`);
       }
 
+      console.log('Saving merged PDF...');
       const mergedPdfBytes = await mergedPdf.save();
+      console.log(`Merged PDF size: ${mergedPdfBytes.length} bytes`);
+      
       const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
       saveAs(blob, `merged-${Date.now()}.pdf`);
+      console.log('Download started');
       
-      toast.dismiss();
-      toast.success('PDFs merged successfully!');
+      toast.dismiss(toastId);
+      toast.success(`PDFs merged successfully! Total pages: ${mergedPdf.getPageCount()}`);
     } catch (error) {
       console.error('Error merging PDFs:', error);
-      toast.dismiss();
-      toast.error('Failed to merge PDFs');
+      console.error('Error details:', error.message, error.stack);
+      toast.dismiss(toastId);
+      toast.error(`Failed to merge PDFs: ${error.message}`);
     } finally {
       setProcessing(false);
+      console.log('Merge process completed');
     }
   };
 
