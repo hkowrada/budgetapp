@@ -204,15 +204,8 @@ export default function PDFManager() {
     // Import pdf.js dynamically
     const pdfjsLib = await import('pdfjs-dist');
     
-    // Use the worker from node_modules - create a data URL to avoid CORS
-    try {
-      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs');
-      const workerBlob = new Blob([pdfjsWorker.default], { type: 'application/javascript' });
-      pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
-    } catch (e) {
-      // Fallback: use a CDN with https
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-    }
+    // Set worker source to use CDN with HTTPS (reliable and works everywhere)
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     
     // Load the PDF with pdf.js for rendering
     const loadingTask = pdfjsLib.getDocument({ 
