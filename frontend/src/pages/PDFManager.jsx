@@ -203,11 +203,17 @@ export default function PDFManager() {
   const compressPDFWithImages = async (arrayBuffer, settings) => {
     // Import pdf.js dynamically
     const pdfjsLib = await import('pdfjs-dist');
-    // Use bundled worker from node_modules
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.js`;
     
-    // Load the PDF with pdf.js for rendering
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    // Disable worker to avoid CORS and loading issues - use main thread
+    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+    
+    // Load the PDF with pdf.js for rendering (will use main thread)
+    const loadingTask = pdfjsLib.getDocument({ 
+      data: arrayBuffer,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true
+    });
     const pdf = await loadingTask.promise;
     
     // Create new compressed PDF
