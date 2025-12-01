@@ -3,3 +3,7 @@
 *.env
 *.env.*
 frontend/node_modules/.cache/default-development/8.pack_
+-e 
+# Environment files
+*.env
+*.env.*
