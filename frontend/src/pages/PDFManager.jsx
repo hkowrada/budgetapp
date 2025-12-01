@@ -203,7 +203,8 @@ export default function PDFManager() {
   const compressPDFWithImages = async (arrayBuffer, settings) => {
     // Import pdf.js dynamically
     const pdfjsLib = await import('pdfjs-dist');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    // Use bundled worker from node_modules
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.js`;
     
     // Load the PDF with pdf.js for rendering
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
