@@ -204,15 +204,19 @@ export default function PDFManager() {
     // Import pdf.js dynamically
     const pdfjsLib = await import('pdfjs-dist');
     
-    // Disable worker to avoid CORS and loading issues - use main thread
-    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+    // Use the worker from node_modules - create a data URL to avoid CORS
+    try {
+      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs');
+      const workerBlob = new Blob([pdfjsWorker.default], { type: 'application/javascript' });
+      pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
+    } catch (e) {
+      // Fallback: use a CDN with https
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    }
     
-    // Load the PDF with pdf.js for rendering (will use main thread)
+    // Load the PDF with pdf.js for rendering
     const loadingTask = pdfjsLib.getDocument({ 
-      data: arrayBuffer,
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true
+      data: arrayBuffer
     });
     const pdf = await loadingTask.promise;
     
