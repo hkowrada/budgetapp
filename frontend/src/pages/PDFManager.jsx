@@ -199,38 +199,47 @@ export default function PDFManager() {
     }
   };
 
-  // Advanced compression function with image processing
+  // Advanced compression function with image processing using PDF.js
   const compressPDFWithImages = async (arrayBuffer, settings) => {
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+    // Import pdf.js dynamically
+    const pdfjsLib = await import('pdfjs-dist');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    
+    // Load the PDF with pdf.js for rendering
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    
+    // Create new compressed PDF
     const compressedPdf = await PDFDocument.create();
     
-    const pages = pdfDoc.getPages();
-    console.log(`Processing ${pages.length} pages...`);
+    console.log(`Processing ${pdf.numPages} pages with ${settings.quality * 100}% quality...`);
     
-    for (let i = 0; i < pages.length; i++) {
-      console.log(`Processing page ${i + 1}/${pages.length}...`);
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      console.log(`Rendering and compressing page ${pageNum}/${pdf.numPages}...`);
       
-      const page = pages[i];
-      const { width, height } = page.getSize();
-      
-      // Scale dimensions based on compression level
-      const scaledWidth = width * settings.scale;
-      const scaledHeight = height * settings.scale;
-      
-      // Create a canvas to render the page
-      const canvas = document.createElement('canvas');
-      const scale = settings.dpi / 72; // PDF points to pixels
-      canvas.width = scaledWidth * scale;
-      canvas.height = scaledHeight * scale;
-      const context = canvas.getContext('2d');
-      
-      // Set white background
-      context.fillStyle = 'white';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Convert page to image with compression
       try {
-        // Export page as image blob
+        // Get page from pdf.js
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: settings.dpi / 72 });
+        
+        // Apply scaling
+        const scaledViewport = page.getViewport({ 
+          scale: (settings.dpi / 72) * settings.scale 
+        });
+        
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+        
+        // Render PDF page to canvas
+        await page.render({
+          canvasContext: context,
+          viewport: scaledViewport,
+        }).promise;
+        
+        // Convert canvas to compressed JPEG
         const imageBlob = await new Promise((resolve) => {
           canvas.toBlob(
             (blob) => resolve(blob),
@@ -243,22 +252,29 @@ export default function PDFManager() {
           const imageBytes = await imageBlob.arrayBuffer();
           const image = await compressedPdf.embedJpg(imageBytes);
           
-          const newPage = compressedPdf.addPage([scaledWidth, scaledHeight]);
+          // Add page with compressed image
+          const newPage = compressedPdf.addPage([
+            scaledViewport.width,
+            scaledViewport.height
+          ]);
+          
           newPage.drawImage(image, {
             x: 0,
             y: 0,
-            width: scaledWidth,
-            height: scaledHeight,
+            width: scaledViewport.width,
+            height: scaledViewport.height,
           });
+          
+          console.log(`Page ${pageNum} compressed successfully`);
         } else {
-          // Fallback: copy page without compression
-          const [copiedPage] = await compressedPdf.copyPages(pdfDoc, [i]);
-          compressedPdf.addPage(copiedPage);
+          throw new Error('Failed to create image blob');
         }
       } catch (err) {
-        console.warn(`Could not compress page ${i + 1}, copying as-is:`, err);
-        // Fallback: copy page without compression
-        const [copiedPage] = await compressedPdf.copyPages(pdfDoc, [i]);
+        console.warn(`Could not compress page ${pageNum}, using fallback:`, err);
+        
+        // Fallback: copy original page
+        const originalPdf = await PDFDocument.load(arrayBuffer);
+        const [copiedPage] = await compressedPdf.copyPages(originalPdf, [pageNum - 1]);
         compressedPdf.addPage(copiedPage);
       }
     }
@@ -270,6 +286,7 @@ export default function PDFManager() {
       objectsPerTick: 50,
     });
     
+    console.log(`Compression complete. Final size: ${pdfBytes.length} bytes`);
     return pdfBytes;
   };
 
