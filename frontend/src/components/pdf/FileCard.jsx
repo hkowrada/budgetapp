@@ -70,16 +70,33 @@ export const FileCard = ({ file, selected, onSelect, onDelete, onCompress, disab
 
         {/* Actions */}
         <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onCompress(file.id)}
-            disabled={disabled}
-            className="flex-1 hover:bg-primary/10 hover:text-primary hover:border-primary transition-colors"
-          >
-            <Minimize2 className="h-4 w-4 mr-1.5" />
-            Compress
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={disabled}
+                className="flex-1 hover:bg-primary/10 hover:text-primary hover:border-primary transition-colors"
+              >
+                <Minimize2 className="h-4 w-4 mr-1.5" />
+                Compress
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem onClick={() => onCompress(file.id, 'lite')}>
+                <span className="font-medium">Lite</span>
+                <span className="text-xs text-muted-foreground ml-2">(~20-30% smaller)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCompress(file.id, 'medium')}>
+                <span className="font-medium">Medium</span>
+                <span className="text-xs text-muted-foreground ml-2">(~40-60% smaller)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCompress(file.id, 'heavy')}>
+                <span className="font-medium">Heavy</span>
+                <span className="text-xs text-muted-foreground ml-2">(~70-85% smaller)</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button
             size="sm"
