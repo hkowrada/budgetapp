@@ -176,47 +176,71 @@ export const AuthPage = () => {
                   </Button>
                 </form>
               ) : (
-                <form onSubmit={handleResetPassword} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="reset-token">Token de réinitialisation</Label>
-                    <Input
-                      id="reset-token"
-                      type="text"
-                      placeholder="Collez le token ici"
-                      value={resetToken}
-                      onChange={(e) => setResetToken(e.target.value)}
-                      required
-                      data-testid="reset-token-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">Nouveau mot de passe</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="new-password"
-                        type="password"
-                        placeholder="••••••••"
-                        className="pl-10"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                        minLength={6}
-                        data-testid="new-password-input"
-                      />
+                <div className="space-y-4">
+                  {resetToken ? (
+                    <form onSubmit={handleResetPassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-token">Token de réinitialisation</Label>
+                        <Input
+                          id="reset-token"
+                          type="text"
+                          placeholder="Collez le token ici"
+                          value={resetToken}
+                          onChange={(e) => setResetToken(e.target.value)}
+                          required
+                          data-testid="reset-token-input"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input
+                            id="new-password"
+                            type="password"
+                            placeholder="••••••••"
+                            className="pl-10"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            minLength={6}
+                            data-testid="new-password-input"
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">Minimum 6 caractères</p>
+                      </div>
+                      <Button 
+                        type="submit" 
+                        className="w-full rounded-full h-12 font-semibold" 
+                        disabled={isLoading}
+                        data-testid="confirm-reset-button"
+                      >
+                        {isLoading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe'}
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
+                        <Mail className="w-8 h-8 text-green-600" />
+                      </div>
+                      <h3 className="font-semibold text-lg mb-2">Email envoyé !</h3>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        Vérifiez votre boîte de réception et cliquez sur le lien dans l'email pour réinitialiser votre mot de passe.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Vous n'avez pas reçu l'email ? Vérifiez vos spams ou{' '}
+                        <button 
+                          type="button"
+                          className="text-primary underline"
+                          onClick={() => setResetStep(1)}
+                        >
+                          réessayez
+                        </button>
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">Minimum 6 caractères</p>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full rounded-full h-12 font-semibold" 
-                    disabled={isLoading}
-                    data-testid="confirm-reset-button"
-                  >
-                    {isLoading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe'}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </form>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
