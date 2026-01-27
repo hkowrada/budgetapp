@@ -586,7 +586,7 @@ export const ChatPage = () => {
 
       {/* Chat Area */}
       {showChat && (
-        <div className="flex-1 flex flex-col h-full min-h-0" data-testid="chat-area">
+        <div className="flex-1 flex flex-col h-full min-h-0 min-w-0 overflow-hidden" data-testid="chat-area">
           {selectedConversation ? (
             <>
               {/* Chat Header */}
