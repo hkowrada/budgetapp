@@ -317,7 +317,8 @@ export const ChatPage = () => {
 
       setSelectedConversation(response.data);
       setShowNewChat(false);
-      setSearchQuery('');
+      setDialogSearchQuery('');
+      setSearchResults([]);
     } catch (error) {
       toast.error('Échec de la création de la conversation');
     }
