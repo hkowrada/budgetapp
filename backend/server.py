@@ -259,11 +259,11 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 
 @api_router.post("/auth/forgot-password")
 async def forgot_password(data: ForgotPasswordRequest):
-    """Generate a password reset token"""
+    """Generate a password reset token and send email"""
     user = await db.users.find_one({"email": data.email})
     if not user:
         # Don't reveal if email exists or not for security
-        return {"message": "Si cet email existe, un lien de réinitialisation a été généré"}
+        return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé"}
     
     # Generate reset token (valid for 1 hour)
     reset_token = str(uuid.uuid4())
@@ -278,15 +278,85 @@ async def forgot_password(data: ForgotPasswordRequest):
         "created_at": datetime.now(timezone.utc).isoformat()
     })
     
-    # In production, send email with reset link
-    # For now, return the token directly (for testing)
-    logger.info(f"Password reset token generated for {data.email}: {reset_token}")
+    # Send email with reset link
+    reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
     
-    return {
-        "message": "Token de réinitialisation généré",
-        "reset_token": reset_token,  # Remove this in production - send via email instead
-        "expires_in": "1 hour"
-    }
+    if RESEND_API_KEY:
+        try:
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+            </head>
+            <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 40px 20px;">
+                <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #4F46E5; font-size: 28px; margin: 0;">Sync</h1>
+                        <p style="color: #64748b; margin-top: 8px;">Réinitialisation du mot de passe</p>
+                    </div>
+                    
+                    <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+                        Bonjour <strong>{user['name']}</strong>,
+                    </p>
+                    
+                    <p style="color: #334155; font-size: 16px; line-height: 1.6;">
+                        Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
+                    </p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{reset_link}" style="display: inline-block; background-color: #4F46E5; color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+                            Réinitialiser mon mot de passe
+                        </a>
+                    </div>
+                    
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+                        Ce lien expire dans <strong>1 heure</strong>.
+                    </p>
+                    
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+                        Si vous n'avez pas demandé cette réinitialisation, ignorez simplement cet email.
+                    </p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+                    
+                    <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+                        Sync Messaging - Votre messagerie instantanée
+                    </p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            params = {
+                "from": SENDER_EMAIL,
+                "to": [data.email],
+                "subject": "Sync - Réinitialisation de votre mot de passe",
+                "html": html_content
+            }
+            
+            await asyncio.to_thread(resend.Emails.send, params)
+            logger.info(f"Password reset email sent to {data.email}")
+            
+            return {"message": "Un email de réinitialisation a été envoyé à votre adresse"}
+            
+        except Exception as e:
+            logger.error(f"Failed to send reset email: {e}")
+            # Fallback: return token directly if email fails
+            return {
+                "message": "Erreur d'envoi d'email. Utilisez ce token:",
+                "reset_token": reset_token,
+                "expires_in": "1 hour"
+            }
+    else:
+        # No email configured - return token directly (for development)
+        logger.info(f"Password reset token generated for {data.email}: {reset_token}")
+        return {
+            "message": "Email non configuré. Utilisez ce token:",
+            "reset_token": reset_token,
+            "reset_link": reset_link,
+            "expires_in": "1 hour"
+        }
 
 @api_router.post("/auth/reset-password")
 async def reset_password(data: ResetPasswordRequest):
