@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-01-27T13:39:23.904689",
-  "total_tests": 14,
-  "passed_tests": 13,
-  "success_rate": 92.85714285714286,
+  "timestamp": "2026-01-27T13:39:47.976102",
+  "total_tests": 15,
+  "passed_tests": 15,
+  "success_rate": 100.0,
   "results": [
     {
       "name": "Root API Endpoint",
@@ -71,8 +71,13 @@
     },
     {
       "name": "File Upload",
-      "success": false,
-      "details": "Expected 200, got 400. Error: File type not allowed"
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Send Message",
+      "success": true,
+      "details": ""
     }
   ]
 }
