@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: sync-backend
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb+srv://msg:msg123987@msg.azwnc1f.mongodb.net/?appName=msg
+      - DB_NAME=sync_messaging
+      - JWT_SECRET=sync-super-secret-change-me-in-production
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:80
+      - RESEND_API_KEY=re_RSLKMWSd_L2ZynHYquCjuAAH8mNdJgpUD
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - uploads_data:/app/uploads
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: sync-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8001
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  uploads_data:
