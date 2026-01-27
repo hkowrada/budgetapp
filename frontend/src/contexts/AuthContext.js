@@ -69,6 +69,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('sync_token');
     setToken(null);
     setUser(null);
+    // Force redirect to auth
+    window.location.href = '/auth';
   };
 
   const value = {
