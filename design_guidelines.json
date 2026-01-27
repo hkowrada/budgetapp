@@ -1,0 +1,190 @@
+{
+  "brand_identity": {
+    "name": "Sync",
+    "description": "A frictionless, aesthetic messaging experience that blends Swiss precision with organic fluidity.",
+    "archetype": "Swiss & High-Contrast (Archetype 4) with a 'Soft Utility' twist",
+    "emotional_tone": "Clarity, Intimacy, Speed, Reliability"
+  },
+  "typography": {
+    "fonts": {
+      "heading": {
+        "family": "Manrope, sans-serif",
+        "weights": ["600", "800"],
+        "usage": "Headings, Modal Titles, Hero Text",
+        "tracking": "tracking-tight"
+      },
+      "body": {
+        "family": "Plus Jakarta Sans, sans-serif",
+        "weights": ["400", "500", "600"],
+        "usage": "Message text, Inputs, Sidebar lists",
+        "tracking": "tracking-normal"
+      },
+      "mono": {
+        "family": "JetBrains Mono, monospace",
+        "weights": ["400"],
+        "usage": "Timestamps, Code snippets, IDs"
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-extrabold tracking-tighter",
+      "h2": "text-3xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-tight",
+      "body_lg": "text-lg leading-relaxed",
+      "body_base": "text-base leading-relaxed",
+      "caption": "text-xs font-medium text-muted-foreground uppercase tracking-wider"
+    }
+  },
+  "colors": {
+    "light": {
+      "background": "#F8FAFC",
+      "foreground": "#0F172A",
+      "card": "#FFFFFF",
+      "card_foreground": "#0F172A",
+      "popover": "#FFFFFF",
+      "popover_foreground": "#0F172A",
+      "primary": "#4F46E5",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#F1F5F9",
+      "secondary_foreground": "#0F172A",
+      "muted": "#F1F5F9",
+      "muted_foreground": "#64748B",
+      "accent": "#F1F5F9",
+      "accent_foreground": "#0F172A",
+      "destructive": "#EF4444",
+      "destructive_foreground": "#FFFFFF",
+      "border": "#E2E8F0",
+      "input": "#E2E8F0",
+      "ring": "#4F46E5"
+    },
+    "dark": {
+      "background": "#09090B",
+      "foreground": "#F8FAFC",
+      "card": "#18181B",
+      "card_foreground": "#F8FAFC",
+      "popover": "#18181B",
+      "popover_foreground": "#F8FAFC",
+      "primary": "#6366F1",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#27272A",
+      "secondary_foreground": "#F8FAFC",
+      "muted": "#27272A",
+      "muted_foreground": "#94A3B8",
+      "accent": "#27272A",
+      "accent_foreground": "#F8FAFC",
+      "destructive": "#7F1D1D",
+      "destructive_foreground": "#F8FAFC",
+      "border": "#27272A",
+      "input": "#27272A",
+      "ring": "#6366F1"
+    },
+    "special": {
+      "online_indicator": "#10B981",
+      "offline_indicator": "#94A3B8",
+      "message_bubble_sent": "bg-primary text-primary-foreground",
+      "message_bubble_received": "bg-secondary text-secondary-foreground"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "sidebar": "backdrop-blur-xl bg-background/80 border-r border-border/50",
+      "modal": "backdrop-blur-2xl bg-background/90 border border-border/50 shadow-2xl",
+      "toast": "backdrop-blur-lg bg-background/90 border border-border shadow-lg"
+    },
+    "shadows": {
+      "soft": "shadow-[0_2px_10px_rgba(0,0,0,0.05)]",
+      "medium": "shadow-[0_4px_20px_rgba(0,0,0,0.08)]",
+      "glow": "shadow-[0_0_20px_rgba(79,70,229,0.3)]"
+    },
+    "borders": {
+      "subtle": "border border-border/60",
+      "active": "border-l-4 border-primary"
+    },
+    "animation": {
+      "micro_interaction": "transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]",
+      "page_transition": "animate-in fade-in slide-in-from-bottom-4 duration-500",
+      "message_pop": "animate-in zoom-in-95 fade-in duration-300"
+    }
+  },
+  "layout_strategy": {
+    "dashboard": {
+      "type": "Two-Column with Rail",
+      "structure": "grid grid-cols-[80px_350px_1fr] h-screen overflow-hidden",
+      "mobile_structure": "flex flex-col h-screen",
+      "rail": "h-full flex flex-col items-center py-6 border-r border-border bg-card/50 backdrop-blur-sm z-20",
+      "sidebar": "h-full border-r border-border bg-background/50 backdrop-blur-sm z-10",
+      "chat_area": "h-full relative bg-background/30"
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-8",
+      "message_gap": "gap-2",
+      "section_gap": "gap-8"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full px-6 py-6 font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5",
+      "ghost": "rounded-full hover:bg-accent hover:text-accent-foreground",
+      "icon": "h-10 w-10 rounded-full p-0 flex items-center justify-center hover:bg-accent transition-colors"
+    },
+    "inputs": {
+      "chat": "rounded-full border-0 bg-secondary/50 focus-visible:ring-1 focus-visible:ring-primary px-6 py-6 shadow-inner",
+      "search": "rounded-xl bg-secondary/30 border-transparent focus:bg-background transition-all"
+    },
+    "avatars": {
+      "style": "rounded-full border-2 border-background shadow-sm",
+      "sizes": {
+        "sm": "h-8 w-8",
+        "md": "h-10 w-10",
+        "lg": "h-14 w-14",
+        "xl": "h-24 w-24"
+      }
+    },
+    "cards": {
+      "style": "rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-all"
+    }
+  },
+  "assets": {
+    "images": {
+      "avatars": [
+        {
+          "url": "https://images.pexels.com/photos/8367851/pexels-photo-8367851.jpeg",
+          "alt": "Professional woman avatar",
+          "category": "user"
+        },
+        {
+          "url": "https://images.pexels.com/photos/32225469/pexels-photo-32225469.jpeg",
+          "alt": "Creative man avatar",
+          "category": "user"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1473413896661-b611b2098a19?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1Mjh8MHwxfHNlYXJjaHwzfHxkaXZlcnNlJTIwdXNlciUyMHBvcnRyYWl0cyUyMHByb2Zlc3Npb25hbHxlbnwwfHx8fDE3Njk0OTg3NzV8MA&ixlib=rb-4.1.0&q=85",
+          "alt": "Photographer avatar",
+          "category": "user"
+        }
+      ],
+      "backgrounds": [
+        {
+          "url": "https://images.unsplash.com/photo-1520073220816-469094c16514?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMHNoYXBlcyUyMG1pbmltYWwlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc2OTUyMDc2OHww&ixlib=rb-4.1.0&q=85",
+          "alt": "Abstract white texture",
+          "category": "chat_bg"
+        }
+      ]
+    },
+    "icons": {
+      "library": "lucide-react",
+      "instructions": "Use thin strokes (stroke-width={1.5}) for a refined look."
+    }
+  },
+  "universal_guidelines": [
+    "DO NOT use generic 'Messenger Blue' (#0084FF). Use the defined Electric Indigo.",
+    "DO NOT use solid backgrounds for sidebars if possible; use glassmorphism to create depth.",
+    "Ensure all interactive elements have `data-testid` attributes.",
+    "Use 'Manrope' for all headings to give a geometric, modern feel.",
+    "Implement a 'Kinetic Typography' empty state: When no chat is selected, show a large, subtle animated text saying 'SYNC' or 'CONNECT'.",
+    "Message bubbles should have a subtle 'pop' animation when they appear.",
+    "Use 'Sonner' for all toast notifications.",
+    "Dark mode is NOT just black. Use the defined 'Obsidian' (#09090B) and 'Zinc' scales.",
+    "Scrollbars should be hidden or custom styled to be very thin and subtle."
+  ],
+  "instructions_to_main_agent": "You are building 'Sync', a next-gen messaging app. Your goal is to make it feel 'weightless' and 'fluid'. Focus on the glassmorphism effects in the sidebar and the smooth transitions of message bubbles. Use the provided image URLs for avatars. Strictly follow the color palette. For the empty state in the chat window, create a visually interesting typographic composition using the brand name 'Sync'."
+}
