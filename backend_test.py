@@ -132,7 +132,7 @@ class SyncMessagingAPITester:
             f"users/search?q={query}",
             200
         )
-        return success, response.get('data', []) if success else []
+        return success, response if success else []
 
     def test_create_conversation(self, participant_ids, is_group=False, name=None):
         """Test creating a conversation"""
