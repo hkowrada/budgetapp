@@ -581,7 +581,7 @@ export const ChatPage = () => {
                               </a>
                             )}
                             {msg.message_type === 'text' && (
-                              <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                              <MessageContent content={msg.content} isMine={isMine} />
                             )}
                           </div>
                           <div className="flex items-center gap-1 mt-1 px-1">
