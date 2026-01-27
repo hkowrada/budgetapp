@@ -58,14 +58,20 @@ export const AuthPage = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(`${API_URL}/auth/forgot-password`, { email: resetEmail });
-      toast.success('Token de réinitialisation généré !');
-      // In production, the token would be sent via email
-      // For demo, we show it in the toast
+      
+      // Check if email was sent successfully or token was returned as fallback
       if (response.data.reset_token) {
-        toast.info(`Token: ${response.data.reset_token}`, { duration: 10000 });
+        // Email not configured or failed - show token
+        toast.success('Token de réinitialisation généré !');
+        toast.info(`Token: ${response.data.reset_token}`, { duration: 15000 });
         setResetToken(response.data.reset_token);
+        setResetStep(2);
+      } else {
+        // Email sent successfully
+        toast.success('Email envoyé ! Vérifiez votre boîte de réception.');
+        setResetStep(2);
+        setResetToken(''); // User will get token from email link
       }
-      setResetStep(2);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Erreur lors de la demande');
     } finally {
