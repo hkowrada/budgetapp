@@ -63,6 +63,10 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+      <Route
         path="/chat"
         element={
           <ProtectedRoute>
