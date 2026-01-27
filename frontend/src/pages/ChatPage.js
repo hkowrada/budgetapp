@@ -586,11 +586,11 @@ export const ChatPage = () => {
 
       {/* Chat Area */}
       {showChat && (
-        <div className="flex-1 flex flex-col h-full" data-testid="chat-area">
+        <div className="flex-1 flex flex-col h-full min-h-0" data-testid="chat-area">
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="h-16 px-4 flex items-center justify-between border-b border-border/50 bg-background/50 glass">
+              <div className="h-16 px-4 flex items-center justify-between border-b border-border/50 bg-background/50 glass shrink-0">
                 <div className="flex items-center gap-3">
                   {isMobileView && (
                     <Button
