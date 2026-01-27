@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-01-27T13:39:23.904689",
+  "total_tests": 14,
+  "passed_tests": 13,
+  "success_rate": 92.85714285714286,
+  "results": [
+    {
+      "name": "Root API Endpoint",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "User Registration",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Get Current User",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Search Users",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Register Second User",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Create 1-to-1 Conversation",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Send Message",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Get Messages",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Mark Messages Read",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Send Message",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Get Conversations",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Create Group Conversation",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "Send Message",
+      "success": true,
+      "details": ""
+    },
+    {
+      "name": "File Upload",
+      "success": false,
+      "details": "Expected 200, got 400. Error: File type not allowed"
+    }
+  ]
+}
