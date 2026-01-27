@@ -322,7 +322,7 @@ startxref
         
         if file_url and conversation_id:
             # Test 15: Send file message
-            self.test_send_message(conversation_id, "test.txt", "file")
+            self.test_send_message(conversation_id, "test.pdf", "file")
         
         # Print final results
         print("\n" + "=" * 50)
