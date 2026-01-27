@@ -873,8 +873,8 @@ export const ChatPage = () => {
               <Input
                 placeholder="Ajouter des participants..."
                 className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={dialogSearchQuery}
+                onChange={(e) => setDialogSearchQuery(e.target.value)}
                 data-testid="search-group-members-input"
               />
             </div>
