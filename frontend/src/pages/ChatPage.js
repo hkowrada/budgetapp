@@ -704,7 +704,7 @@ export const ChatPage = () => {
                   })}
                   <div ref={messagesEndRef} />
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Input Area */}
               <div className="p-4 border-t border-border/50 bg-background/50 glass">
