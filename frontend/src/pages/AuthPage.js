@@ -219,34 +219,6 @@ export const AuthPage = () => {
     );
   }
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await login(loginData.email, loginData.password);
-      toast.success('Bienvenue !');
-      navigate('/chat');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Échec de la connexion');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      await register(registerData.email, registerData.password, registerData.name);
-      toast.success('Compte créé avec succès !');
-      navigate('/chat');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Échec de l'inscription");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-secondary/30">
       {/* Background decoration */}
