@@ -250,20 +250,21 @@ export const ChatPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Search users
+  // Search users for dialog
   useEffect(() => {
     const searchUsers = async () => {
-      if (searchQuery.length < 2) {
+      if (dialogSearchQuery.length < 2) {
         setSearchResults([]);
         return;
       }
 
       setIsSearching(true);
       try {
-        const response = await api.get(`/users/search?q=${encodeURIComponent(searchQuery)}`);
+        const response = await api.get(`/users/search?q=${encodeURIComponent(dialogSearchQuery)}`);
         setSearchResults(response.data);
       } catch (error) {
         console.error('Search failed:', error);
+        setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
@@ -271,7 +272,7 @@ export const ChatPage = () => {
 
     const debounce = setTimeout(searchUsers, 300);
     return () => clearTimeout(debounce);
-  }, [searchQuery, api]);
+  }, [dialogSearchQuery, api]);
 
   // Send message
   const handleSendMessage = async (e) => {
