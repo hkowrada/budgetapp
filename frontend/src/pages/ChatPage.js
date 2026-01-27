@@ -707,7 +707,7 @@ export const ChatPage = () => {
               </div>
 
               {/* Input Area */}
-              <div className="p-4 border-t border-border/50 bg-background/50 glass">
+              <div className="p-4 border-t border-border/50 bg-background/50 glass shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                   <input
                     type="file"
