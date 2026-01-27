@@ -631,8 +631,8 @@ export const ChatPage = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 min-h-0">
+                <div className="space-y-4 max-w-full">
                   {messages.map((msg, index) => {
                     const isMine = msg.sender_id === user?.id;
                     const showAvatar = !isMine && (index === 0 || messages[index - 1]?.sender_id !== msg.sender_id);
@@ -640,25 +640,25 @@ export const ChatPage = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex items-end gap-2 message-bubble ${isMine ? 'justify-end' : 'justify-start'}`}
+                        className={`flex items-end gap-2 message-bubble w-full ${isMine ? 'justify-end' : 'justify-start'}`}
                         data-testid={`message-${msg.id}`}
                       >
                         {!isMine && showAvatar && (
-                          <Avatar className="w-8 h-8">
+                          <Avatar className="w-8 h-8 shrink-0">
                             <AvatarImage src={msg.sender?.avatar} />
                             <AvatarFallback className="bg-secondary text-xs">
                               {msg.sender?.name?.substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                         )}
-                        {!isMine && !showAvatar && <div className="w-8" />}
+                        {!isMine && !showAvatar && <div className="w-8 shrink-0" />}
                         
                         <div className={`max-w-[70%] ${isMine ? 'items-end' : 'items-start'} flex flex-col`}>
                           {!isMine && showAvatar && selectedConversation.is_group && (
                             <span className="text-xs text-muted-foreground mb-1 ml-1">{msg.sender?.name}</span>
                           )}
                           <div
-                            className={`rounded-2xl px-4 py-2 ${
+                            className={`rounded-2xl px-4 py-2 break-words ${
                               isMine
                                 ? 'bg-primary text-primary-foreground rounded-br-sm'
                                 : 'bg-secondary text-secondary-foreground rounded-bl-sm'
