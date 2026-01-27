@@ -30,6 +30,14 @@ JWT_SECRET = os.environ.get('JWT_SECRET', 'sync-messaging-secret-key-2024')
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
+# Resend email settings
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
 # Create the main app
 app = FastAPI()
 
