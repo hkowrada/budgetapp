@@ -343,7 +343,8 @@ export const ChatPage = () => {
       setShowNewGroup(false);
       setGroupName('');
       setSelectedUsers([]);
-      setSearchQuery('');
+      setDialogSearchQuery('');
+      setSearchResults([]);
       toast.success('Groupe créé !');
     } catch (error) {
       toast.error('Échec de la création du groupe');
