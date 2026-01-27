@@ -318,6 +318,15 @@ export const AuthPage = () => {
                     {isLoading ? 'Connexion...' : 'Se connecter'}
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="w-full text-sm text-muted-foreground"
+                    onClick={() => setShowForgotPassword(true)}
+                    data-testid="forgot-password-link"
+                  >
+                    Mot de passe oublié ?
+                  </Button>
                 </form>
               </TabsContent>
 
