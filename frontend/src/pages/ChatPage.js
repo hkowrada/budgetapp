@@ -631,7 +631,7 @@ export const ChatPage = () => {
               </div>
 
               {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
+              <div className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-4">
                   {messages.map((msg, index) => {
                     const isMine = msg.sender_id === user?.id;
