@@ -825,7 +825,7 @@ export const ChatPage = () => {
                     </button>
                   ))}
                 </div>
-              ) : searchQuery.length >= 2 ? (
+              ) : dialogSearchQuery.length >= 2 ? (
                 <p className="text-center py-8 text-muted-foreground">Aucun utilisateur trouvé</p>
               ) : (
                 <p className="text-center py-8 text-muted-foreground">
