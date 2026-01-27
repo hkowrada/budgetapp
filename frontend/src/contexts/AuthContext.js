@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -10,22 +10,27 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('sync_token'));
   const [loading, setLoading] = useState(true);
 
-  const api = axios.create({
-    baseURL: API_URL,
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
-  });
-
-  // Update axios headers when token changes
-  useEffect(() => {
-    if (token) {
-      api.defaults.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete api.defaults.headers.Authorization;
-    }
-  }, [token, api.defaults.headers]);
+  // Create API instance that updates when token changes
+  const api = useMemo(() => {
+    const instance = axios.create({
+      baseURL: API_URL,
+    });
+    
+    // Add token to all requests
+    instance.interceptors.request.use((config) => {
+      const currentToken = localStorage.getItem('sync_token');
+      if (currentToken) {
+        config.headers.Authorization = `Bearer ${currentToken}`;
+      }
+      return config;
+    });
+    
+    return instance;
+  }, []);
 
   const fetchUser = useCallback(async () => {
-    if (!token) {
+    const currentToken = localStorage.getItem('sync_token');
+    if (!currentToken) {
       setLoading(false);
       return;
     }
@@ -41,14 +46,14 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [token, api]);
+  }, [api]);
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
   const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
     const { access_token, user: userData } = response.data;
     localStorage.setItem('sync_token', access_token);
     setToken(access_token);
@@ -57,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (email, password, name) => {
-    const response = await api.post('/auth/register', { email, password, name });
+    const response = await axios.post(`${API_URL}/auth/register`, { email, password, name });
     const { access_token, user: userData } = response.data;
     localStorage.setItem('sync_token', access_token);
     setToken(access_token);
@@ -69,7 +74,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('sync_token');
     setToken(null);
     setUser(null);
-    // Force redirect to auth
     window.location.href = '/auth';
   };
 
