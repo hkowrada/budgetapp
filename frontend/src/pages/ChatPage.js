@@ -793,8 +793,8 @@ export const ChatPage = () => {
               <Input
                 placeholder="Rechercher un utilisateur..."
                 className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={dialogSearchQuery}
+                onChange={(e) => setDialogSearchQuery(e.target.value)}
                 data-testid="search-user-input"
               />
             </div>
