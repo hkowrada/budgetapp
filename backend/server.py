@@ -104,6 +104,17 @@ class MessageResponse(BaseModel):
 class AddParticipantsRequest(BaseModel):
     user_ids: List[str]
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
 # ==================== UTILITIES ====================
 
 def hash_password(password: str) -> str:
@@ -235,6 +246,86 @@ async def login(credentials: UserLogin):
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     return UserResponse(**current_user)
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(data: ForgotPasswordRequest):
+    """Generate a password reset token"""
+    user = await db.users.find_one({"email": data.email})
+    if not user:
+        # Don't reveal if email exists or not for security
+        return {"message": "Si cet email existe, un lien de réinitialisation a été généré"}
+    
+    # Generate reset token (valid for 1 hour)
+    reset_token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    await db.password_resets.delete_many({"user_id": user["id"]})  # Remove old tokens
+    await db.password_resets.insert_one({
+        "token": reset_token,
+        "user_id": user["id"],
+        "email": data.email,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # In production, send email with reset link
+    # For now, return the token directly (for testing)
+    logger.info(f"Password reset token generated for {data.email}: {reset_token}")
+    
+    return {
+        "message": "Token de réinitialisation généré",
+        "reset_token": reset_token,  # Remove this in production - send via email instead
+        "expires_in": "1 hour"
+    }
+
+@api_router.post("/auth/reset-password")
+async def reset_password(data: ResetPasswordRequest):
+    """Reset password using token"""
+    reset_record = await db.password_resets.find_one({"token": data.token}, {"_id": 0})
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Token invalide ou expiré")
+    
+    # Check if token expired
+    expires_at = datetime.fromisoformat(reset_record["expires_at"])
+    if datetime.now(timezone.utc) > expires_at:
+        await db.password_resets.delete_one({"token": data.token})
+        raise HTTPException(status_code=400, detail="Token expiré")
+    
+    # Validate password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Le mot de passe doit contenir au moins 6 caractères")
+    
+    # Update password
+    hashed_password = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": reset_record["user_id"]},
+        {"$set": {"password": hashed_password}}
+    )
+    
+    # Delete used token
+    await db.password_resets.delete_one({"token": data.token})
+    
+    return {"message": "Mot de passe réinitialisé avec succès"}
+
+@api_router.post("/auth/change-password")
+async def change_password(data: ChangePasswordRequest, current_user: dict = Depends(get_current_user)):
+    """Change password for authenticated user"""
+    user = await db.users.find_one({"id": current_user["id"]})
+    
+    if not verify_password(data.current_password, user["password"]):
+        raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect")
+    
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Le nouveau mot de passe doit contenir au moins 6 caractères")
+    
+    hashed_password = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"password": hashed_password}}
+    )
+    
+    return {"message": "Mot de passe modifié avec succès"}
 
 # ==================== USER ENDPOINTS ====================
 
