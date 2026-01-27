@@ -6,6 +6,7 @@ import { WebSocketProvider } from './contexts/WebSocketContext';
 import { Toaster } from './components/ui/sonner';
 import AuthPage from './pages/AuthPage';
 import ChatPage from './pages/ChatPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import './App.css';
 
 // Protected Route Component
