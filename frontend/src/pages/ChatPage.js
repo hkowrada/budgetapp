@@ -34,8 +34,110 @@ import {
   Check,
   CheckCheck,
   MoreVertical,
-  UserPlus
+  UserPlus,
+  ExternalLink
 } from 'lucide-react';
+
+// Component to detect and render image URLs in messages
+const MessageContent = ({ content, isMine }) => {
+  // Regex to detect image URLs
+  const imageUrlRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\s]*)?)/gi;
+  // Regex to detect general URLs
+  const urlRegex = /(https?:\/\/[^\s]+)/gi;
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  // Find all image URLs
+  const imageMatches = [];
+  while ((match = imageUrlRegex.exec(content)) !== null) {
+    imageMatches.push({ url: match[0], index: match.index, isImage: true });
+  }
+  
+  // Reset regex
+  imageUrlRegex.lastIndex = 0;
+  
+  // If there are image URLs, render them as images
+  if (imageMatches.length > 0) {
+    imageMatches.forEach((imgMatch, i) => {
+      // Add text before the image
+      if (imgMatch.index > lastIndex) {
+        const textBefore = content.slice(lastIndex, imgMatch.index);
+        if (textBefore.trim()) {
+          parts.push(
+            <p key={`text-${i}`} className="text-sm whitespace-pre-wrap break-words mb-2">
+              {textBefore}
+            </p>
+          );
+        }
+      }
+      
+      // Add the image
+      parts.push(
+        <div key={`img-${i}`} className="my-2">
+          <img
+            src={imgMatch.url}
+            alt="Shared image"
+            className="max-w-full rounded-lg max-h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => window.open(imgMatch.url, '_blank')}
+            onError={(e) => {
+              // If image fails to load, show as link instead
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+          <a
+            href={imgMatch.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-2 text-sm underline opacity-80 hover:opacity-100"
+          >
+            <ExternalLink className="w-3 h-3" />
+            {imgMatch.url.length > 40 ? imgMatch.url.substring(0, 40) + '...' : imgMatch.url}
+          </a>
+        </div>
+      );
+      
+      lastIndex = imgMatch.index + imgMatch.url.length;
+    });
+    
+    // Add remaining text after last image
+    if (lastIndex < content.length) {
+      const textAfter = content.slice(lastIndex);
+      if (textAfter.trim()) {
+        parts.push(
+          <p key="text-end" className="text-sm whitespace-pre-wrap break-words">
+            {textAfter}
+          </p>
+        );
+      }
+    }
+    
+    return <div>{parts}</div>;
+  }
+  
+  // No image URLs, just render text with clickable links
+  const textWithLinks = content.split(urlRegex).map((part, i) => {
+    if (urlRegex.test(part)) {
+      urlRegex.lastIndex = 0;
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`underline ${isMine ? 'text-primary-foreground/90 hover:text-primary-foreground' : 'text-primary hover:text-primary/80'}`}
+        >
+          {part.length > 50 ? part.substring(0, 50) + '...' : part}
+        </a>
+      );
+    }
+    return part;
+  });
+  
+  return <p className="text-sm whitespace-pre-wrap break-words">{textWithLinks}</p>;
+};
 
 export const ChatPage = () => {
   const { user, logout, api } = useAuth();
