@@ -785,14 +785,19 @@ export const ChatPage = () => {
                             )}
                           </div>
                           <div className="flex items-center gap-1 mt-1 px-1">
+                            <Ghost className="w-3 h-3 text-amber-500 ghost-icon" title="Disparaît après lecture" />
                             <span className="text-[10px] text-muted-foreground mono">
                               {formatTime(msg.created_at)}
                             </span>
                             {isMine && (
                               msg.read_by?.length > 1 ? (
-                                <CheckCheck className="w-3 h-3 text-primary" />
+                                <span className="flex items-center text-primary" title="Lu - sera supprimé">
+                                  <Eye className="w-3 h-3" />
+                                </span>
                               ) : (
-                                <Check className="w-3 h-3 text-muted-foreground" />
+                                <span className="flex items-center text-muted-foreground" title="Non lu">
+                                  <EyeOff className="w-3 h-3" />
+                                </span>
                               )
                             )}
                           </div>
