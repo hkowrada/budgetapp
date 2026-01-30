@@ -707,6 +707,7 @@ async def get_messages(conversation_id: str, limit: int = 50, before: Optional[s
 
 @api_router.post("/messages/{conversation_id}/read")
 async def mark_messages_read(conversation_id: str, current_user: dict = Depends(get_current_user)):
+    """Mark messages as read and delete them if read by all participants (Snapchat mode)"""
     # Verify user is part of conversation
     conv = await db.conversations.find_one(
         {"id": conversation_id, "participant_ids": current_user["id"]},
@@ -716,6 +717,7 @@ async def mark_messages_read(conversation_id: str, current_user: dict = Depends(
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
     
+    # Mark messages as read
     await db.messages.update_many(
         {
             "conversation_id": conversation_id,
@@ -724,7 +726,49 @@ async def mark_messages_read(conversation_id: str, current_user: dict = Depends(
         {"$addToSet": {"read_by": current_user["id"]}}
     )
     
-    return {"message": "Messages marked as read"}
+    # Snapchat mode: Delete messages that have been read by ALL participants
+    participant_count = len(conv.get("participant_ids", []))
+    
+    # Find messages read by everyone and delete them
+    messages_to_delete = await db.messages.find({
+        "conversation_id": conversation_id,
+        "$expr": {"$gte": [{"$size": "$read_by"}, participant_count]}
+    }, {"_id": 0, "id": 1}).to_list(1000)
+    
+    deleted_count = 0
+    if messages_to_delete:
+        message_ids = [m["id"] for m in messages_to_delete]
+        result = await db.messages.delete_many({"id": {"$in": message_ids}})
+        deleted_count = result.deleted_count
+        
+        # Also delete associated files
+        for msg_id in message_ids:
+            # Clean up uploaded files if any
+            pass
+        
+        logger.info(f"Snapchat mode: Deleted {deleted_count} messages from conversation {conversation_id}")
+        
+        # Notify other participants about message deletion via WebSocket
+        ws_message = {
+            "type": "messages_deleted",
+            "conversation_id": conversation_id,
+            "message_ids": message_ids
+        }
+        await manager.broadcast_to_conversation(conversation_id, ws_message)
+    
+    # Update conversation's last_message to None if all messages deleted
+    remaining_messages = await db.messages.count_documents({"conversation_id": conversation_id})
+    if remaining_messages == 0:
+        await db.conversations.update_one(
+            {"id": conversation_id},
+            {"$set": {"last_message": None}}
+        )
+    
+    return {
+        "message": "Messages marked as read",
+        "deleted_count": deleted_count,
+        "snapchat_mode": True
+    }
 
 # ==================== FILE UPLOAD ====================
 
