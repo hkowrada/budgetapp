@@ -35,7 +35,11 @@ import {
   CheckCheck,
   MoreVertical,
   UserPlus,
-  ExternalLink
+  ExternalLink,
+  Ghost,
+  Eye,
+  EyeOff,
+  ShieldAlert
 } from 'lucide-react';
 
 // Component to detect and render image URLs in messages
