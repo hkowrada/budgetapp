@@ -163,10 +163,70 @@ export const ChatPage = () => {
   const [typingUsers, setTypingUsers] = useState({});
   const [uploadingFile, setUploadingFile] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+  const [deletingMessages, setDeletingMessages] = useState(new Set());
+  const [isWindowActive, setIsWindowActive] = useState(true);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef({});
+
+  // Anti-screenshot: Blur content when window loses focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsWindowActive(false);
+        document.body.classList.add('window-inactive');
+      } else {
+        setIsWindowActive(true);
+        document.body.classList.remove('window-inactive');
+      }
+    };
+
+    const handleBlur = () => {
+      setIsWindowActive(false);
+      document.body.classList.add('window-inactive');
+    };
+
+    const handleFocus = () => {
+      setIsWindowActive(true);
+      document.body.classList.remove('window-inactive');
+    };
+
+    // Prevent right-click context menu
+    const handleContextMenu = (e) => {
+      if (e.target.closest('.protected-content')) {
+        e.preventDefault();
+        toast.error('📸 Screenshots non autorisés !', { duration: 2000 });
+      }
+    };
+
+    // Detect print screen attempts
+    const handleKeyDown = (e) => {
+      if (e.key === 'PrintScreen' || 
+          (e.ctrlKey && e.shiftKey && e.key === 'S') ||
+          (e.metaKey && e.shiftKey && e.key === '3') ||
+          (e.metaKey && e.shiftKey && e.key === '4')) {
+        e.preventDefault();
+        toast.error('📸 Screenshots non autorisés !', { duration: 2000 });
+        document.body.classList.add('window-inactive');
+        setTimeout(() => document.body.classList.remove('window-inactive'), 500);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Handle responsive view
   useEffect(() => {
