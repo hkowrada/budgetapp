@@ -1,5 +1,41 @@
 /* Sync Messaging App Styles */
 
+/* ==================== ANTI-SCREENSHOT PROTECTION ==================== */
+
+/* Prevent text selection */
+.no-screenshot {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Blur content when window loses focus (screenshot attempt) */
+.blur-on-inactive:not(:focus-within) {
+  filter: blur(10px);
+  transition: filter 0.1s;
+}
+
+body.window-inactive .protected-content {
+  filter: blur(20px) !important;
+  transition: filter 0.05s;
+}
+
+/* Prevent dragging images */
+.protected-content img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Disable context menu styling */
+.no-context-menu {
+  -webkit-touch-callout: none;
+}
+
+/* ==================== END ANTI-SCREENSHOT ==================== */
+
 /* Animations */
 @keyframes spin {
   from {
@@ -52,4 +88,36 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Snapchat-style disappearing message indicator */
+@keyframes fade-out-message {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.message-disappearing {
+  animation: fade-out-message 2s ease-out forwards;
+}
+
+/* Snapchat ghost icon animation */
+@keyframes ghost-float {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
+
+.ghost-icon {
+  animation: ghost-float 2s ease-in-out infinite;
 }

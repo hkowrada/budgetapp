@@ -35,7 +35,11 @@ import {
   CheckCheck,
   MoreVertical,
   UserPlus,
-  ExternalLink
+  ExternalLink,
+  Ghost,
+  Eye,
+  EyeOff,
+  ShieldAlert
 } from 'lucide-react';
 
 // Component to detect and render image URLs in messages
@@ -159,10 +163,70 @@ export const ChatPage = () => {
   const [typingUsers, setTypingUsers] = useState({});
   const [uploadingFile, setUploadingFile] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+  const [deletingMessages, setDeletingMessages] = useState(new Set());
+  const [isWindowActive, setIsWindowActive] = useState(true);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef({});
+
+  // Anti-screenshot: Blur content when window loses focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsWindowActive(false);
+        document.body.classList.add('window-inactive');
+      } else {
+        setIsWindowActive(true);
+        document.body.classList.remove('window-inactive');
+      }
+    };
+
+    const handleBlur = () => {
+      setIsWindowActive(false);
+      document.body.classList.add('window-inactive');
+    };
+
+    const handleFocus = () => {
+      setIsWindowActive(true);
+      document.body.classList.remove('window-inactive');
+    };
+
+    // Prevent right-click context menu
+    const handleContextMenu = (e) => {
+      if (e.target.closest('.protected-content')) {
+        e.preventDefault();
+        toast.error('📸 Screenshots non autorisés !', { duration: 2000 });
+      }
+    };
+
+    // Detect print screen attempts
+    const handleKeyDown = (e) => {
+      if (e.key === 'PrintScreen' || 
+          (e.ctrlKey && e.shiftKey && e.key === 'S') ||
+          (e.metaKey && e.shiftKey && e.key === '3') ||
+          (e.metaKey && e.shiftKey && e.key === '4')) {
+        e.preventDefault();
+        toast.error('📸 Screenshots non autorisés !', { duration: 2000 });
+        document.body.classList.add('window-inactive');
+        setTimeout(() => document.body.classList.remove('window-inactive'), 500);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Handle responsive view
   useEffect(() => {
@@ -213,7 +277,7 @@ export const ChatPage = () => {
         // Update messages if in the same conversation
         if (selectedConversation?.id === newMsg.conversation_id) {
           setMessages(prev => [...prev, newMsg]);
-          // Mark as read
+          // Mark as read (will trigger deletion in Snapchat mode)
           api.post(`/messages/${newMsg.conversation_id}/read`).catch(console.error);
         }
         
@@ -238,6 +302,27 @@ export const ChatPage = () => {
             [conversation_id]: (prev[conversation_id] || []).filter(id => id !== user_id)
           }));
         }, 3000);
+      } else if (message.type === 'messages_deleted') {
+        // Snapchat mode: Remove deleted messages from UI
+        const { conversation_id, message_ids } = message;
+        
+        if (selectedConversation?.id === conversation_id) {
+          // Animate deletion
+          setDeletingMessages(prev => new Set([...prev, ...message_ids]));
+          
+          // Remove after animation
+          setTimeout(() => {
+            setMessages(prev => prev.filter(m => !message_ids.includes(m.id)));
+            setDeletingMessages(prev => {
+              const newSet = new Set(prev);
+              message_ids.forEach(id => newSet.delete(id));
+              return newSet;
+            });
+          }, 2000);
+        }
+        
+        // Refresh conversations
+        fetchConversations();
       }
     };
 
@@ -635,16 +720,25 @@ export const ChatPage = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 min-h-0">
+              <div className="flex-1 overflow-y-auto p-4 min-h-0 protected-content no-screenshot" onContextMenu={(e) => e.preventDefault()}>
+                {/* Snapchat mode indicator */}
+                <div className="flex items-center justify-center mb-4">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs">
+                    <Ghost className="w-3 h-3 ghost-icon" />
+                    <span>Mode Snapchat : Messages auto-supprimés après lecture</span>
+                  </div>
+                </div>
+                
                 <div className="space-y-4 max-w-full">
                   {messages.map((msg, index) => {
                     const isMine = msg.sender_id === user?.id;
                     const showAvatar = !isMine && (index === 0 || messages[index - 1]?.sender_id !== msg.sender_id);
+                    const isDeleting = deletingMessages.has(msg.id);
 
                     return (
                       <div
                         key={msg.id}
-                        className={`flex items-end gap-2 message-bubble w-full ${isMine ? 'justify-end' : 'justify-start'}`}
+                        className={`flex items-end gap-2 message-bubble w-full ${isMine ? 'justify-end' : 'justify-start'} ${isDeleting ? 'message-disappearing' : ''}`}
                         data-testid={`message-${msg.id}`}
                       >
                         {!isMine && showAvatar && (
@@ -662,7 +756,7 @@ export const ChatPage = () => {
                             <span className="text-xs text-muted-foreground mb-1 ml-1">{msg.sender?.name}</span>
                           )}
                           <div
-                            className={`rounded-2xl px-4 py-2 break-words ${
+                            className={`rounded-2xl px-4 py-2 break-words relative ${
                               isMine
                                 ? 'bg-primary text-primary-foreground rounded-br-sm'
                                 : 'bg-secondary text-secondary-foreground rounded-bl-sm'
@@ -691,14 +785,19 @@ export const ChatPage = () => {
                             )}
                           </div>
                           <div className="flex items-center gap-1 mt-1 px-1">
+                            <Ghost className="w-3 h-3 text-amber-500 ghost-icon" title="Disparaît après lecture" />
                             <span className="text-[10px] text-muted-foreground mono">
                               {formatTime(msg.created_at)}
                             </span>
                             {isMine && (
                               msg.read_by?.length > 1 ? (
-                                <CheckCheck className="w-3 h-3 text-primary" />
+                                <span className="flex items-center text-primary" title="Lu - sera supprimé">
+                                  <Eye className="w-3 h-3" />
+                                </span>
                               ) : (
-                                <Check className="w-3 h-3 text-muted-foreground" />
+                                <span className="flex items-center text-muted-foreground" title="Non lu">
+                                  <EyeOff className="w-3 h-3" />
+                                </span>
                               )
                             )}
                           </div>
@@ -760,16 +859,19 @@ export const ChatPage = () => {
           ) : (
             /* Empty State */
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-              <div className="relative">
-                <h1 className="text-8xl font-extrabold tracking-tighter text-primary/10 float-animation select-none">
-                  SYNC
-                </h1>
-                <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-medium">
-                  Sélectionnez une conversation
-                </p>
+              <div className="relative mb-6">
+                <Ghost className="w-24 h-24 text-primary/20 ghost-icon" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">Mode Snapchat</h2>
+              <p className="text-center text-muted-foreground max-w-sm mb-2">
+                Les messages disparaissent automatiquement après lecture
+              </p>
+              <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 mb-6">
+                <ShieldAlert className="w-4 h-4" />
+                <span>Captures d'écran non autorisées</span>
               </div>
               <Button
-                className="mt-8 rounded-full"
+                className="rounded-full"
                 onClick={() => setShowNewChat(true)}
                 data-testid="start-chat-button"
               >
