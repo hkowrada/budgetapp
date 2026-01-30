@@ -277,7 +277,7 @@ export const ChatPage = () => {
         // Update messages if in the same conversation
         if (selectedConversation?.id === newMsg.conversation_id) {
           setMessages(prev => [...prev, newMsg]);
-          // Mark as read
+          // Mark as read (will trigger deletion in Snapchat mode)
           api.post(`/messages/${newMsg.conversation_id}/read`).catch(console.error);
         }
         
@@ -302,6 +302,27 @@ export const ChatPage = () => {
             [conversation_id]: (prev[conversation_id] || []).filter(id => id !== user_id)
           }));
         }, 3000);
+      } else if (message.type === 'messages_deleted') {
+        // Snapchat mode: Remove deleted messages from UI
+        const { conversation_id, message_ids } = message;
+        
+        if (selectedConversation?.id === conversation_id) {
+          // Animate deletion
+          setDeletingMessages(prev => new Set([...prev, ...message_ids]));
+          
+          // Remove after animation
+          setTimeout(() => {
+            setMessages(prev => prev.filter(m => !message_ids.includes(m.id)));
+            setDeletingMessages(prev => {
+              const newSet = new Set(prev);
+              message_ids.forEach(id => newSet.delete(id));
+              return newSet;
+            });
+          }, 2000);
+        }
+        
+        // Refresh conversations
+        fetchConversations();
       }
     };
 
