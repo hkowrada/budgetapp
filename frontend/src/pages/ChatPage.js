@@ -859,16 +859,19 @@ export const ChatPage = () => {
           ) : (
             /* Empty State */
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-              <div className="relative">
-                <h1 className="text-8xl font-extrabold tracking-tighter text-primary/10 float-animation select-none">
-                  SYNC
-                </h1>
-                <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-medium">
-                  Sélectionnez une conversation
-                </p>
+              <div className="relative mb-6">
+                <Ghost className="w-24 h-24 text-primary/20 ghost-icon" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight mb-2">Mode Snapchat</h2>
+              <p className="text-center text-muted-foreground max-w-sm mb-2">
+                Les messages disparaissent automatiquement après lecture
+              </p>
+              <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 mb-6">
+                <ShieldAlert className="w-4 h-4" />
+                <span>Captures d'écran non autorisées</span>
               </div>
               <Button
-                className="mt-8 rounded-full"
+                className="rounded-full"
                 onClick={() => setShowNewChat(true)}
                 data-testid="start-chat-button"
               >
